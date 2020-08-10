@@ -1,3 +1,7 @@
 ve
-config/settings.py
 __pycache__
+
+
+config/settings.py
+notes.md
+current_files.txt
