@@ -11,52 +11,59 @@ from bokeh.plotting import figure, curdoc
 from bokeh.transform import dodge, cumsum
 
 
+sectors = [
+    "Residential",
+    "Commercial/Industrial",
+    "Mobile-Highway",
+    "Mobile-Transit",
+    "Mobile-Aviation",
+    "Mobile-Other",
+    "Non-Energy",
+]
+
 # Implied National Emissions rate from NG Transmission, Storage, Distribution (fugitive emissions in MMTCO2e/million CF)
 MMTCO2ePerMillionCFNG_CH4 = 0.00000169
 MMTCO2ePerMillionCFNG_CO2 = 0.000000004
 
 # 2015 GHG Inventory Total Emissions (MMTCO2E)
-Residential2015 = 15.37
-ComInd2015 = 27.96  # non-residential/commercial & industrial
-MobHighway2015 = 17.94
-MobTransit2015 = 0.18
-MobAviation2015 = 3.90
-MobOther2015 = 1.12  # includes freight & intercity rail, marine & port-related, off-road vehicles and equipment
-Ag2015 = 0.41  # agriculture
-Waste2015 = 2.01  # landfills
-WasteWater2015 = 0.49
-IP2015 = 5.52  # Includes Hydrogen production, iron & steel production, industrial wastewater treatment, ODS substitutes, and petroleum refining
-UrbanTrees2015 = -1.025
-ForestSequestration2015 = -1.109
-ForestLossGain2015 = 0.380
+GHG_RES = 15.37
+GHG_CI = 27.96  # non-residential/commercial & industrial
+GHG_HIGHWAY = 17.94
+GHG_TRANSIT = 0.18
+GHG_AVIATION = 3.90
+GHG_OTHER_MOBILE = 1.12  # includes freight & intercity rail, marine & port-related, off-road vehicles and equipment
+GHG_AG = 0.41  # agriculture
+GHG_SOLID_WASTE = 2.01  # landfills
+GHG_WASTEWATER = 0.49
+GHG_IP = 5.52  # Includes Hydrogen production, iron & steel production, industrial wastewater treatment, ODS substitutes, and petroleum refining
+GHG_URBAN_TREES = -1.025
+GHG_FORESTS = -1.109
+GHG_FOREST_CHANGE = 0.380
 ResNGCon2015 = 115884601.50 / 1000  # NG Consumpton 2015 (million CF)
 ComIndNGCon2015 = 139139475 / 1000  # NG Consumpton 2015 (million CF)
 NonEnergy2015 = (
-    Ag2015
-    + Waste2015
-    + WasteWater2015
-    + IP2015
-    + UrbanTrees2015
-    + ForestSequestration2015
-    + ForestLossGain2015
+    GHG_AG
+    + GHG_SOLID_WASTE
+    + GHG_WASTEWATER
+    + GHG_IP
+    + GHG_URBAN_TREES
+    + GHG_FORESTS
+    + GHG_FOREST_CHANGE
     + (ResNGCon2015 + ComIndNGCon2015) * (MMTCO2ePerMillionCFNG_CH4 + MMTCO2ePerMillionCFNG_CO2)
 )
 
 # Demographics
-UrbanPop2015 = 1691830
+URBAN_POP = 1691830
+SUBURBAN_POP = 3693658
+RURAL_POP = 332445
+POP = URBAN_POP + SUBURBAN_POP + RURAL_POP
+pop_factor = 0
+urban_pop_percent = URBAN_POP / POP * 100
+suburban_pop_percent = SUBURBAN_POP / POP * 100
+rural_pop_percent = RURAL_POP / POP * 100
 
-SuburbanPop2015 = 3693658
-
-RuralPop2015 = 332445
-
-Population = UrbanPop2015 + SuburbanPop2015 + RuralPop2015
-
-PopFactor = 0
-PerUrbanPop = UrbanPop2015 / Population * 100
-PerSuburbanPop = SuburbanPop2015 / Population * 100
-PerRuralPop = RuralPop2015 / Population * 100
-
-# Average Emissions pr MWh of fossil fuels from eGRID 2014/2016 for RFCE (Future reference - should we pull plant-level data for this?)
+# Average Emissions pr MWh of fossil fuels from eGRID 2014/2016 for RFCE
+# NOTE: Future reference - should we pull plant-level data for this?)
 LB_CO2e_MWh_Coal = (2169.484351 + 2225.525) / 2
 LB_CO2e_MWh_Oil = (1600.098812 + 1341.468) / 2
 LB_CO2e_MWh_NG = (929.651872 + 897.037) / 2
@@ -66,17 +73,17 @@ LB_CO2e_MWh_OtherFos = (1488.036692 + 1334.201) / 2
 PerCombCapture = 0
 
 # Electricity Mix from 2015 inventory
-PerCoal = 20.47
-PerOil = 0.47
-PerNG = 34.38
-PerOtherFos = 0.46
-PerBio = 1.59
-PerHydro = 1.06
-PerNuclear = 40.10
-PerWind = 1.16
-PerSolar = 0.30
-PerGeo = 0.00
-GridLoss = 0.047287092
+grid_coal = 20.47
+grid_oil = 0.47
+grid_ng = 34.38
+grid_other_ff = 0.46
+grid_bio = 1.59
+grid_hydro = 1.06
+grid_nuclear = 40.10
+grid_wind = 1.16
+grid_solar = 0.30
+grid_geo = 0.00
+GRID_LOSS = 0.047287092
 
 MMTCO2e_ThBarrel_FOKer = 0.000428929
 MMTCO2e_ThBarrel_LPG = 0.000219762
@@ -85,11 +92,9 @@ LB_CO2e_MCF_NG = 123.0744706
 MMTperLB = 0.00000000045359
 ThBarrelperGallon = 1 / 42000
 MCFperCCF = 0.1
-CFperCCF = 100
 MillionCFperCF = 0.000001
 GalperBarrel = 42
 kWhperMWh = 1000
-BTUPerBBtu = 1000000000
 MMTperMT = 0.000001
 
 # Btu Conversions
@@ -97,8 +102,7 @@ BTUperkWh = 3412
 BTUperMWh = BTUperkWh * kWhperMWh
 BTUperCFPA = 1048
 BTUperCFNJ = 1050
-BTUperCFavg = mean([BTUperCFPA, BTUperCFNJ])
-BTUperCCF = BTUperCFavg * CFperCCF
+BTUperCCF = mean([BTUperCFPA, BTUperCFNJ]) * 100
 BTUperBarrelFOKer = 5770000
 BTUperGallonFOKer = BTUperBarrelFOKer * (1 / GalperBarrel)
 BTUperBarrelLPG = 3540000
@@ -672,7 +676,6 @@ ComIndPetCokeBBtu = 15067.33
 ComIndStillGasBBtu = 25628.52
 ComIndSpecialNaphthasBBtu = 73.71
 
-
 ComIndElecBBtuUsed = ComIndElecBBtu * PerEnergyToUseComIndElec / 100
 ComIndNGBBtuUsed = ComIndNGBBtu * PerEnergyToUseComIndNG / 100
 ComIndCoalBBtuUsed = ComIndCoalBBtu * PerEnergyToUseComIndCoal / 100
@@ -765,13 +768,13 @@ TransRailSuburbanPerCapDiesel = 0.1138  # gallons/person
 TransRailRuralPerCapDiesel = 0.0368  # gallons/person
 
 TransRailUrbanBTUPerCapDiesel = (
-    TransRailUrbanPerCapDiesel * ThBarrelperGallon * TransRailBBtuPerThBarrelDiesel * BTUPerBBtu
+    TransRailUrbanPerCapDiesel * ThBarrelperGallon * TransRailBBtuPerThBarrelDiesel * 1000000000
 )  # BTU/Person
 TransRailSuburbanBTUPerCapDiesel = (
-    TransRailSuburbanPerCapDiesel * ThBarrelperGallon * TransRailBBtuPerThBarrelDiesel * BTUPerBBtu
+    TransRailSuburbanPerCapDiesel * ThBarrelperGallon * TransRailBBtuPerThBarrelDiesel * 1000000000
 )  # BTU/Person
 TransRailRuralBTUPerCapDiesel = (
-    TransRailRuralPerCapDiesel * ThBarrelperGallon * TransRailBBtuPerThBarrelDiesel * BTUPerBBtu
+    TransRailRuralPerCapDiesel * ThBarrelperGallon * TransRailBBtuPerThBarrelDiesel * 1000000000
 )  # BTU/Person
 
 TransRailUrbanBTUPerCapElecMotion = TransRailUrbanBTUPerCapElec * PerEnergyToMotionRailElec / 100
@@ -810,40 +813,29 @@ TransRailRuralPerElecMotion = (
     TransRailRuralBTUPerCapElecMotion / TransRailRuralBTUPerCapMotion * 100
 )
 
-TransRailUrbanPerElectrification = TransRailUrbanPerElecMotion
-TransRailSuburbanPerElectrification = TransRailSuburbanPerElecMotion
-TransRailRuralPerElectrification = TransRailRuralPerElecMotion
+TransRailRuralPerElecMotion = TransRailRuralPerElecMotion
 
 # Mobile-Other GHG Factors
 
 # Freight Rail
 PerFreightRail = 0
-
 FreightRailElecBBtu = 0
 FreightRailDieselBBtu = 3525.18
-
 FreightRailElecBBtuMotion = FreightRailElecBBtu * PerEnergyToMotionRailElec / 100
 FreightRailDieselBBtuMotion = FreightRailDieselBBtu * PerEnergyToMotionRailDiesel / 100
 FreightRailBBtuMotion = FreightRailElecBBtuMotion + FreightRailDieselBBtuMotion
-
 FreightRailPerElecMotion = FreightRailElecBBtuMotion / FreightRailBBtuMotion * 100
-FreightRailPerElectrification = FreightRailPerElecMotion
-
 FreightRailMTCO2ePerBBtuDiesel = 74.5937203
 
 # InterCity Rail
 PerInterCityRail = 0
-
 InterCityRailElecBBtu = 319.07
 InterCityRailDieselBBtu = 24.93
-
 InterCityRailElecBBtuMotion = InterCityRailElecBBtu * PerEnergyToMotionRailElec / 100
 InterCityRailDieselBBtuMotion = InterCityRailDieselBBtu * PerEnergyToMotionRailDiesel / 100
 InterCityRailBBtuMotion = InterCityRailElecBBtuMotion + InterCityRailDieselBBtuMotion
-
 InterCityRailPerElecMotion = InterCityRailElecBBtuMotion / InterCityRailBBtuMotion * 100
 InterCityRailPerElectrification = InterCityRailPerElecMotion
-
 InterCityRailMTCO2ePerBBtuDiesel = 73.978
 
 # Marine and Port
@@ -851,27 +843,21 @@ PerEnergyToMotionMarineElec = 100
 PerEnergyToMotionMarineRFO = 50  # Calculation of Efficiencies of a Ship Power Plant Operating with Waste Heat Recovery through Combined Heat and Power Production by Mirko Grljušić 1,2,*, Vladimir Medica 3,† and Gojmir Radica 1,†
 PerEnergyToMotionMarineDFO = 50  # Calculation of Efficiencies of a Ship Power Plant Operating with Waste Heat Recovery through Combined Heat and Power Production by Mirko Grljušić 1,2,*, Vladimir Medica 3,† and Gojmir Radica 1,†
 PerMarinePort = 0
-
 MarinePortElecBBtu = 0
 MarinePortRFOBBtu = 2221.436
 MarinePortDFOBBtu = 1855.010
-
 MarinePortElecBBtuMotion = MarinePortElecBBtu * PerEnergyToMotionMarineElec / 100
 MarinePortRFOBBtuMotion = MarinePortRFOBBtu * PerEnergyToMotionMarineRFO / 100
 MarinePortDFOBBtuMotion = MarinePortDFOBBtu * PerEnergyToMotionMarineDFO / 100
 MarinePortBBtuMotion = MarinePortElecBBtuMotion + MarinePortRFOBBtuMotion + MarinePortDFOBBtuMotion
-
 MarinePortPerElecMotion = MarinePortElecBBtuMotion / MarinePortBBtuMotion * 100
 MarinePortPerRFOMotion = MarinePortRFOBBtuMotion / MarinePortBBtuMotion * 100
 MarinePortPerDFOMotion = MarinePortDFOBBtuMotion / MarinePortBBtuMotion * 100
-
 MarinePortMTCO2ePerBBtuRFO = 75.732
 MarinePortMTCO2ePerBBtuDFO = 74.581
-
 MarinePortPerFossilFuelMotion2015 = 100 - MarinePortPerElecMotion
 MarinePortPerFFRFOMotion = MarinePortPerRFOMotion / MarinePortPerFossilFuelMotion2015 * 100
 MarinePortPerFFDFOMotion = MarinePortPerDFOMotion / MarinePortPerFossilFuelMotion2015 * 100
-
 MarinePortMinPerElectrification = MarinePortPerElecMotion
 MarinePortPerElectrification = MarinePortMinPerElectrification
 
@@ -886,7 +872,6 @@ OffroadElecBBtu = 0
 OffroadMotGasBBtu = 6041.46
 OffroadDFOBBtu = 889.30
 OffroadLPGBBtu = 31.67
-
 OffroadElecBBtuMotion = OffroadElecBBtu * PerEnergyToMotionOffroadElec / 100
 OffroadMotGasBBtuMotion = OffroadMotGasBBtu * PerEnergyToMotionOffroadMotGas / 100
 OffroadDFOBBtuMotion = OffroadDFOBBtu * PerEnergyToMotionOffroadDFO / 100
@@ -894,21 +879,17 @@ OffroadLPGBBtuMotion = OffroadLPGBBtu * PerEnergyToMotionOffroadLPG / 100
 OffroadBBtuMotion = (
     OffroadElecBBtuMotion + OffroadMotGasBBtuMotion + OffroadDFOBBtuMotion + OffroadLPGBBtuMotion
 )
-
 OffroadPerElecMotion = OffroadElecBBtuMotion / OffroadBBtuMotion * 100
 OffroadPerMotGasMotion = OffroadMotGasBBtuMotion / OffroadBBtuMotion * 100
 OffroadPerDFOMotion = OffroadDFOBBtuMotion / OffroadBBtuMotion * 100
 OffroadPerLPGMotion = OffroadLPGBBtuMotion / OffroadBBtuMotion * 100
-
 OffroadMTCO2ePerBBtuMotGas = 74.05165922
 OffroadMTCO2ePerBBtuDFO = 74.20539973
 OffroadMTCO2ePerBBtuLPG = 62.05918303
-
 OffroadPerFossilFuelMotion2015 = 100 - OffroadPerElecMotion
 OffroadPerFFMotGasMotion = OffroadPerMotGasMotion / OffroadPerFossilFuelMotion2015 * 100
 OffroadPerFFDFOMotion = OffroadPerDFOMotion / OffroadPerFossilFuelMotion2015 * 100
 OffroadPerFFLPGMotion = OffroadPerLPGMotion / OffroadPerFossilFuelMotion2015 * 100
-
 OffroadMinPerElectrification = OffroadPerElecMotion
 OffroadPerElectrification = OffroadMinPerElectrification
 
@@ -922,9 +903,8 @@ PerForestCoverage = 0
 
 
 def CalcResGHG(
-    Population,
-    PopFactor,
-    PerUrbanPop,
+    pop_factor,
+    urban_pop_percent,
     UrbanBTUPerCapUsed,
     PerCapResEnergyUse,
     UrbanPerResElectrification,
@@ -1028,14 +1008,13 @@ def CalcResGHG(
     RuralPerResFFSpaceHeatingLPGUsed,
     RuralPerResFFWaterHeatingLPGUsed,
     BTUperMWh,
-    GridLoss,
-    PerCoal,
+    grid_coal,
     LB_CO2e_MWh_Coal,
-    PerOil,
+    grid_oil,
     LB_CO2e_MWh_Oil,
-    PerNG,
+    grid_ng,
     LB_CO2e_MWh_NG,
-    PerOtherFos,
+    grid_other_ff,
     LB_CO2e_MWh_OtherFos,
     MMTperLB,
     PerCombCapture,
@@ -1053,9 +1032,9 @@ def CalcResGHG(
     Begins calculating BTUs of residential energy use from urban areas.
     """
     UrbanResBTUUsed = (
-        Population
-        * (1 + PopFactor / 100)
-        * (PerUrbanPop / 100)
+        POP
+        * (1 + pop_factor / 100)
+        * (urban_pop_percent / 100)
         * UrbanBTUPerCapUsed
         * (1 + PerCapResEnergyUse / 100)
     )
@@ -1334,9 +1313,9 @@ def CalcResGHG(
 
     # Begins calculating energy use in suburban areas
     SuburbanResBTUUsed = (
-        Population
-        * (1 + PopFactor / 100)
-        * (PerSuburbanPop / 100)
+        POP
+        * (1 + pop_factor / 100)
+        * (suburban_pop_percent / 100)
         * SuburbanBTUPerCapUsed
         * (1 + PerCapResEnergyUse / 100)
     )
@@ -1621,9 +1600,9 @@ def CalcResGHG(
 
     # Begins calculating BTUs of residential energy use from rural areas
     RuralResBTUUsed = (
-        Population
-        * (1 + PopFactor / 100)
-        * (PerRuralPop / 100)
+        POP
+        * (1 + pop_factor / 100)
+        * (rural_pop_percent / 100)
         * RuralBTUPerCapUsed
         * (1 + PerCapResEnergyUse / 100)
     )
@@ -1904,13 +1883,13 @@ def CalcResGHG(
     ResElecGHG = (
         (UrbanResElecBTU + SuburbanResElecBTU + RuralResElecBTU)
         * (1 / BTUperMWh)
-        / (1 - GridLoss)
+        / (1 - GRID_LOSS)
         * (
             (
-                (PerCoal / 100 * LB_CO2e_MWh_Coal)
-                + (PerOil / 100 * LB_CO2e_MWh_Oil)
-                + (PerNG / 100 * LB_CO2e_MWh_NG)
-                + (PerOtherFos / 100 * LB_CO2e_MWh_OtherFos)
+                (grid_coal / 100 * LB_CO2e_MWh_Coal)
+                + (grid_oil / 100 * LB_CO2e_MWh_Oil)
+                + (grid_ng / 100 * LB_CO2e_MWh_NG)
+                + (grid_other_ff / 100 * LB_CO2e_MWh_OtherFos)
             )
             * MMTperLB
         )
@@ -1950,16 +1929,14 @@ def CalcComIndGHG(
     ComIndBBtuUsed,
     PerComIndEnergyUse,
     PerEnergyToUseComIndElec,
-    BTUPerBBtu,
     BTUperMWh,
-    GridLoss,
-    PerCoal,
+    grid_coal,
     LB_CO2e_MWh_Coal,
-    PerOil,
+    grid_oil,
     LB_CO2e_MWh_Oil,
-    PerNG,
+    grid_ng,
     LB_CO2e_MWh_NG,
-    PerOtherFos,
+    grid_other_ff,
     LB_CO2e_MWh_OtherFos,
     MMTperLB,
     PerCombCapture,
@@ -2006,15 +1983,15 @@ def CalcComIndGHG(
         * (1 + PerComIndEnergyUse / 100)
         * (ComIndPerElectrification / 100)
         / (PerEnergyToUseComIndElec / 100)
-        * BTUPerBBtu
+        * 1000000000
         * (1 / BTUperMWh)
-        / (1 - GridLoss)
+        / (1 - GRID_LOSS)
         * (
             (
-                (PerCoal / 100 * LB_CO2e_MWh_Coal)
-                + (PerOil / 100 * LB_CO2e_MWh_Oil)
-                + (PerNG / 100 * LB_CO2e_MWh_NG)
-                + (PerOtherFos / 100 * LB_CO2e_MWh_OtherFos)
+                (grid_coal / 100 * LB_CO2e_MWh_Coal)
+                + (grid_oil / 100 * LB_CO2e_MWh_Oil)
+                + (grid_ng / 100 * LB_CO2e_MWh_NG)
+                + (grid_other_ff / 100 * LB_CO2e_MWh_OtherFos)
             )
             * MMTperLB
         )
@@ -2149,13 +2126,12 @@ def CalcComIndGHG(
 
 
 def CalcMobHighwayGHG(
-    Population,
-    PerUrbanPop,
-    PopFactor,
+    urban_pop_percent,
+    pop_factor,
     UrbanVMTperPop,
-    PerSuburbanPop,
+    suburban_pop_percent,
     SuburbanVMTperPop,
-    PerRuralPop,
+    rural_pop_percent,
     RuralVMTperPop,
     VMTperCap,
     PerEVMT,
@@ -2163,20 +2139,20 @@ def CalcMobHighwayGHG(
     CO2eperGallonGasoline,
     MMTperLB,
     EVEff,
-    PerCoal,
+    grid_coal,
     LB_CO2e_MWh_Coal,
-    PerOil,
+    grid_oil,
     LB_CO2e_MWh_Oil,
-    PerNG,
+    grid_ng,
     LB_CO2e_MWh_NG,
-    PerOtherFos,
+    grid_other_ff,
     LB_CO2e_MWh_OtherFos,
     PerCombCapture,
 ):
     VMT = (
-        (Population * PerUrbanPop / 100 * (1 + PopFactor / 100) * UrbanVMTperPop)
-        + (Population * PerSuburbanPop / 100 * (1 + PopFactor / 100) * SuburbanVMTperPop)
-        + (Population * PerRuralPop / 100 * (1 + PopFactor / 100) * RuralVMTperPop)
+        (POP * urban_pop_percent / 100 * (1 + pop_factor / 100) * UrbanVMTperPop)
+        + (POP * suburban_pop_percent / 100 * (1 + pop_factor / 100) * SuburbanVMTperPop)
+        + (POP * rural_pop_percent / 100 * (1 + pop_factor / 100) * RuralVMTperPop)
     ) * (1 + VMTperCap / 100)
 
     EVMT = VMT * PerEVMT / 100
@@ -2185,12 +2161,12 @@ def CalcMobHighwayGHG(
         EVMT
         * EVEff
         * 0.001
-        / (1 - GridLoss)
+        / (1 - GRID_LOSS)
         * (
-            (PerCoal / 100 * LB_CO2e_MWh_Coal)
-            + (PerOil / 100 * LB_CO2e_MWh_Oil)
-            + (PerNG / 100 * LB_CO2e_MWh_NG)
-            + (PerOtherFos / 100 * LB_CO2e_MWh_OtherFos)
+            (grid_coal / 100 * LB_CO2e_MWh_Coal)
+            + (grid_oil / 100 * LB_CO2e_MWh_Oil)
+            + (grid_ng / 100 * LB_CO2e_MWh_NG)
+            + (grid_other_ff / 100 * LB_CO2e_MWh_OtherFos)
         )
         * MMTperLB
     ) * (1 - PerCombCapture / 100)
@@ -2198,81 +2174,78 @@ def CalcMobHighwayGHG(
     return MobHighwayGHG
 
 
-def CalcMobAviationGHG(MobAviation2015, PopFactor, PerAviation):
-    MobAviationGHG = MobAviation2015 * (1 + PopFactor / 100) * (1 + PerAviation / 100)
+def CalcMobAviationGHG(pop_factor, PerAviation):
+    MobAviationGHG = GHG_AVIATION * (1 + pop_factor / 100) * (1 + PerAviation / 100)
     return MobAviationGHG
 
 
 def CalcMobTransitGHG(
-    Population,
-    PopFactor,
+    pop_factor,
     BTUperMWh,
-    GridLoss,
-    PerUrbanPop,
-    TransRailUrbanPerElectrification,
-    TransRailSuburbanPerElectrification,
-    TransRailRuralPerElectrification,
+    urban_pop_percent,
+    TransRailUrbanPerElecMotion,
+    TransRailSuburbanPerElecMotion,
+    TransRailRuralPerElecMotion,
     TransRailUrbanBTUPerCapMotion,
-    PerSuburbanPop,
+    suburban_pop_percent,
     TransRailSuburbanBTUPerCapMotion,
-    PerRuralPop,
+    rural_pop_percent,
     TransRailRuralBTUPerCapMotion,
     PerEnergyToMotionRailElec,
-    PerCoal,
+    grid_coal,
     LB_CO2e_MWh_Coal,
-    PerOil,
+    grid_oil,
     LB_CO2e_MWh_Oil,
-    PerNG,
+    grid_ng,
     LB_CO2e_MWh_NG,
-    PerOtherFos,
+    grid_other_ff,
     LB_CO2e_MWh_OtherFos,
     MMTperLB,
     PerCombCapture,
     TransRailMTCO2ePerBBtuDiesel,
-    BTUPerBBtu,
     MMTperMT,
     PerEnergyToMotionRailDiesel,
     PerTransRailRidership,
 ):
-    TransRailUrbanPerDieselMotion = 100 - TransRailUrbanPerElectrification
-    TransRailSuburbanPerDieselMotion = 100 - TransRailSuburbanPerElectrification
-    TransRailRuralPerDieselMotion = 100 - TransRailRuralPerElectrification
+    TransRailUrbanPerDieselMotion = 100 - TransRailUrbanPerElecMotion
+    TransRailSuburbanPerDieselMotion = 100 - TransRailSuburbanPerElecMotion
+    TransRailRuralPerDieselMotion = 100 - TransRailRuralPerElecMotion
 
     MobTransitElecGHG = (
-        Population
-        * (1 + PopFactor / 100)
+        POP
+        * (1 + pop_factor / 100)
         * (1 / BTUperMWh)
-        / (1 - GridLoss)
+        / (1 - GRID_LOSS)
         * (
             (
-                PerUrbanPop
+                urban_pop_percent
                 / 100
                 * TransRailUrbanBTUPerCapMotion
-                * TransRailUrbanPerElectrification
+                * TransRailUrbanPerElecMotion
                 / 100
             )
             + (
-                PerSuburbanPop
+                suburban_pop_percent
                 / 100
                 * TransRailSuburbanBTUPerCapMotion
-                * TransRailSuburbanPerElectrification
+                * TransRailSuburbanPerElecMotion
                 / 100
             )
             + (
-                PerRuralPop
+                rural_pop_percent
                 / 100
                 * TransRailRuralBTUPerCapMotion
-                * TransRailRuralPerElectrification
+                * TransRailRuralPerElecMotion
                 / 100
             )
         )
         / (PerEnergyToMotionRailElec / 100)
         * (
             (
-                (PerCoal / 100 * LB_CO2e_MWh_Coal)
-                + (PerOil / 100 * LB_CO2e_MWh_Oil)
-                + (PerNG / 100 * LB_CO2e_MWh_NG)
-                + (PerOtherFos / 100 * LB_CO2e_MWh_OtherFos)
+                (grid_coal / 100 * LB_CO2e_MWh_Coal)
+                + (grid_oil / 100 * LB_CO2e_MWh_Oil)
+                + (grid_ng / 100 * LB_CO2e_MWh_NG)
+                + (grid_other_ff / 100 * LB_CO2e_MWh_OtherFos)
             )
             * MMTperLB
         )
@@ -2280,28 +2253,28 @@ def CalcMobTransitGHG(
     )
 
     MobTransitDieselGHG = (
-        Population
-        * (1 + PopFactor / 100)
+        POP
+        * (1 + pop_factor / 100)
         * TransRailMTCO2ePerBBtuDiesel
-        * (1 / BTUPerBBtu)
+        * (1 / 1000000000)
         * MMTperMT
         * (
             (
-                PerUrbanPop
+                urban_pop_percent
                 / 100
                 * TransRailUrbanBTUPerCapMotion
                 * TransRailUrbanPerDieselMotion
                 / 100
             )
             + (
-                PerSuburbanPop
+                suburban_pop_percent
                 / 100
                 * TransRailSuburbanBTUPerCapMotion
                 * TransRailSuburbanPerDieselMotion
                 / 100
             )
             + (
-                PerRuralPop
+                rural_pop_percent
                 / 100
                 * TransRailRuralBTUPerCapMotion
                 * TransRailRuralPerDieselMotion
@@ -2316,21 +2289,18 @@ def CalcMobTransitGHG(
     return MobTransitGHG
 
 
-# includes freight & intercity rail, marine & port-related, off-road vehicles and equipment
 def CalcMobOtherGHG(
     FreightRailBBtuMotion,
-    FreightRailPerElectrification,
+    FreightRailPerElecMotion,
     PerEnergyToMotionRailElec,
-    BTUPerBBtu,
     BTUperMWh,
-    GridLoss,
-    PerCoal,
+    grid_coal,
     LB_CO2e_MWh_Coal,
-    PerOil,
+    grid_oil,
     LB_CO2e_MWh_Oil,
-    PerNG,
+    grid_ng,
     LB_CO2e_MWh_NG,
-    PerOtherFos,
+    grid_other_ff,
     LB_CO2e_MWh_OtherFos,
     MMTperLB,
     PerCombCapture,
@@ -2339,7 +2309,7 @@ def CalcMobOtherGHG(
     PerEnergyToMotionRailDiesel,
     PerFreightRail,
     InterCityRailBBtuMotion,
-    InterCityRailPerElectrification,
+    InterCityRailPerElecMotion,
     InterCityRailMTCO2ePerBBtuDiesel,
     PerInterCityRail,
     MarinePortPerElectrification,
@@ -2368,21 +2338,25 @@ def CalcMobOtherGHG(
     PerEnergyToMotionOffroadLPG,
     PerOffroad,
 ):
-    FreightRailPerDieselMotion = 100 - FreightRailPerElectrification
+    """
+    Calculate GHG emissions for freight & intercity rail, marine & port-related, and off-road
+    vehicles and equipment.
+    """
+    FreightRailPerDieselMotion = 100 - FreightRailPerElecMotion
 
     FreightRailElecGHG = (
         FreightRailBBtuMotion
-        * (FreightRailPerElectrification / 100)
+        * (FreightRailPerElecMotion / 100)
         / (PerEnergyToMotionRailElec / 100)
-        * BTUPerBBtu
+        * 1000000000
         * (1 / BTUperMWh)
-        / (1 - GridLoss)
+        / (1 - GRID_LOSS)
         * (
             (
-                (PerCoal / 100 * LB_CO2e_MWh_Coal)
-                + (PerOil / 100 * LB_CO2e_MWh_Oil)
-                + (PerNG / 100 * LB_CO2e_MWh_NG)
-                + (PerOtherFos / 100 * LB_CO2e_MWh_OtherFos)
+                (grid_coal / 100 * LB_CO2e_MWh_Coal)
+                + (grid_oil / 100 * LB_CO2e_MWh_Oil)
+                + (grid_ng / 100 * LB_CO2e_MWh_NG)
+                + (grid_other_ff / 100 * LB_CO2e_MWh_OtherFos)
             )
             * MMTperLB
         )
@@ -2399,20 +2373,20 @@ def CalcMobOtherGHG(
 
     FreightRailGHG = (FreightRailElecGHG + FreightRailDieselGHG) * (1 + PerFreightRail / 100)
 
-    InterCityRailPerDieselMotion = 100 - InterCityRailPerElectrification
+    InterCityRailPerDieselMotion = 100 - InterCityRailPerElecMotion
     InterCityRailElecGHG = (
         InterCityRailBBtuMotion
-        * (InterCityRailPerElectrification / 100)
+        * (InterCityRailPerElecMotion / 100)
         / (PerEnergyToMotionRailElec / 100)
-        * BTUPerBBtu
+        * 1000000000
         * (1 / BTUperMWh)
-        / (1 - GridLoss)
+        / (1 - GRID_LOSS)
         * (
             (
-                (PerCoal / 100 * LB_CO2e_MWh_Coal)
-                + (PerOil / 100 * LB_CO2e_MWh_Oil)
-                + (PerNG / 100 * LB_CO2e_MWh_NG)
-                + (PerOtherFos / 100 * LB_CO2e_MWh_OtherFos)
+                (grid_coal / 100 * LB_CO2e_MWh_Coal)
+                + (grid_oil / 100 * LB_CO2e_MWh_Oil)
+                + (grid_ng / 100 * LB_CO2e_MWh_NG)
+                + (grid_other_ff / 100 * LB_CO2e_MWh_OtherFos)
             )
             * MMTperLB
         )
@@ -2440,15 +2414,15 @@ def CalcMobOtherGHG(
         MarinePortBBtuMotion
         * (MarinePortPerElectrification / 100)
         / (PerEnergyToMotionMarineElec / 100)
-        * BTUPerBBtu
+        * 1000000000
         * (1 / BTUperMWh)
-        / (1 - GridLoss)
+        / (1 - GRID_LOSS)
         * (
             (
-                (PerCoal / 100 * LB_CO2e_MWh_Coal)
-                + (PerOil / 100 * LB_CO2e_MWh_Oil)
-                + (PerNG / 100 * LB_CO2e_MWh_NG)
-                + (PerOtherFos / 100 * LB_CO2e_MWh_OtherFos)
+                (grid_coal / 100 * LB_CO2e_MWh_Coal)
+                + (grid_oil / 100 * LB_CO2e_MWh_Oil)
+                + (grid_ng / 100 * LB_CO2e_MWh_NG)
+                + (grid_other_ff / 100 * LB_CO2e_MWh_OtherFos)
             )
             * MMTperLB
         )
@@ -2488,15 +2462,15 @@ def CalcMobOtherGHG(
         OffroadBBtuMotion
         * (OffroadPerElectrification / 100)
         / (PerEnergyToMotionOffroadElec / 100)
-        * BTUPerBBtu
+        * 1000000000
         * (1 / BTUperMWh)
-        / (1 - GridLoss)
+        / (1 - GRID_LOSS)
         * (
             (
-                (PerCoal / 100 * LB_CO2e_MWh_Coal)
-                + (PerOil / 100 * LB_CO2e_MWh_Oil)
-                + (PerNG / 100 * LB_CO2e_MWh_NG)
-                + (PerOtherFos / 100 * LB_CO2e_MWh_OtherFos)
+                (grid_coal / 100 * LB_CO2e_MWh_Coal)
+                + (grid_oil / 100 * LB_CO2e_MWh_Oil)
+                + (grid_ng / 100 * LB_CO2e_MWh_NG)
+                + (grid_other_ff / 100 * LB_CO2e_MWh_OtherFos)
             )
             * MMTperLB
         )
@@ -2543,17 +2517,12 @@ def CalcMobOtherGHG(
 
 
 def CalcNonEnergyGHG(
-    Ag2015,
     PerAg,
-    Waste2015,
     PerWaste,
-    PopFactor,
-    WasteWater2015,
+    pop_factor,
     PerWasteWater,
-    IP2015,
     PerIP,
-    Population,
-    PerUrbanPop,
+    urban_pop_percent,
     UrbanBTUPerCapUsed,
     PerCapResEnergyUse,
     UrbanPerResElectrification,
@@ -2657,14 +2626,13 @@ def CalcNonEnergyGHG(
     RuralPerResFFSpaceHeatingLPGUsed,
     RuralPerResFFWaterHeatingLPGUsed,
     BTUperMWh,
-    GridLoss,
-    PerCoal,
+    grid_coal,
     LB_CO2e_MWh_Coal,
-    PerOil,
+    grid_oil,
     LB_CO2e_MWh_Oil,
-    PerNG,
+    grid_ng,
     LB_CO2e_MWh_NG,
-    PerOtherFos,
+    grid_other_ff,
     LB_CO2e_MWh_OtherFos,
     MMTperLB,
     PerCombCapture,
@@ -2682,29 +2650,20 @@ def CalcNonEnergyGHG(
     PerComIndEnergyUse,
     ComIndPerFFNGUsed,
     PerEnergyToUseComIndNG,
-    BTUPerBBtu,
-    CFperCCF,
     MillionCFperCF,
     MMTCO2ePerMillionCFNG_CH4,
     MMTCO2ePerMillionCFNG_CO2,
-    UrbanTrees2015,
     PerUrbanTreeCoverage,
-    ForestSequestration2015,
-    ForestLossGain2015,
     PerForestCoverage,
 ):
-    AgricultureGHG = Ag2015 * (1 + PerAg / 100)
-
-    SolidWasteGHG = Waste2015 * (1 + PerWaste / 100) * (1 + PopFactor / 100)
-
-    WasteWaterGHG = WasteWater2015 * (1 + PerWasteWater / 100) * (1 + PopFactor / 100)
-
-    IndProcGHG = IP2015 * (1 + PerIP / 100)
+    AgricultureGHG = GHG_AG * (1 + PerAg / 100)
+    SolidWasteGHG = GHG_SOLID_WASTE * (1 + PerWaste / 100) * (1 + pop_factor / 100)
+    WasteWaterGHG = GHG_WASTEWATER * (1 + PerWasteWater / 100) * (1 + pop_factor / 100)
+    IndProcGHG = GHG_IP * (1 + PerIP / 100)
 
     ResNGConsumption = CalcResGHG(
-        Population,
-        PopFactor,
-        PerUrbanPop,
+        pop_factor,
+        urban_pop_percent,
         UrbanBTUPerCapUsed,
         PerCapResEnergyUse,
         UrbanPerResElectrification,
@@ -2808,14 +2767,13 @@ def CalcNonEnergyGHG(
         RuralPerResFFSpaceHeatingLPGUsed,
         RuralPerResFFWaterHeatingLPGUsed,
         BTUperMWh,
-        GridLoss,
-        PerCoal,
+        grid_coal,
         LB_CO2e_MWh_Coal,
-        PerOil,
+        grid_oil,
         LB_CO2e_MWh_Oil,
-        PerNG,
+        grid_ng,
         LB_CO2e_MWh_NG,
-        PerOtherFos,
+        grid_other_ff,
         LB_CO2e_MWh_OtherFos,
         MMTperLB,
         PerCombCapture,
@@ -2841,19 +2799,19 @@ def CalcNonEnergyGHG(
         * (1 + PerChangedFossilFuelUsed)
         * (ComIndPerFFNGUsed / 100)
         / (PerEnergyToUseComIndNG / 100)
-        * BTUPerBBtu
+        * 1000000000
     )
 
     NGSystemsGHG = (
         (ResNGConsumption + ComIndNGConsumption)
         * (1 / BTUperCCF)
-        * CFperCCF
+        * 100
         * MillionCFperCF
         * (MMTCO2ePerMillionCFNG_CH4 + MMTCO2ePerMillionCFNG_CO2)
     )
 
-    LULUCFGHG = UrbanTrees2015 * (1 + PerUrbanTreeCoverage / 100) + (
-        ForestSequestration2015 + ForestLossGain2015
+    LULUCFGHG = GHG_URBAN_TREES * (1 + PerUrbanTreeCoverage / 100) + (
+        GHG_FORESTS + GHG_FOREST_CHANGE
     ) * (1 + PerForestCoverage / 100)
 
     NonEnergyGHG = (
@@ -2864,7 +2822,16 @@ def CalcNonEnergyGHG(
 
 
 def CalcGridText(
-    PerCoal, PerOil, PerNG, PerNuclear, PerSolar, PerWind, PerBio, PerHydro, PerGeo, PerOtherFos
+    grid_coal,
+    grid_oil,
+    grid_ng,
+    grid_nuclear,
+    grid_solar,
+    grid_wind,
+    grid_bio,
+    grid_hydro,
+    grid_geo,
+    grid_other_ff,
 ):
     """
     Creates function for creating paragraph widget text for grid mix to update based on recalculated
@@ -2875,16 +2842,16 @@ def CalcGridText(
         + str(
             round(
                 (
-                    PerCoal
-                    + PerOil
-                    + PerNG
-                    + PerNuclear
-                    + PerSolar
-                    + PerWind
-                    + PerBio
-                    + PerHydro
-                    + PerGeo
-                    + PerOtherFos
+                    grid_coal
+                    + grid_oil
+                    + grid_ng
+                    + grid_nuclear
+                    + grid_solar
+                    + grid_wind
+                    + grid_bio
+                    + grid_hydro
+                    + grid_geo
+                    + grid_other_ff
                 ),
                 2,
             )
@@ -2894,32 +2861,1222 @@ def CalcGridText(
     return GridText
 
 
-# Modify plot with callbacks based on user input in sliders.
-categories = [
-    "Residential",
-    "Commercial/Industrial",
-    "Mobile-Highway",
-    "Mobile-Transit",
-    "Mobile-Aviation",
-    "Mobile-Other",
-    "Non-Energy",
-]
+def callback(attr, old, new):
+    """Set variables according to user inputs."""
+    grid_coal = float(grid_coalTextInput.value)
+    grid_oil = float(grid_oilTextInput.value)
+    grid_ng = float(grid_ngTextInput.value)
+    grid_nuclear = float(grid_nuclearTextInput.value)
+    grid_solar = float(grid_solarTextInput.value)
+    grid_wind = float(grid_windTextInput.value)
+    grid_bio = float(grid_bioTextInput.value)
+    grid_hydro = float(grid_hydroTextInput.value)
+    grid_geo = float(grid_geoTextInput.value)
+    grid_other_ff = float(grid_other_ffTextInput.value)
+    PerNetZeroCarbon = float(
+        PerNetZeroCarbonTextInput.value
+    )  # we may add this scenario in the future
+
+    pop_factor = pop_factorSlider.value
+    urban_pop_percent = float(urban_pop_percentTextInput.value)
+    suburban_pop_percent = float(suburban_pop_percentTextInput.value)
+    rural_pop_percent = float(rural_pop_percentTextInput.value)
+
+    PerCapResEnergyUse = PerCapResEnergyUseSlider.value
+    UrbanPerResElectrification = UrbanPerResElectrificationSlider.value
+    SuburbanPerResElectrification = SuburbanPerResElectrificationSlider.value
+    RuralPerResElectrification = RuralPerResElectrificationSlider.value
+
+    PerComIndEnergyUse = PerComIndEnergyUseSlider.value
+    ComIndPerElectrification = ComIndPerElectrificationSlider.value
+
+    VMTperCap = VMTperCapSlider.value
+    RegionalFleetMPG = RegionalFleetMPGSlider.value
+    PerEVMT = PerEVMTSlider.value
+
+    PerTransRailRidership = PerTransRailRidershipSlider.value
+    TransRailUrbanPerElecMotion = TransRailUrbanPerElecMotionSlider.value
+    TransRailSuburbanPerElecMotion = TransRailSuburbanPerElecMotionSlider.value
+    TransRailRuralPerElecMotion = TransRailRuralPerElecMotionSlider.value
+
+    PerFreightRail = PerFreightRailSlider.value
+    FreightRailPerElecMotion = FreightRailPerElecMotionSlider.value
+
+    PerInterCityRail = PerInterCityRailSlider.value
+    InterCityRailPerElecMotion = InterCityRailPerElecMotionSlider.value
+
+    PerMarinePort = PerMarinePortSlider.value
+    MarinePortPerElectrification = MarinePortPerElectrificationSlider.value
+
+    PerOffroad = PerOffroadSlider.value
+    OffroadPerElectrification = OffroadPerElectrificationSlider.value
+
+    PerAviation = PerAviationSlider.value
+    PerAg = PerAgSlider.value
+    PerWaste = PerWasteSlider.value
+    PerWasteWater = PerWasteWaterSlider.value
+    PerIP = PerIPSlider.value
+    PerUrbanTreeCoverage = PerUrbanTreeCoverageSlider.value
+    PerForestCoverage = PerForestCoverageSlider.value
+
+    PerCombCapture = PerCombCaptureSlider.value
+    AirCapture = AirCaptureSlider.value  # TK
+
+    # Update source data for vertical bar chart
+    source.data = {
+        "Category": sectors,
+        "2015": [
+            GHG_RES,
+            GHG_CI,
+            GHG_HIGHWAY,
+            GHG_TRANSIT,
+            GHG_AVIATION,
+            GHG_OTHER_MOBILE,
+            NonEnergy2015,
+        ],
+        "Scenario": [
+            CalcResGHG(
+                pop_factor,
+                urban_pop_percent,
+                UrbanBTUPerCapUsed,
+                PerCapResEnergyUse,
+                UrbanPerResElectrification,
+                UrbanPerResElecUsed,
+                PerUrbanElecBTUPerCapUsedSpaceHeating,
+                PerUrbanElecBTUPerCapUsedWaterHeating,
+                PerUrbanElecBTUPerCapUsedOther,
+                UrbanPerResNGUsed,
+                PerUrbanNGBTUPerCapUsedSpaceHeating,
+                PerUrbanNGBTUPerCapUsedWaterHeating,
+                PerUrbanNGBTUPerCapUsedOther,
+                UrbanPerResFOKerUsed,
+                PerUrbanFOKerBTUPerCapUsedSpaceHeating,
+                PerUrbanFOKerBTUPerCapUsedWaterHeating,
+                PerUrbanFOKerBTUPerCapUsedOther,
+                UrbanPerResLPGUsed,
+                PerUrbanLPGBTUPerCapUsedSpaceHeating,
+                PerUrbanLPGBTUPerCapUsedWaterHeating,
+                PerUrbanLPGBTUPerCapUsedOther,
+                UrbanPerResFFNGUsed,
+                UrbanPerResFFFOKerUsed,
+                UrbanPerResFFLPGUsed,
+                UrbanPerElecHeatingUsedforSpaceHeating,
+                UrbanPerResFFSpaceHeatingNGUsed,
+                UrbanPerElecHeatingUsedforWaterHeating,
+                UrbanPerResFFWaterHeatingNGUsed,
+                UrbanPerResFFSpaceHeatingFOKerUsed,
+                UrbanPerResFFWaterHeatingFOKerUsed,
+                UrbanPerResFFSpaceHeatingLPGUsed,
+                UrbanPerResFFWaterHeatingLPGUsed,
+                PerEnergyToUseResElecSpaceHeating,
+                PerEnergyToUseResElecWaterHeating,
+                PerEnergyToUseResElecOther,
+                PerEnergyToUseResElecSpaceHeatingSwitch,
+                PerEnergyToUseResElecWaterHeatingSwitch,
+                PerEnergyToUseResNGSpaceHeating,
+                PerEnergyToUseResNGWaterHeating,
+                PerEnergyToUseResNGOther,
+                PerEnergyToUseResFOKerSpaceHeating,
+                PerEnergyToUseResFOKerWaterHeating,
+                PerEnergyToUseResFOKerOther,
+                PerEnergyToUseResLPGSpaceHeating,
+                PerEnergyToUseResLPGWaterHeating,
+                PerEnergyToUseResLPGOther,
+                SuburbanBTUPerCapUsed,
+                SuburbanPerResElectrification,
+                SuburbanPerResElecUsed,
+                PerSuburbanElecBTUPerCapUsedSpaceHeating,
+                PerSuburbanElecBTUPerCapUsedWaterHeating,
+                PerSuburbanElecBTUPerCapUsedOther,
+                SuburbanPerResNGUsed,
+                PerSuburbanNGBTUPerCapUsedSpaceHeating,
+                PerSuburbanNGBTUPerCapUsedWaterHeating,
+                PerSuburbanNGBTUPerCapUsedOther,
+                SuburbanPerResFOKerUsed,
+                PerSuburbanFOKerBTUPerCapUsedSpaceHeating,
+                PerSuburbanFOKerBTUPerCapUsedWaterHeating,
+                PerSuburbanFOKerBTUPerCapUsedOther,
+                SuburbanPerResLPGUsed,
+                PerSuburbanLPGBTUPerCapUsedSpaceHeating,
+                PerSuburbanLPGBTUPerCapUsedWaterHeating,
+                PerSuburbanLPGBTUPerCapUsedOther,
+                SuburbanPerResFFNGUsed,
+                SuburbanPerResFFFOKerUsed,
+                SuburbanPerResFFLPGUsed,
+                SuburbanPerElecHeatingUsedforSpaceHeating,
+                SuburbanPerResFFSpaceHeatingNGUsed,
+                SuburbanPerElecHeatingUsedforWaterHeating,
+                SuburbanPerResFFWaterHeatingNGUsed,
+                SuburbanPerResFFSpaceHeatingFOKerUsed,
+                SuburbanPerResFFWaterHeatingFOKerUsed,
+                SuburbanPerResFFSpaceHeatingLPGUsed,
+                SuburbanPerResFFWaterHeatingLPGUsed,
+                RuralBTUPerCapUsed,
+                RuralPerResElectrification,
+                RuralPerResElecUsed,
+                PerRuralElecBTUPerCapUsedSpaceHeating,
+                PerRuralElecBTUPerCapUsedWaterHeating,
+                PerRuralElecBTUPerCapUsedOther,
+                RuralPerResNGUsed,
+                PerRuralNGBTUPerCapUsedSpaceHeating,
+                PerRuralNGBTUPerCapUsedWaterHeating,
+                PerRuralNGBTUPerCapUsedOther,
+                RuralPerResFOKerUsed,
+                PerRuralFOKerBTUPerCapUsedSpaceHeating,
+                PerRuralFOKerBTUPerCapUsedWaterHeating,
+                PerRuralFOKerBTUPerCapUsedOther,
+                RuralPerResLPGUsed,
+                PerRuralLPGBTUPerCapUsedSpaceHeating,
+                PerRuralLPGBTUPerCapUsedWaterHeating,
+                PerRuralLPGBTUPerCapUsedOther,
+                RuralPerResFFNGUsed,
+                RuralPerResFFFOKerUsed,
+                RuralPerResFFLPGUsed,
+                RuralPerElecHeatingUsedforSpaceHeating,
+                RuralPerResFFSpaceHeatingNGUsed,
+                RuralPerElecHeatingUsedforWaterHeating,
+                RuralPerResFFWaterHeatingNGUsed,
+                RuralPerResFFSpaceHeatingFOKerUsed,
+                RuralPerResFFWaterHeatingFOKerUsed,
+                RuralPerResFFSpaceHeatingLPGUsed,
+                RuralPerResFFWaterHeatingLPGUsed,
+                BTUperMWh,
+                grid_coal,
+                LB_CO2e_MWh_Coal,
+                grid_oil,
+                LB_CO2e_MWh_Oil,
+                grid_ng,
+                LB_CO2e_MWh_NG,
+                grid_other_ff,
+                LB_CO2e_MWh_OtherFos,
+                MMTperLB,
+                PerCombCapture,
+                BTUperCCF,
+                MCFperCCF,
+                LB_CO2e_MCF_NG,
+                BTUperGallonFOKer,
+                MMTCO2e_ThBarrel_FOKer,
+                ThBarrelperGallon,
+                BTUperGallonLPG,
+                MMTCO2e_ThBarrel_LPG,
+            )[0],
+            CalcComIndGHG(
+                ComIndPerElectrification,
+                ComIndBBtuUsed,
+                PerComIndEnergyUse,
+                PerEnergyToUseComIndElec,
+                BTUperMWh,
+                grid_coal,
+                LB_CO2e_MWh_Coal,
+                grid_oil,
+                LB_CO2e_MWh_Oil,
+                grid_ng,
+                LB_CO2e_MWh_NG,
+                grid_other_ff,
+                LB_CO2e_MWh_OtherFos,
+                MMTperLB,
+                PerCombCapture,
+                ComIndPerFossilFuelUsed2015,
+                ComIndPerFFNGUsed,
+                PerEnergyToUseComIndNG,
+                MTCO2ePerBBtuNG,
+                MMTperMT,
+                ComIndPerFFCoalUsed,
+                PerEnergyToUseComIndCoal,
+                MTCO2ePerBBtuCoal,
+                ComIndPerFFDFOUsed,
+                PerEnergyToUseComIndDFO,
+                MTCO2ePerBBtuDFO,
+                ComIndPerFFKerUsed,
+                PerEnergyToUseComIndKer,
+                MTCO2ePerBBtuKer,
+                ComIndPerFFLPGUsed,
+                PerEnergyToUseComIndLPG,
+                MTCO2ePerBBtuLPG,
+                ComIndPerFFMotGasUsed,
+                PerEnergyToUseComIndMotGas,
+                MTCO2ePerBBtuMotGas,
+                ComIndPerFFRFOUsed,
+                PerEnergyToUseComIndRFO,
+                MTCO2ePerBBtuRFO,
+                ComIndPerFFPetCokeUsed,
+                PerEnergyToUseComIndPetCoke,
+                MTCO2ePerBBtuPetCoke,
+                ComIndPerFFStillGasUsed,
+                PerEnergyToUseComIndStillGas,
+                MTCO2ePerBBtuStillGas,
+                ComIndPerSpecialNaphthasUsed,
+                PerEnergyToUseComIndSpecialNaphthas,
+                MTCO2ePerBBtuSpecialNaphthas,
+            ),
+            CalcMobHighwayGHG(
+                urban_pop_percent,
+                pop_factor,
+                UrbanVMTperPop,
+                suburban_pop_percent,
+                SuburbanVMTperPop,
+                rural_pop_percent,
+                RuralVMTperPop,
+                VMTperCap,
+                PerEVMT,
+                RegionalFleetMPG,
+                CO2eperGallonGasoline,
+                MMTperLB,
+                EVEff,
+                grid_coal,
+                LB_CO2e_MWh_Coal,
+                grid_oil,
+                LB_CO2e_MWh_Oil,
+                grid_ng,
+                LB_CO2e_MWh_NG,
+                grid_other_ff,
+                LB_CO2e_MWh_OtherFos,
+                PerCombCapture,
+            ),
+            CalcMobTransitGHG(
+                pop_factor,
+                BTUperMWh,
+                urban_pop_percent,
+                TransRailUrbanPerElecMotion,
+                TransRailSuburbanPerElecMotion,
+                TransRailRuralPerElecMotion,
+                TransRailUrbanBTUPerCapMotion,
+                suburban_pop_percent,
+                TransRailSuburbanBTUPerCapMotion,
+                rural_pop_percent,
+                TransRailRuralBTUPerCapMotion,
+                PerEnergyToMotionRailElec,
+                grid_coal,
+                LB_CO2e_MWh_Coal,
+                grid_oil,
+                LB_CO2e_MWh_Oil,
+                grid_ng,
+                LB_CO2e_MWh_NG,
+                grid_other_ff,
+                LB_CO2e_MWh_OtherFos,
+                MMTperLB,
+                PerCombCapture,
+                TransRailMTCO2ePerBBtuDiesel,
+                MMTperMT,
+                PerEnergyToMotionRailDiesel,
+                PerTransRailRidership,
+            ),
+            CalcMobAviationGHG(pop_factor, PerAviation),
+            CalcMobOtherGHG(
+                FreightRailBBtuMotion,
+                FreightRailPerElecMotion,
+                PerEnergyToMotionRailElec,
+                BTUperMWh,
+                grid_coal,
+                LB_CO2e_MWh_Coal,
+                grid_oil,
+                LB_CO2e_MWh_Oil,
+                grid_ng,
+                LB_CO2e_MWh_NG,
+                grid_other_ff,
+                LB_CO2e_MWh_OtherFos,
+                MMTperLB,
+                PerCombCapture,
+                FreightRailMTCO2ePerBBtuDiesel,
+                MMTperMT,
+                PerEnergyToMotionRailDiesel,
+                PerFreightRail,
+                InterCityRailBBtuMotion,
+                InterCityRailPerElecMotion,
+                InterCityRailMTCO2ePerBBtuDiesel,
+                PerInterCityRail,
+                MarinePortPerElectrification,
+                MarinePortPerFossilFuelMotion2015,
+                MarinePortBBtuMotion,
+                PerEnergyToMotionMarineElec,
+                MarinePortPerFFRFOMotion,
+                MarinePortMTCO2ePerBBtuRFO,
+                PerEnergyToMotionMarineRFO,
+                MarinePortPerFFDFOMotion,
+                MarinePortMTCO2ePerBBtuDFO,
+                PerEnergyToMotionMarineDFO,
+                PerMarinePort,
+                OffroadPerElectrification,
+                OffroadPerFossilFuelMotion2015,
+                OffroadBBtuMotion,
+                PerEnergyToMotionOffroadElec,
+                OffroadPerFFMotGasMotion,
+                OffroadMTCO2ePerBBtuMotGas,
+                PerEnergyToMotionOffroadMotGas,
+                OffroadPerFFDFOMotion,
+                OffroadMTCO2ePerBBtuDFO,
+                PerEnergyToMotionOffroadDFO,
+                OffroadPerFFLPGMotion,
+                OffroadMTCO2ePerBBtuLPG,
+                PerEnergyToMotionOffroadLPG,
+                PerOffroad,
+            ),
+            CalcNonEnergyGHG(
+                PerAg,
+                PerWaste,
+                pop_factor,
+                PerWasteWater,
+                PerIP,
+                urban_pop_percent,
+                UrbanBTUPerCapUsed,
+                PerCapResEnergyUse,
+                UrbanPerResElectrification,
+                UrbanPerResElecUsed,
+                PerUrbanElecBTUPerCapUsedSpaceHeating,
+                PerUrbanElecBTUPerCapUsedWaterHeating,
+                PerUrbanElecBTUPerCapUsedOther,
+                UrbanPerResNGUsed,
+                PerUrbanNGBTUPerCapUsedSpaceHeating,
+                PerUrbanNGBTUPerCapUsedWaterHeating,
+                PerUrbanNGBTUPerCapUsedOther,
+                UrbanPerResFOKerUsed,
+                PerUrbanFOKerBTUPerCapUsedSpaceHeating,
+                PerUrbanFOKerBTUPerCapUsedWaterHeating,
+                PerUrbanFOKerBTUPerCapUsedOther,
+                UrbanPerResLPGUsed,
+                PerUrbanLPGBTUPerCapUsedSpaceHeating,
+                PerUrbanLPGBTUPerCapUsedWaterHeating,
+                PerUrbanLPGBTUPerCapUsedOther,
+                UrbanPerResFFNGUsed,
+                UrbanPerResFFFOKerUsed,
+                UrbanPerResFFLPGUsed,
+                UrbanPerElecHeatingUsedforSpaceHeating,
+                UrbanPerResFFSpaceHeatingNGUsed,
+                UrbanPerElecHeatingUsedforWaterHeating,
+                UrbanPerResFFWaterHeatingNGUsed,
+                UrbanPerResFFSpaceHeatingFOKerUsed,
+                UrbanPerResFFWaterHeatingFOKerUsed,
+                UrbanPerResFFSpaceHeatingLPGUsed,
+                UrbanPerResFFWaterHeatingLPGUsed,
+                PerEnergyToUseResElecSpaceHeating,
+                PerEnergyToUseResElecWaterHeating,
+                PerEnergyToUseResElecOther,
+                PerEnergyToUseResElecSpaceHeatingSwitch,
+                PerEnergyToUseResElecWaterHeatingSwitch,
+                PerEnergyToUseResNGSpaceHeating,
+                PerEnergyToUseResNGWaterHeating,
+                PerEnergyToUseResNGOther,
+                PerEnergyToUseResFOKerSpaceHeating,
+                PerEnergyToUseResFOKerWaterHeating,
+                PerEnergyToUseResFOKerOther,
+                PerEnergyToUseResLPGSpaceHeating,
+                PerEnergyToUseResLPGWaterHeating,
+                PerEnergyToUseResLPGOther,
+                SuburbanBTUPerCapUsed,
+                SuburbanPerResElectrification,
+                SuburbanPerResElecUsed,
+                PerSuburbanElecBTUPerCapUsedSpaceHeating,
+                PerSuburbanElecBTUPerCapUsedWaterHeating,
+                PerSuburbanElecBTUPerCapUsedOther,
+                SuburbanPerResNGUsed,
+                PerSuburbanNGBTUPerCapUsedSpaceHeating,
+                PerSuburbanNGBTUPerCapUsedWaterHeating,
+                PerSuburbanNGBTUPerCapUsedOther,
+                SuburbanPerResFOKerUsed,
+                PerSuburbanFOKerBTUPerCapUsedSpaceHeating,
+                PerSuburbanFOKerBTUPerCapUsedWaterHeating,
+                PerSuburbanFOKerBTUPerCapUsedOther,
+                SuburbanPerResLPGUsed,
+                PerSuburbanLPGBTUPerCapUsedSpaceHeating,
+                PerSuburbanLPGBTUPerCapUsedWaterHeating,
+                PerSuburbanLPGBTUPerCapUsedOther,
+                SuburbanPerResFFNGUsed,
+                SuburbanPerResFFFOKerUsed,
+                SuburbanPerResFFLPGUsed,
+                SuburbanPerElecHeatingUsedforSpaceHeating,
+                SuburbanPerResFFSpaceHeatingNGUsed,
+                SuburbanPerElecHeatingUsedforWaterHeating,
+                SuburbanPerResFFWaterHeatingNGUsed,
+                SuburbanPerResFFSpaceHeatingFOKerUsed,
+                SuburbanPerResFFWaterHeatingFOKerUsed,
+                SuburbanPerResFFSpaceHeatingLPGUsed,
+                SuburbanPerResFFWaterHeatingLPGUsed,
+                RuralBTUPerCapUsed,
+                RuralPerResElectrification,
+                RuralPerResElecUsed,
+                PerRuralElecBTUPerCapUsedSpaceHeating,
+                PerRuralElecBTUPerCapUsedWaterHeating,
+                PerRuralElecBTUPerCapUsedOther,
+                RuralPerResNGUsed,
+                PerRuralNGBTUPerCapUsedSpaceHeating,
+                PerRuralNGBTUPerCapUsedWaterHeating,
+                PerRuralNGBTUPerCapUsedOther,
+                RuralPerResFOKerUsed,
+                PerRuralFOKerBTUPerCapUsedSpaceHeating,
+                PerRuralFOKerBTUPerCapUsedWaterHeating,
+                PerRuralFOKerBTUPerCapUsedOther,
+                RuralPerResLPGUsed,
+                PerRuralLPGBTUPerCapUsedSpaceHeating,
+                PerRuralLPGBTUPerCapUsedWaterHeating,
+                PerRuralLPGBTUPerCapUsedOther,
+                RuralPerResFFNGUsed,
+                RuralPerResFFFOKerUsed,
+                RuralPerResFFLPGUsed,
+                RuralPerElecHeatingUsedforSpaceHeating,
+                RuralPerResFFSpaceHeatingNGUsed,
+                RuralPerElecHeatingUsedforWaterHeating,
+                RuralPerResFFWaterHeatingNGUsed,
+                RuralPerResFFSpaceHeatingFOKerUsed,
+                RuralPerResFFWaterHeatingFOKerUsed,
+                RuralPerResFFSpaceHeatingLPGUsed,
+                RuralPerResFFWaterHeatingLPGUsed,
+                BTUperMWh,
+                grid_coal,
+                LB_CO2e_MWh_Coal,
+                grid_oil,
+                LB_CO2e_MWh_Oil,
+                grid_ng,
+                LB_CO2e_MWh_NG,
+                grid_other_ff,
+                LB_CO2e_MWh_OtherFos,
+                MMTperLB,
+                PerCombCapture,
+                BTUperCCF,
+                MCFperCCF,
+                LB_CO2e_MCF_NG,
+                BTUperGallonFOKer,
+                MMTCO2e_ThBarrel_FOKer,
+                ThBarrelperGallon,
+                BTUperGallonLPG,
+                MMTCO2e_ThBarrel_LPG,
+                ComIndPerElectrification,
+                ComIndPerFossilFuelUsed2015,
+                ComIndBBtuUsed,
+                PerComIndEnergyUse,
+                ComIndPerFFNGUsed,
+                PerEnergyToUseComIndNG,
+                MillionCFperCF,
+                MMTCO2ePerMillionCFNG_CH4,
+                MMTCO2ePerMillionCFNG_CO2,
+                PerUrbanTreeCoverage,
+                PerForestCoverage,
+            ),
+        ],
+    }
+
+    # Update source data for stacked bar chart
+    source2.data = {
+        "Year": ["2015", "Scenario"],
+        "Residential": [
+            GHG_RES,
+            CalcResGHG(
+                pop_factor,
+                urban_pop_percent,
+                UrbanBTUPerCapUsed,
+                PerCapResEnergyUse,
+                UrbanPerResElectrification,
+                UrbanPerResElecUsed,
+                PerUrbanElecBTUPerCapUsedSpaceHeating,
+                PerUrbanElecBTUPerCapUsedWaterHeating,
+                PerUrbanElecBTUPerCapUsedOther,
+                UrbanPerResNGUsed,
+                PerUrbanNGBTUPerCapUsedSpaceHeating,
+                PerUrbanNGBTUPerCapUsedWaterHeating,
+                PerUrbanNGBTUPerCapUsedOther,
+                UrbanPerResFOKerUsed,
+                PerUrbanFOKerBTUPerCapUsedSpaceHeating,
+                PerUrbanFOKerBTUPerCapUsedWaterHeating,
+                PerUrbanFOKerBTUPerCapUsedOther,
+                UrbanPerResLPGUsed,
+                PerUrbanLPGBTUPerCapUsedSpaceHeating,
+                PerUrbanLPGBTUPerCapUsedWaterHeating,
+                PerUrbanLPGBTUPerCapUsedOther,
+                UrbanPerResFFNGUsed,
+                UrbanPerResFFFOKerUsed,
+                UrbanPerResFFLPGUsed,
+                UrbanPerElecHeatingUsedforSpaceHeating,
+                UrbanPerResFFSpaceHeatingNGUsed,
+                UrbanPerElecHeatingUsedforWaterHeating,
+                UrbanPerResFFWaterHeatingNGUsed,
+                UrbanPerResFFSpaceHeatingFOKerUsed,
+                UrbanPerResFFWaterHeatingFOKerUsed,
+                UrbanPerResFFSpaceHeatingLPGUsed,
+                UrbanPerResFFWaterHeatingLPGUsed,
+                PerEnergyToUseResElecSpaceHeating,
+                PerEnergyToUseResElecWaterHeating,
+                PerEnergyToUseResElecOther,
+                PerEnergyToUseResElecSpaceHeatingSwitch,
+                PerEnergyToUseResElecWaterHeatingSwitch,
+                PerEnergyToUseResNGSpaceHeating,
+                PerEnergyToUseResNGWaterHeating,
+                PerEnergyToUseResNGOther,
+                PerEnergyToUseResFOKerSpaceHeating,
+                PerEnergyToUseResFOKerWaterHeating,
+                PerEnergyToUseResFOKerOther,
+                PerEnergyToUseResLPGSpaceHeating,
+                PerEnergyToUseResLPGWaterHeating,
+                PerEnergyToUseResLPGOther,
+                SuburbanBTUPerCapUsed,
+                SuburbanPerResElectrification,
+                SuburbanPerResElecUsed,
+                PerSuburbanElecBTUPerCapUsedSpaceHeating,
+                PerSuburbanElecBTUPerCapUsedWaterHeating,
+                PerSuburbanElecBTUPerCapUsedOther,
+                SuburbanPerResNGUsed,
+                PerSuburbanNGBTUPerCapUsedSpaceHeating,
+                PerSuburbanNGBTUPerCapUsedWaterHeating,
+                PerSuburbanNGBTUPerCapUsedOther,
+                SuburbanPerResFOKerUsed,
+                PerSuburbanFOKerBTUPerCapUsedSpaceHeating,
+                PerSuburbanFOKerBTUPerCapUsedWaterHeating,
+                PerSuburbanFOKerBTUPerCapUsedOther,
+                SuburbanPerResLPGUsed,
+                PerSuburbanLPGBTUPerCapUsedSpaceHeating,
+                PerSuburbanLPGBTUPerCapUsedWaterHeating,
+                PerSuburbanLPGBTUPerCapUsedOther,
+                SuburbanPerResFFNGUsed,
+                SuburbanPerResFFFOKerUsed,
+                SuburbanPerResFFLPGUsed,
+                SuburbanPerElecHeatingUsedforSpaceHeating,
+                SuburbanPerResFFSpaceHeatingNGUsed,
+                SuburbanPerElecHeatingUsedforWaterHeating,
+                SuburbanPerResFFWaterHeatingNGUsed,
+                SuburbanPerResFFSpaceHeatingFOKerUsed,
+                SuburbanPerResFFWaterHeatingFOKerUsed,
+                SuburbanPerResFFSpaceHeatingLPGUsed,
+                SuburbanPerResFFWaterHeatingLPGUsed,
+                RuralBTUPerCapUsed,
+                RuralPerResElectrification,
+                RuralPerResElecUsed,
+                PerRuralElecBTUPerCapUsedSpaceHeating,
+                PerRuralElecBTUPerCapUsedWaterHeating,
+                PerRuralElecBTUPerCapUsedOther,
+                RuralPerResNGUsed,
+                PerRuralNGBTUPerCapUsedSpaceHeating,
+                PerRuralNGBTUPerCapUsedWaterHeating,
+                PerRuralNGBTUPerCapUsedOther,
+                RuralPerResFOKerUsed,
+                PerRuralFOKerBTUPerCapUsedSpaceHeating,
+                PerRuralFOKerBTUPerCapUsedWaterHeating,
+                PerRuralFOKerBTUPerCapUsedOther,
+                RuralPerResLPGUsed,
+                PerRuralLPGBTUPerCapUsedSpaceHeating,
+                PerRuralLPGBTUPerCapUsedWaterHeating,
+                PerRuralLPGBTUPerCapUsedOther,
+                RuralPerResFFNGUsed,
+                RuralPerResFFFOKerUsed,
+                RuralPerResFFLPGUsed,
+                RuralPerElecHeatingUsedforSpaceHeating,
+                RuralPerResFFSpaceHeatingNGUsed,
+                RuralPerElecHeatingUsedforWaterHeating,
+                RuralPerResFFWaterHeatingNGUsed,
+                RuralPerResFFSpaceHeatingFOKerUsed,
+                RuralPerResFFWaterHeatingFOKerUsed,
+                RuralPerResFFSpaceHeatingLPGUsed,
+                RuralPerResFFWaterHeatingLPGUsed,
+                BTUperMWh,
+                grid_coal,
+                LB_CO2e_MWh_Coal,
+                grid_oil,
+                LB_CO2e_MWh_Oil,
+                grid_ng,
+                LB_CO2e_MWh_NG,
+                grid_other_ff,
+                LB_CO2e_MWh_OtherFos,
+                MMTperLB,
+                PerCombCapture,
+                BTUperCCF,
+                MCFperCCF,
+                LB_CO2e_MCF_NG,
+                BTUperGallonFOKer,
+                MMTCO2e_ThBarrel_FOKer,
+                ThBarrelperGallon,
+                BTUperGallonLPG,
+                MMTCO2e_ThBarrel_LPG,
+            )[0],
+        ],
+        "Commercial/Industrial": [
+            GHG_CI,
+            CalcComIndGHG(
+                ComIndPerElectrification,
+                ComIndBBtuUsed,
+                PerComIndEnergyUse,
+                PerEnergyToUseComIndElec,
+                BTUperMWh,
+                grid_coal,
+                LB_CO2e_MWh_Coal,
+                grid_oil,
+                LB_CO2e_MWh_Oil,
+                grid_ng,
+                LB_CO2e_MWh_NG,
+                grid_other_ff,
+                LB_CO2e_MWh_OtherFos,
+                MMTperLB,
+                PerCombCapture,
+                ComIndPerFossilFuelUsed2015,
+                ComIndPerFFNGUsed,
+                PerEnergyToUseComIndNG,
+                MTCO2ePerBBtuNG,
+                MMTperMT,
+                ComIndPerFFCoalUsed,
+                PerEnergyToUseComIndCoal,
+                MTCO2ePerBBtuCoal,
+                ComIndPerFFDFOUsed,
+                PerEnergyToUseComIndDFO,
+                MTCO2ePerBBtuDFO,
+                ComIndPerFFKerUsed,
+                PerEnergyToUseComIndKer,
+                MTCO2ePerBBtuKer,
+                ComIndPerFFLPGUsed,
+                PerEnergyToUseComIndLPG,
+                MTCO2ePerBBtuLPG,
+                ComIndPerFFMotGasUsed,
+                PerEnergyToUseComIndMotGas,
+                MTCO2ePerBBtuMotGas,
+                ComIndPerFFRFOUsed,
+                PerEnergyToUseComIndRFO,
+                MTCO2ePerBBtuRFO,
+                ComIndPerFFPetCokeUsed,
+                PerEnergyToUseComIndPetCoke,
+                MTCO2ePerBBtuPetCoke,
+                ComIndPerFFStillGasUsed,
+                PerEnergyToUseComIndStillGas,
+                MTCO2ePerBBtuStillGas,
+                ComIndPerSpecialNaphthasUsed,
+                PerEnergyToUseComIndSpecialNaphthas,
+                MTCO2ePerBBtuSpecialNaphthas,
+            ),
+        ],
+        "Mobile-Highway": [
+            GHG_HIGHWAY,
+            CalcMobHighwayGHG(
+                urban_pop_percent,
+                pop_factor,
+                UrbanVMTperPop,
+                suburban_pop_percent,
+                SuburbanVMTperPop,
+                rural_pop_percent,
+                RuralVMTperPop,
+                VMTperCap,
+                PerEVMT,
+                RegionalFleetMPG,
+                CO2eperGallonGasoline,
+                MMTperLB,
+                EVEff,
+                grid_coal,
+                LB_CO2e_MWh_Coal,
+                grid_oil,
+                LB_CO2e_MWh_Oil,
+                grid_ng,
+                LB_CO2e_MWh_NG,
+                grid_other_ff,
+                LB_CO2e_MWh_OtherFos,
+                PerCombCapture,
+            ),
+        ],
+        "Mobile-Transit": [
+            GHG_TRANSIT,
+            CalcMobTransitGHG(
+                pop_factor,
+                BTUperMWh,
+                urban_pop_percent,
+                TransRailUrbanPerElecMotion,
+                TransRailSuburbanPerElecMotion,
+                TransRailRuralPerElecMotion,
+                TransRailUrbanBTUPerCapMotion,
+                suburban_pop_percent,
+                TransRailSuburbanBTUPerCapMotion,
+                rural_pop_percent,
+                TransRailRuralBTUPerCapMotion,
+                PerEnergyToMotionRailElec,
+                grid_coal,
+                LB_CO2e_MWh_Coal,
+                grid_oil,
+                LB_CO2e_MWh_Oil,
+                grid_ng,
+                LB_CO2e_MWh_NG,
+                grid_other_ff,
+                LB_CO2e_MWh_OtherFos,
+                MMTperLB,
+                PerCombCapture,
+                TransRailMTCO2ePerBBtuDiesel,
+                MMTperMT,
+                PerEnergyToMotionRailDiesel,
+                PerTransRailRidership,
+            ),
+        ],
+        "Mobile-Aviation": [GHG_AVIATION, CalcMobAviationGHG(pop_factor, PerAviation),],
+        "Mobile-Other": [
+            GHG_OTHER_MOBILE,
+            CalcMobOtherGHG(
+                FreightRailBBtuMotion,
+                FreightRailPerElecMotion,
+                PerEnergyToMotionRailElec,
+                BTUperMWh,
+                grid_coal,
+                LB_CO2e_MWh_Coal,
+                grid_oil,
+                LB_CO2e_MWh_Oil,
+                grid_ng,
+                LB_CO2e_MWh_NG,
+                grid_other_ff,
+                LB_CO2e_MWh_OtherFos,
+                MMTperLB,
+                PerCombCapture,
+                FreightRailMTCO2ePerBBtuDiesel,
+                MMTperMT,
+                PerEnergyToMotionRailDiesel,
+                PerFreightRail,
+                InterCityRailBBtuMotion,
+                InterCityRailPerElecMotion,
+                InterCityRailMTCO2ePerBBtuDiesel,
+                PerInterCityRail,
+                MarinePortPerElectrification,
+                MarinePortPerFossilFuelMotion2015,
+                MarinePortBBtuMotion,
+                PerEnergyToMotionMarineElec,
+                MarinePortPerFFRFOMotion,
+                MarinePortMTCO2ePerBBtuRFO,
+                PerEnergyToMotionMarineRFO,
+                MarinePortPerFFDFOMotion,
+                MarinePortMTCO2ePerBBtuDFO,
+                PerEnergyToMotionMarineDFO,
+                PerMarinePort,
+                OffroadPerElectrification,
+                OffroadPerFossilFuelMotion2015,
+                OffroadBBtuMotion,
+                PerEnergyToMotionOffroadElec,
+                OffroadPerFFMotGasMotion,
+                OffroadMTCO2ePerBBtuMotGas,
+                PerEnergyToMotionOffroadMotGas,
+                OffroadPerFFDFOMotion,
+                OffroadMTCO2ePerBBtuDFO,
+                PerEnergyToMotionOffroadDFO,
+                OffroadPerFFLPGMotion,
+                OffroadMTCO2ePerBBtuLPG,
+                PerEnergyToMotionOffroadLPG,
+                PerOffroad,
+            ),
+        ],
+        "Non-Energy": [
+            NonEnergy2015,
+            CalcNonEnergyGHG(
+                PerAg,
+                PerWaste,
+                pop_factor,
+                PerWasteWater,
+                PerIP,
+                urban_pop_percent,
+                UrbanBTUPerCapUsed,
+                PerCapResEnergyUse,
+                UrbanPerResElectrification,
+                UrbanPerResElecUsed,
+                PerUrbanElecBTUPerCapUsedSpaceHeating,
+                PerUrbanElecBTUPerCapUsedWaterHeating,
+                PerUrbanElecBTUPerCapUsedOther,
+                UrbanPerResNGUsed,
+                PerUrbanNGBTUPerCapUsedSpaceHeating,
+                PerUrbanNGBTUPerCapUsedWaterHeating,
+                PerUrbanNGBTUPerCapUsedOther,
+                UrbanPerResFOKerUsed,
+                PerUrbanFOKerBTUPerCapUsedSpaceHeating,
+                PerUrbanFOKerBTUPerCapUsedWaterHeating,
+                PerUrbanFOKerBTUPerCapUsedOther,
+                UrbanPerResLPGUsed,
+                PerUrbanLPGBTUPerCapUsedSpaceHeating,
+                PerUrbanLPGBTUPerCapUsedWaterHeating,
+                PerUrbanLPGBTUPerCapUsedOther,
+                UrbanPerResFFNGUsed,
+                UrbanPerResFFFOKerUsed,
+                UrbanPerResFFLPGUsed,
+                UrbanPerElecHeatingUsedforSpaceHeating,
+                UrbanPerResFFSpaceHeatingNGUsed,
+                UrbanPerElecHeatingUsedforWaterHeating,
+                UrbanPerResFFWaterHeatingNGUsed,
+                UrbanPerResFFSpaceHeatingFOKerUsed,
+                UrbanPerResFFWaterHeatingFOKerUsed,
+                UrbanPerResFFSpaceHeatingLPGUsed,
+                UrbanPerResFFWaterHeatingLPGUsed,
+                PerEnergyToUseResElecSpaceHeating,
+                PerEnergyToUseResElecWaterHeating,
+                PerEnergyToUseResElecOther,
+                PerEnergyToUseResElecSpaceHeatingSwitch,
+                PerEnergyToUseResElecWaterHeatingSwitch,
+                PerEnergyToUseResNGSpaceHeating,
+                PerEnergyToUseResNGWaterHeating,
+                PerEnergyToUseResNGOther,
+                PerEnergyToUseResFOKerSpaceHeating,
+                PerEnergyToUseResFOKerWaterHeating,
+                PerEnergyToUseResFOKerOther,
+                PerEnergyToUseResLPGSpaceHeating,
+                PerEnergyToUseResLPGWaterHeating,
+                PerEnergyToUseResLPGOther,
+                SuburbanBTUPerCapUsed,
+                SuburbanPerResElectrification,
+                SuburbanPerResElecUsed,
+                PerSuburbanElecBTUPerCapUsedSpaceHeating,
+                PerSuburbanElecBTUPerCapUsedWaterHeating,
+                PerSuburbanElecBTUPerCapUsedOther,
+                SuburbanPerResNGUsed,
+                PerSuburbanNGBTUPerCapUsedSpaceHeating,
+                PerSuburbanNGBTUPerCapUsedWaterHeating,
+                PerSuburbanNGBTUPerCapUsedOther,
+                SuburbanPerResFOKerUsed,
+                PerSuburbanFOKerBTUPerCapUsedSpaceHeating,
+                PerSuburbanFOKerBTUPerCapUsedWaterHeating,
+                PerSuburbanFOKerBTUPerCapUsedOther,
+                SuburbanPerResLPGUsed,
+                PerSuburbanLPGBTUPerCapUsedSpaceHeating,
+                PerSuburbanLPGBTUPerCapUsedWaterHeating,
+                PerSuburbanLPGBTUPerCapUsedOther,
+                SuburbanPerResFFNGUsed,
+                SuburbanPerResFFFOKerUsed,
+                SuburbanPerResFFLPGUsed,
+                SuburbanPerElecHeatingUsedforSpaceHeating,
+                SuburbanPerResFFSpaceHeatingNGUsed,
+                SuburbanPerElecHeatingUsedforWaterHeating,
+                SuburbanPerResFFWaterHeatingNGUsed,
+                SuburbanPerResFFSpaceHeatingFOKerUsed,
+                SuburbanPerResFFWaterHeatingFOKerUsed,
+                SuburbanPerResFFSpaceHeatingLPGUsed,
+                SuburbanPerResFFWaterHeatingLPGUsed,
+                RuralBTUPerCapUsed,
+                RuralPerResElectrification,
+                RuralPerResElecUsed,
+                PerRuralElecBTUPerCapUsedSpaceHeating,
+                PerRuralElecBTUPerCapUsedWaterHeating,
+                PerRuralElecBTUPerCapUsedOther,
+                RuralPerResNGUsed,
+                PerRuralNGBTUPerCapUsedSpaceHeating,
+                PerRuralNGBTUPerCapUsedWaterHeating,
+                PerRuralNGBTUPerCapUsedOther,
+                RuralPerResFOKerUsed,
+                PerRuralFOKerBTUPerCapUsedSpaceHeating,
+                PerRuralFOKerBTUPerCapUsedWaterHeating,
+                PerRuralFOKerBTUPerCapUsedOther,
+                RuralPerResLPGUsed,
+                PerRuralLPGBTUPerCapUsedSpaceHeating,
+                PerRuralLPGBTUPerCapUsedWaterHeating,
+                PerRuralLPGBTUPerCapUsedOther,
+                RuralPerResFFNGUsed,
+                RuralPerResFFFOKerUsed,
+                RuralPerResFFLPGUsed,
+                RuralPerElecHeatingUsedforSpaceHeating,
+                RuralPerResFFSpaceHeatingNGUsed,
+                RuralPerElecHeatingUsedforWaterHeating,
+                RuralPerResFFWaterHeatingNGUsed,
+                RuralPerResFFSpaceHeatingFOKerUsed,
+                RuralPerResFFWaterHeatingFOKerUsed,
+                RuralPerResFFSpaceHeatingLPGUsed,
+                RuralPerResFFWaterHeatingLPGUsed,
+                BTUperMWh,
+                grid_coal,
+                LB_CO2e_MWh_Coal,
+                grid_oil,
+                LB_CO2e_MWh_Oil,
+                grid_ng,
+                LB_CO2e_MWh_NG,
+                grid_other_ff,
+                LB_CO2e_MWh_OtherFos,
+                MMTperLB,
+                PerCombCapture,
+                BTUperCCF,
+                MCFperCCF,
+                LB_CO2e_MCF_NG,
+                BTUperGallonFOKer,
+                MMTCO2e_ThBarrel_FOKer,
+                ThBarrelperGallon,
+                BTUperGallonLPG,
+                MMTCO2e_ThBarrel_LPG,
+                ComIndPerElectrification,
+                ComIndPerFossilFuelUsed2015,
+                ComIndBBtuUsed,
+                PerComIndEnergyUse,
+                ComIndPerFFNGUsed,
+                PerEnergyToUseComIndNG,
+                MillionCFperCF,
+                MMTCO2ePerMillionCFNG_CH4,
+                MMTCO2ePerMillionCFNG_CO2,
+                PerUrbanTreeCoverage,
+                PerForestCoverage,
+            ),
+        ],
+    }
+
+    # Update source data for pie chart
+    source3.data = {
+        "FuelType": [
+            "Coal",
+            "Oil",
+            "Natural Gas",
+            "Nuclear",
+            "Solar",
+            "Wind",
+            "Biomass",
+            "Hydropower",
+            "Geothermal",
+            "Other Fossil Fuel",
+        ],
+        "Percentage": [
+            grid_coal,
+            grid_oil,
+            grid_ng,
+            grid_nuclear,
+            grid_solar,
+            grid_wind,
+            grid_bio,
+            grid_hydro,
+            grid_geo,
+            grid_other_ff,
+        ],
+        "angle": [
+            (
+                grid_coal
+                / (
+                    grid_bio
+                    + grid_coal
+                    + grid_hydro
+                    + grid_ng
+                    + grid_nuclear
+                    + grid_oil
+                    + grid_other_ff
+                    + grid_solar
+                    + grid_wind
+                    + grid_geo
+                )
+                * (2 * pi)
+            ),
+            (
+                grid_oil
+                / (
+                    grid_bio
+                    + grid_coal
+                    + grid_hydro
+                    + grid_ng
+                    + grid_nuclear
+                    + grid_oil
+                    + grid_other_ff
+                    + grid_solar
+                    + grid_wind
+                    + grid_geo
+                )
+                * (2 * pi)
+            ),
+            (
+                grid_ng
+                / (
+                    grid_bio
+                    + grid_coal
+                    + grid_hydro
+                    + grid_ng
+                    + grid_nuclear
+                    + grid_oil
+                    + grid_other_ff
+                    + grid_solar
+                    + grid_wind
+                    + grid_geo
+                )
+                * (2 * pi)
+            ),
+            (
+                grid_nuclear
+                / (
+                    grid_bio
+                    + grid_coal
+                    + grid_hydro
+                    + grid_ng
+                    + grid_nuclear
+                    + grid_oil
+                    + grid_other_ff
+                    + grid_solar
+                    + grid_wind
+                    + grid_geo
+                )
+                * (2 * pi)
+            ),
+            (
+                grid_solar
+                / (
+                    grid_bio
+                    + grid_coal
+                    + grid_hydro
+                    + grid_ng
+                    + grid_nuclear
+                    + grid_oil
+                    + grid_other_ff
+                    + grid_solar
+                    + grid_wind
+                    + grid_geo
+                )
+                * (2 * pi)
+            ),
+            (
+                grid_wind
+                / (
+                    grid_bio
+                    + grid_coal
+                    + grid_hydro
+                    + grid_ng
+                    + grid_nuclear
+                    + grid_oil
+                    + grid_other_ff
+                    + grid_solar
+                    + grid_wind
+                    + grid_geo
+                )
+                * (2 * pi)
+            ),
+            (
+                grid_bio
+                / (
+                    grid_bio
+                    + grid_coal
+                    + grid_hydro
+                    + grid_ng
+                    + grid_nuclear
+                    + grid_oil
+                    + grid_other_ff
+                    + grid_solar
+                    + grid_wind
+                    + grid_geo
+                )
+                * (2 * pi)
+            ),
+            (
+                grid_hydro
+                / (
+                    grid_bio
+                    + grid_coal
+                    + grid_hydro
+                    + grid_ng
+                    + grid_nuclear
+                    + grid_oil
+                    + grid_other_ff
+                    + grid_solar
+                    + grid_wind
+                    + grid_geo
+                )
+                * (2 * pi)
+            ),
+            (
+                grid_geo
+                / (
+                    grid_bio
+                    + grid_coal
+                    + grid_hydro
+                    + grid_ng
+                    + grid_nuclear
+                    + grid_oil
+                    + grid_other_ff
+                    + grid_solar
+                    + grid_wind
+                    + grid_geo
+                )
+                * (2 * pi)
+            ),
+            (
+                grid_other_ff
+                / (
+                    grid_bio
+                    + grid_coal
+                    + grid_hydro
+                    + grid_ng
+                    + grid_nuclear
+                    + grid_oil
+                    + grid_other_ff
+                    + grid_solar
+                    + grid_wind
+                    + grid_geo
+                )
+                * (2 * pi)
+            ),
+        ],
+        "color": Spectral10,
+    }
+    # Update the paragraph widget text based on the new text inputs
+    if (
+        round(
+            (
+                grid_coal
+                + grid_oil
+                + grid_ng
+                + grid_nuclear
+                + grid_solar
+                + grid_wind
+                + grid_bio
+                + grid_hydro
+                + grid_geo
+                + grid_other_ff
+            ),
+            2,
+        )
+        > 100
+    ):
+        GridTextParagraph.text = CalcGridText(
+            grid_coal,
+            grid_oil,
+            grid_ng,
+            grid_nuclear,
+            grid_solar,
+            grid_wind,
+            grid_bio,
+            grid_hydro,
+            grid_geo,
+            grid_other_ff,
+        )
+        GridTextParagraph.style = {"color": "red"}
+    elif (
+        round(
+            (
+                grid_coal
+                + grid_oil
+                + grid_ng
+                + grid_nuclear
+                + grid_solar
+                + grid_wind
+                + grid_bio
+                + grid_hydro
+                + grid_other_ff
+            ),
+            2,
+        )
+        < 100
+    ):
+        GridTextParagraph.text = CalcGridText(
+            grid_coal,
+            grid_oil,
+            grid_ng,
+            grid_nuclear,
+            grid_solar,
+            grid_wind,
+            grid_bio,
+            grid_hydro,
+            grid_geo,
+            grid_other_ff,
+        )
+        GridTextParagraph.style = {"color": "orange"}
+    else:
+        GridTextParagraph.text = CalcGridText(
+            grid_coal,
+            grid_oil,
+            grid_ng,
+            grid_nuclear,
+            grid_solar,
+            grid_wind,
+            grid_bio,
+            grid_hydro,
+            grid_geo,
+            grid_other_ff,
+        )
+        GridTextParagraph.style = {"color": "black"}
+
+
+# Create initial plots
 data = {
-    "Category": categories,
+    "Category": sectors,
     "2015": [
-        Residential2015,
-        ComInd2015,
-        MobHighway2015,
-        MobTransit2015,
-        MobAviation2015,
-        MobOther2015,
+        GHG_RES,
+        GHG_CI,
+        GHG_HIGHWAY,
+        GHG_TRANSIT,
+        GHG_AVIATION,
+        GHG_OTHER_MOBILE,
         NonEnergy2015,
     ],
     "Scenario": [
         CalcResGHG(
-            Population,
-            PopFactor,
-            PerUrbanPop,
+            pop_factor,
+            urban_pop_percent,
             UrbanBTUPerCapUsed,
             PerCapResEnergyUse,
             UrbanPerResElectrification,
@@ -3023,14 +4180,13 @@ data = {
             RuralPerResFFSpaceHeatingLPGUsed,
             RuralPerResFFWaterHeatingLPGUsed,
             BTUperMWh,
-            GridLoss,
-            PerCoal,
+            grid_coal,
             LB_CO2e_MWh_Coal,
-            PerOil,
+            grid_oil,
             LB_CO2e_MWh_Oil,
-            PerNG,
+            grid_ng,
             LB_CO2e_MWh_NG,
-            PerOtherFos,
+            grid_other_ff,
             LB_CO2e_MWh_OtherFos,
             MMTperLB,
             PerCombCapture,
@@ -3048,16 +4204,14 @@ data = {
             ComIndBBtuUsed,
             PerComIndEnergyUse,
             PerEnergyToUseComIndElec,
-            BTUPerBBtu,
             BTUperMWh,
-            GridLoss,
-            PerCoal,
+            grid_coal,
             LB_CO2e_MWh_Coal,
-            PerOil,
+            grid_oil,
             LB_CO2e_MWh_Oil,
-            PerNG,
+            grid_ng,
             LB_CO2e_MWh_NG,
-            PerOtherFos,
+            grid_other_ff,
             LB_CO2e_MWh_OtherFos,
             MMTperLB,
             PerCombCapture,
@@ -3095,13 +4249,12 @@ data = {
             MTCO2ePerBBtuSpecialNaphthas,
         ),
         CalcMobHighwayGHG(
-            Population,
-            PerUrbanPop,
-            PopFactor,
+            urban_pop_percent,
+            pop_factor,
             UrbanVMTperPop,
-            PerSuburbanPop,
+            suburban_pop_percent,
             SuburbanVMTperPop,
-            PerRuralPop,
+            rural_pop_percent,
             RuralVMTperPop,
             VMTperCap,
             PerEVMT,
@@ -3109,62 +4262,57 @@ data = {
             CO2eperGallonGasoline,
             MMTperLB,
             EVEff,
-            PerCoal,
+            grid_coal,
             LB_CO2e_MWh_Coal,
-            PerOil,
+            grid_oil,
             LB_CO2e_MWh_Oil,
-            PerNG,
+            grid_ng,
             LB_CO2e_MWh_NG,
-            PerOtherFos,
+            grid_other_ff,
             LB_CO2e_MWh_OtherFos,
             PerCombCapture,
         ),
         CalcMobTransitGHG(
-            Population,
-            PopFactor,
+            pop_factor,
             BTUperMWh,
-            GridLoss,
-            PerUrbanPop,
-            TransRailUrbanPerElectrification,
-            TransRailSuburbanPerElectrification,
-            TransRailRuralPerElectrification,
+            urban_pop_percent,
+            TransRailUrbanPerElecMotion,
+            TransRailSuburbanPerElecMotion,
+            TransRailRuralPerElecMotion,
             TransRailUrbanBTUPerCapMotion,
-            PerSuburbanPop,
+            suburban_pop_percent,
             TransRailSuburbanBTUPerCapMotion,
-            PerRuralPop,
+            rural_pop_percent,
             TransRailRuralBTUPerCapMotion,
             PerEnergyToMotionRailElec,
-            PerCoal,
+            grid_coal,
             LB_CO2e_MWh_Coal,
-            PerOil,
+            grid_oil,
             LB_CO2e_MWh_Oil,
-            PerNG,
+            grid_ng,
             LB_CO2e_MWh_NG,
-            PerOtherFos,
+            grid_other_ff,
             LB_CO2e_MWh_OtherFos,
             MMTperLB,
             PerCombCapture,
             TransRailMTCO2ePerBBtuDiesel,
-            BTUPerBBtu,
             MMTperMT,
             PerEnergyToMotionRailDiesel,
             PerTransRailRidership,
         ),
-        CalcMobAviationGHG(MobAviation2015, PopFactor, PerAviation),
+        CalcMobAviationGHG(pop_factor, PerAviation),
         CalcMobOtherGHG(
             FreightRailBBtuMotion,
-            FreightRailPerElectrification,
+            FreightRailPerElecMotion,
             PerEnergyToMotionRailElec,
-            BTUPerBBtu,
             BTUperMWh,
-            GridLoss,
-            PerCoal,
+            grid_coal,
             LB_CO2e_MWh_Coal,
-            PerOil,
+            grid_oil,
             LB_CO2e_MWh_Oil,
-            PerNG,
+            grid_ng,
             LB_CO2e_MWh_NG,
-            PerOtherFos,
+            grid_other_ff,
             LB_CO2e_MWh_OtherFos,
             MMTperLB,
             PerCombCapture,
@@ -3173,7 +4321,7 @@ data = {
             PerEnergyToMotionRailDiesel,
             PerFreightRail,
             InterCityRailBBtuMotion,
-            InterCityRailPerElectrification,
+            InterCityRailPerElecMotion,
             InterCityRailMTCO2ePerBBtuDiesel,
             PerInterCityRail,
             MarinePortPerElectrification,
@@ -3203,17 +4351,12 @@ data = {
             PerOffroad,
         ),
         CalcNonEnergyGHG(
-            Ag2015,
             PerAg,
-            Waste2015,
             PerWaste,
-            PopFactor,
-            WasteWater2015,
+            pop_factor,
             PerWasteWater,
-            IP2015,
             PerIP,
-            Population,
-            PerUrbanPop,
+            urban_pop_percent,
             UrbanBTUPerCapUsed,
             PerCapResEnergyUse,
             UrbanPerResElectrification,
@@ -3317,14 +4460,13 @@ data = {
             RuralPerResFFSpaceHeatingLPGUsed,
             RuralPerResFFWaterHeatingLPGUsed,
             BTUperMWh,
-            GridLoss,
-            PerCoal,
+            grid_coal,
             LB_CO2e_MWh_Coal,
-            PerOil,
+            grid_oil,
             LB_CO2e_MWh_Oil,
-            PerNG,
+            grid_ng,
             LB_CO2e_MWh_NG,
-            PerOtherFos,
+            grid_other_ff,
             LB_CO2e_MWh_OtherFos,
             MMTperLB,
             PerCombCapture,
@@ -3342,15 +4484,10 @@ data = {
             PerComIndEnergyUse,
             ComIndPerFFNGUsed,
             PerEnergyToUseComIndNG,
-            BTUPerBBtu,
-            CFperCCF,
             MillionCFperCF,
             MMTCO2ePerMillionCFNG_CH4,
             MMTCO2ePerMillionCFNG_CO2,
-            UrbanTrees2015,
             PerUrbanTreeCoverage,
-            ForestSequestration2015,
-            ForestLossGain2015,
             PerForestCoverage,
         ),
     ],
@@ -3393,11 +4530,10 @@ bar_chart.x_range.range_padding = 0.1
 data2 = {
     "Year": ["2015", "Scenario"],
     "Residential": [
-        Residential2015,
+        GHG_RES,
         CalcResGHG(
-            Population,
-            PopFactor,
-            PerUrbanPop,
+            pop_factor,
+            urban_pop_percent,
             UrbanBTUPerCapUsed,
             PerCapResEnergyUse,
             UrbanPerResElectrification,
@@ -3501,14 +4637,13 @@ data2 = {
             RuralPerResFFSpaceHeatingLPGUsed,
             RuralPerResFFWaterHeatingLPGUsed,
             BTUperMWh,
-            GridLoss,
-            PerCoal,
+            grid_coal,
             LB_CO2e_MWh_Coal,
-            PerOil,
+            grid_oil,
             LB_CO2e_MWh_Oil,
-            PerNG,
+            grid_ng,
             LB_CO2e_MWh_NG,
-            PerOtherFos,
+            grid_other_ff,
             LB_CO2e_MWh_OtherFos,
             MMTperLB,
             PerCombCapture,
@@ -3523,22 +4658,20 @@ data2 = {
         )[0],
     ],
     "Commercial/Industrial": [
-        ComInd2015,
+        GHG_CI,
         CalcComIndGHG(
             ComIndPerElectrification,
             ComIndBBtuUsed,
             PerComIndEnergyUse,
             PerEnergyToUseComIndElec,
-            BTUPerBBtu,
             BTUperMWh,
-            GridLoss,
-            PerCoal,
+            grid_coal,
             LB_CO2e_MWh_Coal,
-            PerOil,
+            grid_oil,
             LB_CO2e_MWh_Oil,
-            PerNG,
+            grid_ng,
             LB_CO2e_MWh_NG,
-            PerOtherFos,
+            grid_other_ff,
             LB_CO2e_MWh_OtherFos,
             MMTperLB,
             PerCombCapture,
@@ -3577,15 +4710,14 @@ data2 = {
         ),
     ],
     "Mobile-Highway": [
-        MobHighway2015,
+        GHG_HIGHWAY,
         CalcMobHighwayGHG(
-            Population,
-            PerUrbanPop,
-            PopFactor,
+            urban_pop_percent,
+            pop_factor,
             UrbanVMTperPop,
-            PerSuburbanPop,
+            suburban_pop_percent,
             SuburbanVMTperPop,
-            PerRuralPop,
+            rural_pop_percent,
             RuralVMTperPop,
             VMTperCap,
             PerEVMT,
@@ -3593,71 +4725,63 @@ data2 = {
             CO2eperGallonGasoline,
             MMTperLB,
             EVEff,
-            PerCoal,
+            grid_coal,
             LB_CO2e_MWh_Coal,
-            PerOil,
+            grid_oil,
             LB_CO2e_MWh_Oil,
-            PerNG,
+            grid_ng,
             LB_CO2e_MWh_NG,
-            PerOtherFos,
+            grid_other_ff,
             LB_CO2e_MWh_OtherFos,
             PerCombCapture,
         ),
     ],
     "Mobile-Transit": [
-        MobTransit2015,
+        GHG_TRANSIT,
         CalcMobTransitGHG(
-            Population,
-            PopFactor,
+            pop_factor,
             BTUperMWh,
-            GridLoss,
-            PerUrbanPop,
-            TransRailUrbanPerElectrification,
-            TransRailSuburbanPerElectrification,
-            TransRailRuralPerElectrification,
+            urban_pop_percent,
+            TransRailUrbanPerElecMotion,
+            TransRailSuburbanPerElecMotion,
+            TransRailRuralPerElecMotion,
             TransRailUrbanBTUPerCapMotion,
-            PerSuburbanPop,
+            suburban_pop_percent,
             TransRailSuburbanBTUPerCapMotion,
-            PerRuralPop,
+            rural_pop_percent,
             TransRailRuralBTUPerCapMotion,
             PerEnergyToMotionRailElec,
-            PerCoal,
+            grid_coal,
             LB_CO2e_MWh_Coal,
-            PerOil,
+            grid_oil,
             LB_CO2e_MWh_Oil,
-            PerNG,
+            grid_ng,
             LB_CO2e_MWh_NG,
-            PerOtherFos,
+            grid_other_ff,
             LB_CO2e_MWh_OtherFos,
             MMTperLB,
             PerCombCapture,
             TransRailMTCO2ePerBBtuDiesel,
-            BTUPerBBtu,
             MMTperMT,
             PerEnergyToMotionRailDiesel,
             PerTransRailRidership,
         ),
     ],
-    "Mobile-Aviation": [
-        MobAviation2015,
-        CalcMobAviationGHG(MobAviation2015, PopFactor, PerAviation),
-    ],
+    "Mobile-Aviation": [GHG_AVIATION, CalcMobAviationGHG(pop_factor, PerAviation)],
     "Mobile-Other": [
-        MobOther2015,
+        GHG_OTHER_MOBILE,
         CalcMobOtherGHG(
             FreightRailBBtuMotion,
-            FreightRailPerElectrification,
+            FreightRailPerElecMotion,
             PerEnergyToMotionRailElec,
-            BTUPerBBtu,
             BTUperMWh,
-            GridLoss,
-            PerCoal,
+            grid_coal,
             LB_CO2e_MWh_Coal,
-            PerOil,
+            grid_oil,
             LB_CO2e_MWh_Oil,
-            PerNG,
+            grid_ng,
             LB_CO2e_MWh_NG,
-            PerOtherFos,
+            grid_other_ff,
             LB_CO2e_MWh_OtherFos,
             MMTperLB,
             PerCombCapture,
@@ -3666,7 +4790,7 @@ data2 = {
             PerEnergyToMotionRailDiesel,
             PerFreightRail,
             InterCityRailBBtuMotion,
-            InterCityRailPerElectrification,
+            InterCityRailPerElecMotion,
             InterCityRailMTCO2ePerBBtuDiesel,
             PerInterCityRail,
             MarinePortPerElectrification,
@@ -3699,17 +4823,12 @@ data2 = {
     "Non-Energy": [
         NonEnergy2015,
         CalcNonEnergyGHG(
-            Ag2015,
             PerAg,
-            Waste2015,
             PerWaste,
-            PopFactor,
-            WasteWater2015,
+            pop_factor,
             PerWasteWater,
-            IP2015,
             PerIP,
-            Population,
-            PerUrbanPop,
+            urban_pop_percent,
             UrbanBTUPerCapUsed,
             PerCapResEnergyUse,
             UrbanPerResElectrification,
@@ -3813,14 +4932,13 @@ data2 = {
             RuralPerResFFSpaceHeatingLPGUsed,
             RuralPerResFFWaterHeatingLPGUsed,
             BTUperMWh,
-            GridLoss,
-            PerCoal,
+            grid_coal,
             LB_CO2e_MWh_Coal,
-            PerOil,
+            grid_oil,
             LB_CO2e_MWh_Oil,
-            PerNG,
+            grid_ng,
             LB_CO2e_MWh_NG,
-            PerOtherFos,
+            grid_other_ff,
             LB_CO2e_MWh_OtherFos,
             MMTperLB,
             PerCombCapture,
@@ -3838,30 +4956,16 @@ data2 = {
             PerComIndEnergyUse,
             ComIndPerFFNGUsed,
             PerEnergyToUseComIndNG,
-            BTUPerBBtu,
-            CFperCCF,
             MillionCFperCF,
             MMTCO2ePerMillionCFNG_CH4,
             MMTCO2ePerMillionCFNG_CO2,
-            UrbanTrees2015,
             PerUrbanTreeCoverage,
-            ForestSequestration2015,
-            ForestLossGain2015,
             PerForestCoverage,
         ),
     ],
 }
 
 source2 = ColumnDataSource(data=data2)
-sectors = [
-    "Residential",
-    "Commercial/Industrial",
-    "Mobile-Highway",
-    "Mobile-Transit",
-    "Mobile-Aviation",
-    "Mobile-Other",
-    "Non-Energy",
-]
 
 # Configure stacked bar plot
 stacked_bar_chart = figure(
@@ -3874,7 +4978,7 @@ stacked_bar_chart = figure(
 )
 
 stacked_bar_chart.vbar_stack(
-    categories, x="Year", width=0.4, color=Viridis7, source=source2, legend_label=sectors
+    sectors, x="Year", width=0.4, color=Viridis7, source=source2, legend_label=sectors
 )
 
 stacked_bar_chart.legend[
@@ -3886,16 +4990,16 @@ stacked_bar_chart.add_layout(stacked_bar_chart_legend, "right")
 # Configure data and plot for pie chart
 
 x = {
-    "Coal": PerCoal,
-    "Oil": PerOil,
-    "Natural Gas": PerNG,
-    "Nuclear": PerNuclear,
-    "Solar": PerSolar,
-    "Wind": PerWind,
-    "Biomass": PerBio,
-    "Hydropower": PerHydro,
-    "Geothermal": PerGeo,
-    "Other Fossil Fuel": PerOtherFos,
+    "Coal": grid_coal,
+    "Oil": grid_oil,
+    "Natural Gas": grid_ng,
+    "Nuclear": grid_nuclear,
+    "Solar": grid_solar,
+    "Wind": grid_wind,
+    "Biomass": grid_bio,
+    "Hydropower": grid_hydro,
+    "Geothermal": grid_geo,
+    "Other Fossil Fuel": grid_other_ff,
 }
 
 data3 = pd.Series(x).reset_index(name="Percentage").rename(columns={"index": "FuelType"})
@@ -3933,1334 +5037,80 @@ electric_grid_pie_chart.grid.grid_line_color = None
 # Initializes paragraph widget based on calculating grid mix and assigning it to text within the paragraph to be updated
 GridTextParagraph = Paragraph(
     text=CalcGridText(
-        PerCoal,
-        PerOil,
-        PerNG,
-        PerNuclear,
-        PerSolar,
-        PerWind,
-        PerBio,
-        PerHydro,
-        PerGeo,
-        PerOtherFos,
+        grid_coal,
+        grid_oil,
+        grid_ng,
+        grid_nuclear,
+        grid_solar,
+        grid_wind,
+        grid_bio,
+        grid_hydro,
+        grid_geo,
+        grid_other_ff,
     ),
     style={"color": "black"},
 )
 
-
-def callback(attr, old, new):
-    """Callback function nested within modify function."""
-    PerCoal = float(PerCoalTextInput.value)
-    PerOil = float(PerOilTextInput.value)
-    PerNG = float(PerNGTextInput.value)
-    PerNuclear = float(PerNuclearTextInput.value)
-    PerSolar = float(PerSolarTextInput.value)
-    PerWind = float(PerWindTextInput.value)
-    PerBio = float(PerBioTextInput.value)
-    PerHydro = float(PerHydroTextInput.value)
-    PerGeo = float(PerGeoTextInput.value)
-    PerOtherFos = float(PerOtherFosTextInput.value)
-    PerNetZeroCarbon = float(
-        PerNetZeroCarbonTextInput.value
-    )  # we may add this scenario in the future
-
-    PopFactor = PopFactorSlider.value
-    PerUrbanPop = float(PerUrbanPopTextInput.value)
-    PerSuburbanPop = float(PerSuburbanPopTextInput.value)
-    PerRuralPop = float(PerRuralPopTextInput.value)
-
-    PerCapResEnergyUse = PerCapResEnergyUseSlider.value
-    UrbanPerResElectrification = UrbanPerResElectrificationSlider.value
-    SuburbanPerResElectrification = SuburbanPerResElectrificationSlider.value
-    RuralPerResElectrification = RuralPerResElectrificationSlider.value
-
-    PerComIndEnergyUse = PerComIndEnergyUseSlider.value
-    ComIndPerElectrification = ComIndPerElectrificationSlider.value
-
-    VMTperCap = VMTperCapSlider.value
-    RegionalFleetMPG = RegionalFleetMPGSlider.value
-    #         EVEff = 1/(EVEffSlider.value)
-    PerEVMT = PerEVMTSlider.value
-
-    PerTransRailRidership = PerTransRailRidershipSlider.value
-    TransRailUrbanPerElectrification = TransRailUrbanPerElectrificationSlider.value
-    TransRailSuburbanPerElectrification = TransRailSuburbanPerElectrificationSlider.value
-    TransRailRuralPerElectrification = TransRailRuralPerElectrificationSlider.value
-
-    PerFreightRail = PerFreightRailSlider.value
-    FreightRailPerElectrification = FreightRailPerElectrificationSlider.value
-
-    PerInterCityRail = PerInterCityRailSlider.value
-    InterCityRailPerElectrification = InterCityRailPerElectrificationSlider.value
-
-    PerMarinePort = PerMarinePortSlider.value
-    MarinePortPerElectrification = MarinePortPerElectrificationSlider.value
-
-    PerOffroad = PerOffroadSlider.value
-    OffroadPerElectrification = OffroadPerElectrificationSlider.value
-
-    PerAviation = PerAviationSlider.value
-    PerAg = PerAgSlider.value
-    PerWaste = PerWasteSlider.value
-    PerWasteWater = PerWasteWaterSlider.value
-    PerIP = PerIPSlider.value
-    PerUrbanTreeCoverage = PerUrbanTreeCoverageSlider.value
-    PerForestCoverage = PerForestCoverageSlider.value
-
-    PerCombCapture = PerCombCaptureSlider.value
-    AirCapture = AirCaptureSlider.value  # TK
-
-    # Updates source data for vertical bar chart
-    source.data = {
-        "Category": [
-            "Residential",
-            "Commercial/Industrial",
-            "Mobile-Highway",
-            "Mobile-Transit",
-            "Mobile-Aviation",
-            "Mobile-Other",
-            "Non-Energy",
-        ],
-        "2015": [
-            Residential2015,
-            ComInd2015,
-            MobHighway2015,
-            MobTransit2015,
-            MobAviation2015,
-            MobOther2015,
-            NonEnergy2015,
-        ],
-        "Scenario": [
-            CalcResGHG(
-                Population,
-                PopFactor,
-                PerUrbanPop,
-                UrbanBTUPerCapUsed,
-                PerCapResEnergyUse,
-                UrbanPerResElectrification,
-                UrbanPerResElecUsed,
-                PerUrbanElecBTUPerCapUsedSpaceHeating,
-                PerUrbanElecBTUPerCapUsedWaterHeating,
-                PerUrbanElecBTUPerCapUsedOther,
-                UrbanPerResNGUsed,
-                PerUrbanNGBTUPerCapUsedSpaceHeating,
-                PerUrbanNGBTUPerCapUsedWaterHeating,
-                PerUrbanNGBTUPerCapUsedOther,
-                UrbanPerResFOKerUsed,
-                PerUrbanFOKerBTUPerCapUsedSpaceHeating,
-                PerUrbanFOKerBTUPerCapUsedWaterHeating,
-                PerUrbanFOKerBTUPerCapUsedOther,
-                UrbanPerResLPGUsed,
-                PerUrbanLPGBTUPerCapUsedSpaceHeating,
-                PerUrbanLPGBTUPerCapUsedWaterHeating,
-                PerUrbanLPGBTUPerCapUsedOther,
-                UrbanPerResFFNGUsed,
-                UrbanPerResFFFOKerUsed,
-                UrbanPerResFFLPGUsed,
-                UrbanPerElecHeatingUsedforSpaceHeating,
-                UrbanPerResFFSpaceHeatingNGUsed,
-                UrbanPerElecHeatingUsedforWaterHeating,
-                UrbanPerResFFWaterHeatingNGUsed,
-                UrbanPerResFFSpaceHeatingFOKerUsed,
-                UrbanPerResFFWaterHeatingFOKerUsed,
-                UrbanPerResFFSpaceHeatingLPGUsed,
-                UrbanPerResFFWaterHeatingLPGUsed,
-                PerEnergyToUseResElecSpaceHeating,
-                PerEnergyToUseResElecWaterHeating,
-                PerEnergyToUseResElecOther,
-                PerEnergyToUseResElecSpaceHeatingSwitch,
-                PerEnergyToUseResElecWaterHeatingSwitch,
-                PerEnergyToUseResNGSpaceHeating,
-                PerEnergyToUseResNGWaterHeating,
-                PerEnergyToUseResNGOther,
-                PerEnergyToUseResFOKerSpaceHeating,
-                PerEnergyToUseResFOKerWaterHeating,
-                PerEnergyToUseResFOKerOther,
-                PerEnergyToUseResLPGSpaceHeating,
-                PerEnergyToUseResLPGWaterHeating,
-                PerEnergyToUseResLPGOther,
-                SuburbanBTUPerCapUsed,
-                SuburbanPerResElectrification,
-                SuburbanPerResElecUsed,
-                PerSuburbanElecBTUPerCapUsedSpaceHeating,
-                PerSuburbanElecBTUPerCapUsedWaterHeating,
-                PerSuburbanElecBTUPerCapUsedOther,
-                SuburbanPerResNGUsed,
-                PerSuburbanNGBTUPerCapUsedSpaceHeating,
-                PerSuburbanNGBTUPerCapUsedWaterHeating,
-                PerSuburbanNGBTUPerCapUsedOther,
-                SuburbanPerResFOKerUsed,
-                PerSuburbanFOKerBTUPerCapUsedSpaceHeating,
-                PerSuburbanFOKerBTUPerCapUsedWaterHeating,
-                PerSuburbanFOKerBTUPerCapUsedOther,
-                SuburbanPerResLPGUsed,
-                PerSuburbanLPGBTUPerCapUsedSpaceHeating,
-                PerSuburbanLPGBTUPerCapUsedWaterHeating,
-                PerSuburbanLPGBTUPerCapUsedOther,
-                SuburbanPerResFFNGUsed,
-                SuburbanPerResFFFOKerUsed,
-                SuburbanPerResFFLPGUsed,
-                SuburbanPerElecHeatingUsedforSpaceHeating,
-                SuburbanPerResFFSpaceHeatingNGUsed,
-                SuburbanPerElecHeatingUsedforWaterHeating,
-                SuburbanPerResFFWaterHeatingNGUsed,
-                SuburbanPerResFFSpaceHeatingFOKerUsed,
-                SuburbanPerResFFWaterHeatingFOKerUsed,
-                SuburbanPerResFFSpaceHeatingLPGUsed,
-                SuburbanPerResFFWaterHeatingLPGUsed,
-                RuralBTUPerCapUsed,
-                RuralPerResElectrification,
-                RuralPerResElecUsed,
-                PerRuralElecBTUPerCapUsedSpaceHeating,
-                PerRuralElecBTUPerCapUsedWaterHeating,
-                PerRuralElecBTUPerCapUsedOther,
-                RuralPerResNGUsed,
-                PerRuralNGBTUPerCapUsedSpaceHeating,
-                PerRuralNGBTUPerCapUsedWaterHeating,
-                PerRuralNGBTUPerCapUsedOther,
-                RuralPerResFOKerUsed,
-                PerRuralFOKerBTUPerCapUsedSpaceHeating,
-                PerRuralFOKerBTUPerCapUsedWaterHeating,
-                PerRuralFOKerBTUPerCapUsedOther,
-                RuralPerResLPGUsed,
-                PerRuralLPGBTUPerCapUsedSpaceHeating,
-                PerRuralLPGBTUPerCapUsedWaterHeating,
-                PerRuralLPGBTUPerCapUsedOther,
-                RuralPerResFFNGUsed,
-                RuralPerResFFFOKerUsed,
-                RuralPerResFFLPGUsed,
-                RuralPerElecHeatingUsedforSpaceHeating,
-                RuralPerResFFSpaceHeatingNGUsed,
-                RuralPerElecHeatingUsedforWaterHeating,
-                RuralPerResFFWaterHeatingNGUsed,
-                RuralPerResFFSpaceHeatingFOKerUsed,
-                RuralPerResFFWaterHeatingFOKerUsed,
-                RuralPerResFFSpaceHeatingLPGUsed,
-                RuralPerResFFWaterHeatingLPGUsed,
-                BTUperMWh,
-                GridLoss,
-                PerCoal,
-                LB_CO2e_MWh_Coal,
-                PerOil,
-                LB_CO2e_MWh_Oil,
-                PerNG,
-                LB_CO2e_MWh_NG,
-                PerOtherFos,
-                LB_CO2e_MWh_OtherFos,
-                MMTperLB,
-                PerCombCapture,
-                BTUperCCF,
-                MCFperCCF,
-                LB_CO2e_MCF_NG,
-                BTUperGallonFOKer,
-                MMTCO2e_ThBarrel_FOKer,
-                ThBarrelperGallon,
-                BTUperGallonLPG,
-                MMTCO2e_ThBarrel_LPG,
-            )[0],
-            CalcComIndGHG(
-                ComIndPerElectrification,
-                ComIndBBtuUsed,
-                PerComIndEnergyUse,
-                PerEnergyToUseComIndElec,
-                BTUPerBBtu,
-                BTUperMWh,
-                GridLoss,
-                PerCoal,
-                LB_CO2e_MWh_Coal,
-                PerOil,
-                LB_CO2e_MWh_Oil,
-                PerNG,
-                LB_CO2e_MWh_NG,
-                PerOtherFos,
-                LB_CO2e_MWh_OtherFos,
-                MMTperLB,
-                PerCombCapture,
-                ComIndPerFossilFuelUsed2015,
-                ComIndPerFFNGUsed,
-                PerEnergyToUseComIndNG,
-                MTCO2ePerBBtuNG,
-                MMTperMT,
-                ComIndPerFFCoalUsed,
-                PerEnergyToUseComIndCoal,
-                MTCO2ePerBBtuCoal,
-                ComIndPerFFDFOUsed,
-                PerEnergyToUseComIndDFO,
-                MTCO2ePerBBtuDFO,
-                ComIndPerFFKerUsed,
-                PerEnergyToUseComIndKer,
-                MTCO2ePerBBtuKer,
-                ComIndPerFFLPGUsed,
-                PerEnergyToUseComIndLPG,
-                MTCO2ePerBBtuLPG,
-                ComIndPerFFMotGasUsed,
-                PerEnergyToUseComIndMotGas,
-                MTCO2ePerBBtuMotGas,
-                ComIndPerFFRFOUsed,
-                PerEnergyToUseComIndRFO,
-                MTCO2ePerBBtuRFO,
-                ComIndPerFFPetCokeUsed,
-                PerEnergyToUseComIndPetCoke,
-                MTCO2ePerBBtuPetCoke,
-                ComIndPerFFStillGasUsed,
-                PerEnergyToUseComIndStillGas,
-                MTCO2ePerBBtuStillGas,
-                ComIndPerSpecialNaphthasUsed,
-                PerEnergyToUseComIndSpecialNaphthas,
-                MTCO2ePerBBtuSpecialNaphthas,
-            ),
-            CalcMobHighwayGHG(
-                Population,
-                PerUrbanPop,
-                PopFactor,
-                UrbanVMTperPop,
-                PerSuburbanPop,
-                SuburbanVMTperPop,
-                PerRuralPop,
-                RuralVMTperPop,
-                VMTperCap,
-                PerEVMT,
-                RegionalFleetMPG,
-                CO2eperGallonGasoline,
-                MMTperLB,
-                EVEff,
-                PerCoal,
-                LB_CO2e_MWh_Coal,
-                PerOil,
-                LB_CO2e_MWh_Oil,
-                PerNG,
-                LB_CO2e_MWh_NG,
-                PerOtherFos,
-                LB_CO2e_MWh_OtherFos,
-                PerCombCapture,
-            ),
-            CalcMobTransitGHG(
-                Population,
-                PopFactor,
-                BTUperMWh,
-                GridLoss,
-                PerUrbanPop,
-                TransRailUrbanPerElectrification,
-                TransRailSuburbanPerElectrification,
-                TransRailRuralPerElectrification,
-                TransRailUrbanBTUPerCapMotion,
-                PerSuburbanPop,
-                TransRailSuburbanBTUPerCapMotion,
-                PerRuralPop,
-                TransRailRuralBTUPerCapMotion,
-                PerEnergyToMotionRailElec,
-                PerCoal,
-                LB_CO2e_MWh_Coal,
-                PerOil,
-                LB_CO2e_MWh_Oil,
-                PerNG,
-                LB_CO2e_MWh_NG,
-                PerOtherFos,
-                LB_CO2e_MWh_OtherFos,
-                MMTperLB,
-                PerCombCapture,
-                TransRailMTCO2ePerBBtuDiesel,
-                BTUPerBBtu,
-                MMTperMT,
-                PerEnergyToMotionRailDiesel,
-                PerTransRailRidership,
-            ),
-            CalcMobAviationGHG(MobAviation2015, PopFactor, PerAviation),
-            CalcMobOtherGHG(
-                FreightRailBBtuMotion,
-                FreightRailPerElectrification,
-                PerEnergyToMotionRailElec,
-                BTUPerBBtu,
-                BTUperMWh,
-                GridLoss,
-                PerCoal,
-                LB_CO2e_MWh_Coal,
-                PerOil,
-                LB_CO2e_MWh_Oil,
-                PerNG,
-                LB_CO2e_MWh_NG,
-                PerOtherFos,
-                LB_CO2e_MWh_OtherFos,
-                MMTperLB,
-                PerCombCapture,
-                FreightRailMTCO2ePerBBtuDiesel,
-                MMTperMT,
-                PerEnergyToMotionRailDiesel,
-                PerFreightRail,
-                InterCityRailBBtuMotion,
-                InterCityRailPerElectrification,
-                InterCityRailMTCO2ePerBBtuDiesel,
-                PerInterCityRail,
-                MarinePortPerElectrification,
-                MarinePortPerFossilFuelMotion2015,
-                MarinePortBBtuMotion,
-                PerEnergyToMotionMarineElec,
-                MarinePortPerFFRFOMotion,
-                MarinePortMTCO2ePerBBtuRFO,
-                PerEnergyToMotionMarineRFO,
-                MarinePortPerFFDFOMotion,
-                MarinePortMTCO2ePerBBtuDFO,
-                PerEnergyToMotionMarineDFO,
-                PerMarinePort,
-                OffroadPerElectrification,
-                OffroadPerFossilFuelMotion2015,
-                OffroadBBtuMotion,
-                PerEnergyToMotionOffroadElec,
-                OffroadPerFFMotGasMotion,
-                OffroadMTCO2ePerBBtuMotGas,
-                PerEnergyToMotionOffroadMotGas,
-                OffroadPerFFDFOMotion,
-                OffroadMTCO2ePerBBtuDFO,
-                PerEnergyToMotionOffroadDFO,
-                OffroadPerFFLPGMotion,
-                OffroadMTCO2ePerBBtuLPG,
-                PerEnergyToMotionOffroadLPG,
-                PerOffroad,
-            ),
-            CalcNonEnergyGHG(
-                Ag2015,
-                PerAg,
-                Waste2015,
-                PerWaste,
-                PopFactor,
-                WasteWater2015,
-                PerWasteWater,
-                IP2015,
-                PerIP,
-                Population,
-                PerUrbanPop,
-                UrbanBTUPerCapUsed,
-                PerCapResEnergyUse,
-                UrbanPerResElectrification,
-                UrbanPerResElecUsed,
-                PerUrbanElecBTUPerCapUsedSpaceHeating,
-                PerUrbanElecBTUPerCapUsedWaterHeating,
-                PerUrbanElecBTUPerCapUsedOther,
-                UrbanPerResNGUsed,
-                PerUrbanNGBTUPerCapUsedSpaceHeating,
-                PerUrbanNGBTUPerCapUsedWaterHeating,
-                PerUrbanNGBTUPerCapUsedOther,
-                UrbanPerResFOKerUsed,
-                PerUrbanFOKerBTUPerCapUsedSpaceHeating,
-                PerUrbanFOKerBTUPerCapUsedWaterHeating,
-                PerUrbanFOKerBTUPerCapUsedOther,
-                UrbanPerResLPGUsed,
-                PerUrbanLPGBTUPerCapUsedSpaceHeating,
-                PerUrbanLPGBTUPerCapUsedWaterHeating,
-                PerUrbanLPGBTUPerCapUsedOther,
-                UrbanPerResFFNGUsed,
-                UrbanPerResFFFOKerUsed,
-                UrbanPerResFFLPGUsed,
-                UrbanPerElecHeatingUsedforSpaceHeating,
-                UrbanPerResFFSpaceHeatingNGUsed,
-                UrbanPerElecHeatingUsedforWaterHeating,
-                UrbanPerResFFWaterHeatingNGUsed,
-                UrbanPerResFFSpaceHeatingFOKerUsed,
-                UrbanPerResFFWaterHeatingFOKerUsed,
-                UrbanPerResFFSpaceHeatingLPGUsed,
-                UrbanPerResFFWaterHeatingLPGUsed,
-                PerEnergyToUseResElecSpaceHeating,
-                PerEnergyToUseResElecWaterHeating,
-                PerEnergyToUseResElecOther,
-                PerEnergyToUseResElecSpaceHeatingSwitch,
-                PerEnergyToUseResElecWaterHeatingSwitch,
-                PerEnergyToUseResNGSpaceHeating,
-                PerEnergyToUseResNGWaterHeating,
-                PerEnergyToUseResNGOther,
-                PerEnergyToUseResFOKerSpaceHeating,
-                PerEnergyToUseResFOKerWaterHeating,
-                PerEnergyToUseResFOKerOther,
-                PerEnergyToUseResLPGSpaceHeating,
-                PerEnergyToUseResLPGWaterHeating,
-                PerEnergyToUseResLPGOther,
-                SuburbanBTUPerCapUsed,
-                SuburbanPerResElectrification,
-                SuburbanPerResElecUsed,
-                PerSuburbanElecBTUPerCapUsedSpaceHeating,
-                PerSuburbanElecBTUPerCapUsedWaterHeating,
-                PerSuburbanElecBTUPerCapUsedOther,
-                SuburbanPerResNGUsed,
-                PerSuburbanNGBTUPerCapUsedSpaceHeating,
-                PerSuburbanNGBTUPerCapUsedWaterHeating,
-                PerSuburbanNGBTUPerCapUsedOther,
-                SuburbanPerResFOKerUsed,
-                PerSuburbanFOKerBTUPerCapUsedSpaceHeating,
-                PerSuburbanFOKerBTUPerCapUsedWaterHeating,
-                PerSuburbanFOKerBTUPerCapUsedOther,
-                SuburbanPerResLPGUsed,
-                PerSuburbanLPGBTUPerCapUsedSpaceHeating,
-                PerSuburbanLPGBTUPerCapUsedWaterHeating,
-                PerSuburbanLPGBTUPerCapUsedOther,
-                SuburbanPerResFFNGUsed,
-                SuburbanPerResFFFOKerUsed,
-                SuburbanPerResFFLPGUsed,
-                SuburbanPerElecHeatingUsedforSpaceHeating,
-                SuburbanPerResFFSpaceHeatingNGUsed,
-                SuburbanPerElecHeatingUsedforWaterHeating,
-                SuburbanPerResFFWaterHeatingNGUsed,
-                SuburbanPerResFFSpaceHeatingFOKerUsed,
-                SuburbanPerResFFWaterHeatingFOKerUsed,
-                SuburbanPerResFFSpaceHeatingLPGUsed,
-                SuburbanPerResFFWaterHeatingLPGUsed,
-                RuralBTUPerCapUsed,
-                RuralPerResElectrification,
-                RuralPerResElecUsed,
-                PerRuralElecBTUPerCapUsedSpaceHeating,
-                PerRuralElecBTUPerCapUsedWaterHeating,
-                PerRuralElecBTUPerCapUsedOther,
-                RuralPerResNGUsed,
-                PerRuralNGBTUPerCapUsedSpaceHeating,
-                PerRuralNGBTUPerCapUsedWaterHeating,
-                PerRuralNGBTUPerCapUsedOther,
-                RuralPerResFOKerUsed,
-                PerRuralFOKerBTUPerCapUsedSpaceHeating,
-                PerRuralFOKerBTUPerCapUsedWaterHeating,
-                PerRuralFOKerBTUPerCapUsedOther,
-                RuralPerResLPGUsed,
-                PerRuralLPGBTUPerCapUsedSpaceHeating,
-                PerRuralLPGBTUPerCapUsedWaterHeating,
-                PerRuralLPGBTUPerCapUsedOther,
-                RuralPerResFFNGUsed,
-                RuralPerResFFFOKerUsed,
-                RuralPerResFFLPGUsed,
-                RuralPerElecHeatingUsedforSpaceHeating,
-                RuralPerResFFSpaceHeatingNGUsed,
-                RuralPerElecHeatingUsedforWaterHeating,
-                RuralPerResFFWaterHeatingNGUsed,
-                RuralPerResFFSpaceHeatingFOKerUsed,
-                RuralPerResFFWaterHeatingFOKerUsed,
-                RuralPerResFFSpaceHeatingLPGUsed,
-                RuralPerResFFWaterHeatingLPGUsed,
-                BTUperMWh,
-                GridLoss,
-                PerCoal,
-                LB_CO2e_MWh_Coal,
-                PerOil,
-                LB_CO2e_MWh_Oil,
-                PerNG,
-                LB_CO2e_MWh_NG,
-                PerOtherFos,
-                LB_CO2e_MWh_OtherFos,
-                MMTperLB,
-                PerCombCapture,
-                BTUperCCF,
-                MCFperCCF,
-                LB_CO2e_MCF_NG,
-                BTUperGallonFOKer,
-                MMTCO2e_ThBarrel_FOKer,
-                ThBarrelperGallon,
-                BTUperGallonLPG,
-                MMTCO2e_ThBarrel_LPG,
-                ComIndPerElectrification,
-                ComIndPerFossilFuelUsed2015,
-                ComIndBBtuUsed,
-                PerComIndEnergyUse,
-                ComIndPerFFNGUsed,
-                PerEnergyToUseComIndNG,
-                BTUPerBBtu,
-                CFperCCF,
-                MillionCFperCF,
-                MMTCO2ePerMillionCFNG_CH4,
-                MMTCO2ePerMillionCFNG_CO2,
-                UrbanTrees2015,
-                PerUrbanTreeCoverage,
-                ForestSequestration2015,
-                ForestLossGain2015,
-                PerForestCoverage,
-            ),
-        ],
-    }
-
-    # Updates source data for stacked bar chart
-    source2.data = {
-        "Year": ["2015", "Scenario"],
-        "Residential": [
-            Residential2015,
-            CalcResGHG(
-                Population,
-                PopFactor,
-                PerUrbanPop,
-                UrbanBTUPerCapUsed,
-                PerCapResEnergyUse,
-                UrbanPerResElectrification,
-                UrbanPerResElecUsed,
-                PerUrbanElecBTUPerCapUsedSpaceHeating,
-                PerUrbanElecBTUPerCapUsedWaterHeating,
-                PerUrbanElecBTUPerCapUsedOther,
-                UrbanPerResNGUsed,
-                PerUrbanNGBTUPerCapUsedSpaceHeating,
-                PerUrbanNGBTUPerCapUsedWaterHeating,
-                PerUrbanNGBTUPerCapUsedOther,
-                UrbanPerResFOKerUsed,
-                PerUrbanFOKerBTUPerCapUsedSpaceHeating,
-                PerUrbanFOKerBTUPerCapUsedWaterHeating,
-                PerUrbanFOKerBTUPerCapUsedOther,
-                UrbanPerResLPGUsed,
-                PerUrbanLPGBTUPerCapUsedSpaceHeating,
-                PerUrbanLPGBTUPerCapUsedWaterHeating,
-                PerUrbanLPGBTUPerCapUsedOther,
-                UrbanPerResFFNGUsed,
-                UrbanPerResFFFOKerUsed,
-                UrbanPerResFFLPGUsed,
-                UrbanPerElecHeatingUsedforSpaceHeating,
-                UrbanPerResFFSpaceHeatingNGUsed,
-                UrbanPerElecHeatingUsedforWaterHeating,
-                UrbanPerResFFWaterHeatingNGUsed,
-                UrbanPerResFFSpaceHeatingFOKerUsed,
-                UrbanPerResFFWaterHeatingFOKerUsed,
-                UrbanPerResFFSpaceHeatingLPGUsed,
-                UrbanPerResFFWaterHeatingLPGUsed,
-                PerEnergyToUseResElecSpaceHeating,
-                PerEnergyToUseResElecWaterHeating,
-                PerEnergyToUseResElecOther,
-                PerEnergyToUseResElecSpaceHeatingSwitch,
-                PerEnergyToUseResElecWaterHeatingSwitch,
-                PerEnergyToUseResNGSpaceHeating,
-                PerEnergyToUseResNGWaterHeating,
-                PerEnergyToUseResNGOther,
-                PerEnergyToUseResFOKerSpaceHeating,
-                PerEnergyToUseResFOKerWaterHeating,
-                PerEnergyToUseResFOKerOther,
-                PerEnergyToUseResLPGSpaceHeating,
-                PerEnergyToUseResLPGWaterHeating,
-                PerEnergyToUseResLPGOther,
-                SuburbanBTUPerCapUsed,
-                SuburbanPerResElectrification,
-                SuburbanPerResElecUsed,
-                PerSuburbanElecBTUPerCapUsedSpaceHeating,
-                PerSuburbanElecBTUPerCapUsedWaterHeating,
-                PerSuburbanElecBTUPerCapUsedOther,
-                SuburbanPerResNGUsed,
-                PerSuburbanNGBTUPerCapUsedSpaceHeating,
-                PerSuburbanNGBTUPerCapUsedWaterHeating,
-                PerSuburbanNGBTUPerCapUsedOther,
-                SuburbanPerResFOKerUsed,
-                PerSuburbanFOKerBTUPerCapUsedSpaceHeating,
-                PerSuburbanFOKerBTUPerCapUsedWaterHeating,
-                PerSuburbanFOKerBTUPerCapUsedOther,
-                SuburbanPerResLPGUsed,
-                PerSuburbanLPGBTUPerCapUsedSpaceHeating,
-                PerSuburbanLPGBTUPerCapUsedWaterHeating,
-                PerSuburbanLPGBTUPerCapUsedOther,
-                SuburbanPerResFFNGUsed,
-                SuburbanPerResFFFOKerUsed,
-                SuburbanPerResFFLPGUsed,
-                SuburbanPerElecHeatingUsedforSpaceHeating,
-                SuburbanPerResFFSpaceHeatingNGUsed,
-                SuburbanPerElecHeatingUsedforWaterHeating,
-                SuburbanPerResFFWaterHeatingNGUsed,
-                SuburbanPerResFFSpaceHeatingFOKerUsed,
-                SuburbanPerResFFWaterHeatingFOKerUsed,
-                SuburbanPerResFFSpaceHeatingLPGUsed,
-                SuburbanPerResFFWaterHeatingLPGUsed,
-                RuralBTUPerCapUsed,
-                RuralPerResElectrification,
-                RuralPerResElecUsed,
-                PerRuralElecBTUPerCapUsedSpaceHeating,
-                PerRuralElecBTUPerCapUsedWaterHeating,
-                PerRuralElecBTUPerCapUsedOther,
-                RuralPerResNGUsed,
-                PerRuralNGBTUPerCapUsedSpaceHeating,
-                PerRuralNGBTUPerCapUsedWaterHeating,
-                PerRuralNGBTUPerCapUsedOther,
-                RuralPerResFOKerUsed,
-                PerRuralFOKerBTUPerCapUsedSpaceHeating,
-                PerRuralFOKerBTUPerCapUsedWaterHeating,
-                PerRuralFOKerBTUPerCapUsedOther,
-                RuralPerResLPGUsed,
-                PerRuralLPGBTUPerCapUsedSpaceHeating,
-                PerRuralLPGBTUPerCapUsedWaterHeating,
-                PerRuralLPGBTUPerCapUsedOther,
-                RuralPerResFFNGUsed,
-                RuralPerResFFFOKerUsed,
-                RuralPerResFFLPGUsed,
-                RuralPerElecHeatingUsedforSpaceHeating,
-                RuralPerResFFSpaceHeatingNGUsed,
-                RuralPerElecHeatingUsedforWaterHeating,
-                RuralPerResFFWaterHeatingNGUsed,
-                RuralPerResFFSpaceHeatingFOKerUsed,
-                RuralPerResFFWaterHeatingFOKerUsed,
-                RuralPerResFFSpaceHeatingLPGUsed,
-                RuralPerResFFWaterHeatingLPGUsed,
-                BTUperMWh,
-                GridLoss,
-                PerCoal,
-                LB_CO2e_MWh_Coal,
-                PerOil,
-                LB_CO2e_MWh_Oil,
-                PerNG,
-                LB_CO2e_MWh_NG,
-                PerOtherFos,
-                LB_CO2e_MWh_OtherFos,
-                MMTperLB,
-                PerCombCapture,
-                BTUperCCF,
-                MCFperCCF,
-                LB_CO2e_MCF_NG,
-                BTUperGallonFOKer,
-                MMTCO2e_ThBarrel_FOKer,
-                ThBarrelperGallon,
-                BTUperGallonLPG,
-                MMTCO2e_ThBarrel_LPG,
-            )[0],
-        ],
-        "Commercial/Industrial": [
-            ComInd2015,
-            CalcComIndGHG(
-                ComIndPerElectrification,
-                ComIndBBtuUsed,
-                PerComIndEnergyUse,
-                PerEnergyToUseComIndElec,
-                BTUPerBBtu,
-                BTUperMWh,
-                GridLoss,
-                PerCoal,
-                LB_CO2e_MWh_Coal,
-                PerOil,
-                LB_CO2e_MWh_Oil,
-                PerNG,
-                LB_CO2e_MWh_NG,
-                PerOtherFos,
-                LB_CO2e_MWh_OtherFos,
-                MMTperLB,
-                PerCombCapture,
-                ComIndPerFossilFuelUsed2015,
-                ComIndPerFFNGUsed,
-                PerEnergyToUseComIndNG,
-                MTCO2ePerBBtuNG,
-                MMTperMT,
-                ComIndPerFFCoalUsed,
-                PerEnergyToUseComIndCoal,
-                MTCO2ePerBBtuCoal,
-                ComIndPerFFDFOUsed,
-                PerEnergyToUseComIndDFO,
-                MTCO2ePerBBtuDFO,
-                ComIndPerFFKerUsed,
-                PerEnergyToUseComIndKer,
-                MTCO2ePerBBtuKer,
-                ComIndPerFFLPGUsed,
-                PerEnergyToUseComIndLPG,
-                MTCO2ePerBBtuLPG,
-                ComIndPerFFMotGasUsed,
-                PerEnergyToUseComIndMotGas,
-                MTCO2ePerBBtuMotGas,
-                ComIndPerFFRFOUsed,
-                PerEnergyToUseComIndRFO,
-                MTCO2ePerBBtuRFO,
-                ComIndPerFFPetCokeUsed,
-                PerEnergyToUseComIndPetCoke,
-                MTCO2ePerBBtuPetCoke,
-                ComIndPerFFStillGasUsed,
-                PerEnergyToUseComIndStillGas,
-                MTCO2ePerBBtuStillGas,
-                ComIndPerSpecialNaphthasUsed,
-                PerEnergyToUseComIndSpecialNaphthas,
-                MTCO2ePerBBtuSpecialNaphthas,
-            ),
-        ],
-        "Mobile-Highway": [
-            MobHighway2015,
-            CalcMobHighwayGHG(
-                Population,
-                PerUrbanPop,
-                PopFactor,
-                UrbanVMTperPop,
-                PerSuburbanPop,
-                SuburbanVMTperPop,
-                PerRuralPop,
-                RuralVMTperPop,
-                VMTperCap,
-                PerEVMT,
-                RegionalFleetMPG,
-                CO2eperGallonGasoline,
-                MMTperLB,
-                EVEff,
-                PerCoal,
-                LB_CO2e_MWh_Coal,
-                PerOil,
-                LB_CO2e_MWh_Oil,
-                PerNG,
-                LB_CO2e_MWh_NG,
-                PerOtherFos,
-                LB_CO2e_MWh_OtherFos,
-                PerCombCapture,
-            ),
-        ],
-        "Mobile-Transit": [
-            MobTransit2015,
-            CalcMobTransitGHG(
-                Population,
-                PopFactor,
-                BTUperMWh,
-                GridLoss,
-                PerUrbanPop,
-                TransRailUrbanPerElectrification,
-                TransRailSuburbanPerElectrification,
-                TransRailRuralPerElectrification,
-                TransRailUrbanBTUPerCapMotion,
-                PerSuburbanPop,
-                TransRailSuburbanBTUPerCapMotion,
-                PerRuralPop,
-                TransRailRuralBTUPerCapMotion,
-                PerEnergyToMotionRailElec,
-                PerCoal,
-                LB_CO2e_MWh_Coal,
-                PerOil,
-                LB_CO2e_MWh_Oil,
-                PerNG,
-                LB_CO2e_MWh_NG,
-                PerOtherFos,
-                LB_CO2e_MWh_OtherFos,
-                MMTperLB,
-                PerCombCapture,
-                TransRailMTCO2ePerBBtuDiesel,
-                BTUPerBBtu,
-                MMTperMT,
-                PerEnergyToMotionRailDiesel,
-                PerTransRailRidership,
-            ),
-        ],
-        "Mobile-Aviation": [
-            MobAviation2015,
-            CalcMobAviationGHG(MobAviation2015, PopFactor, PerAviation),
-        ],
-        "Mobile-Other": [
-            MobOther2015,
-            CalcMobOtherGHG(
-                FreightRailBBtuMotion,
-                FreightRailPerElectrification,
-                PerEnergyToMotionRailElec,
-                BTUPerBBtu,
-                BTUperMWh,
-                GridLoss,
-                PerCoal,
-                LB_CO2e_MWh_Coal,
-                PerOil,
-                LB_CO2e_MWh_Oil,
-                PerNG,
-                LB_CO2e_MWh_NG,
-                PerOtherFos,
-                LB_CO2e_MWh_OtherFos,
-                MMTperLB,
-                PerCombCapture,
-                FreightRailMTCO2ePerBBtuDiesel,
-                MMTperMT,
-                PerEnergyToMotionRailDiesel,
-                PerFreightRail,
-                InterCityRailBBtuMotion,
-                InterCityRailPerElectrification,
-                InterCityRailMTCO2ePerBBtuDiesel,
-                PerInterCityRail,
-                MarinePortPerElectrification,
-                MarinePortPerFossilFuelMotion2015,
-                MarinePortBBtuMotion,
-                PerEnergyToMotionMarineElec,
-                MarinePortPerFFRFOMotion,
-                MarinePortMTCO2ePerBBtuRFO,
-                PerEnergyToMotionMarineRFO,
-                MarinePortPerFFDFOMotion,
-                MarinePortMTCO2ePerBBtuDFO,
-                PerEnergyToMotionMarineDFO,
-                PerMarinePort,
-                OffroadPerElectrification,
-                OffroadPerFossilFuelMotion2015,
-                OffroadBBtuMotion,
-                PerEnergyToMotionOffroadElec,
-                OffroadPerFFMotGasMotion,
-                OffroadMTCO2ePerBBtuMotGas,
-                PerEnergyToMotionOffroadMotGas,
-                OffroadPerFFDFOMotion,
-                OffroadMTCO2ePerBBtuDFO,
-                PerEnergyToMotionOffroadDFO,
-                OffroadPerFFLPGMotion,
-                OffroadMTCO2ePerBBtuLPG,
-                PerEnergyToMotionOffroadLPG,
-                PerOffroad,
-            ),
-        ],
-        "Non-Energy": [
-            NonEnergy2015,
-            CalcNonEnergyGHG(
-                Ag2015,
-                PerAg,
-                Waste2015,
-                PerWaste,
-                PopFactor,
-                WasteWater2015,
-                PerWasteWater,
-                IP2015,
-                PerIP,
-                Population,
-                PerUrbanPop,
-                UrbanBTUPerCapUsed,
-                PerCapResEnergyUse,
-                UrbanPerResElectrification,
-                UrbanPerResElecUsed,
-                PerUrbanElecBTUPerCapUsedSpaceHeating,
-                PerUrbanElecBTUPerCapUsedWaterHeating,
-                PerUrbanElecBTUPerCapUsedOther,
-                UrbanPerResNGUsed,
-                PerUrbanNGBTUPerCapUsedSpaceHeating,
-                PerUrbanNGBTUPerCapUsedWaterHeating,
-                PerUrbanNGBTUPerCapUsedOther,
-                UrbanPerResFOKerUsed,
-                PerUrbanFOKerBTUPerCapUsedSpaceHeating,
-                PerUrbanFOKerBTUPerCapUsedWaterHeating,
-                PerUrbanFOKerBTUPerCapUsedOther,
-                UrbanPerResLPGUsed,
-                PerUrbanLPGBTUPerCapUsedSpaceHeating,
-                PerUrbanLPGBTUPerCapUsedWaterHeating,
-                PerUrbanLPGBTUPerCapUsedOther,
-                UrbanPerResFFNGUsed,
-                UrbanPerResFFFOKerUsed,
-                UrbanPerResFFLPGUsed,
-                UrbanPerElecHeatingUsedforSpaceHeating,
-                UrbanPerResFFSpaceHeatingNGUsed,
-                UrbanPerElecHeatingUsedforWaterHeating,
-                UrbanPerResFFWaterHeatingNGUsed,
-                UrbanPerResFFSpaceHeatingFOKerUsed,
-                UrbanPerResFFWaterHeatingFOKerUsed,
-                UrbanPerResFFSpaceHeatingLPGUsed,
-                UrbanPerResFFWaterHeatingLPGUsed,
-                PerEnergyToUseResElecSpaceHeating,
-                PerEnergyToUseResElecWaterHeating,
-                PerEnergyToUseResElecOther,
-                PerEnergyToUseResElecSpaceHeatingSwitch,
-                PerEnergyToUseResElecWaterHeatingSwitch,
-                PerEnergyToUseResNGSpaceHeating,
-                PerEnergyToUseResNGWaterHeating,
-                PerEnergyToUseResNGOther,
-                PerEnergyToUseResFOKerSpaceHeating,
-                PerEnergyToUseResFOKerWaterHeating,
-                PerEnergyToUseResFOKerOther,
-                PerEnergyToUseResLPGSpaceHeating,
-                PerEnergyToUseResLPGWaterHeating,
-                PerEnergyToUseResLPGOther,
-                SuburbanBTUPerCapUsed,
-                SuburbanPerResElectrification,
-                SuburbanPerResElecUsed,
-                PerSuburbanElecBTUPerCapUsedSpaceHeating,
-                PerSuburbanElecBTUPerCapUsedWaterHeating,
-                PerSuburbanElecBTUPerCapUsedOther,
-                SuburbanPerResNGUsed,
-                PerSuburbanNGBTUPerCapUsedSpaceHeating,
-                PerSuburbanNGBTUPerCapUsedWaterHeating,
-                PerSuburbanNGBTUPerCapUsedOther,
-                SuburbanPerResFOKerUsed,
-                PerSuburbanFOKerBTUPerCapUsedSpaceHeating,
-                PerSuburbanFOKerBTUPerCapUsedWaterHeating,
-                PerSuburbanFOKerBTUPerCapUsedOther,
-                SuburbanPerResLPGUsed,
-                PerSuburbanLPGBTUPerCapUsedSpaceHeating,
-                PerSuburbanLPGBTUPerCapUsedWaterHeating,
-                PerSuburbanLPGBTUPerCapUsedOther,
-                SuburbanPerResFFNGUsed,
-                SuburbanPerResFFFOKerUsed,
-                SuburbanPerResFFLPGUsed,
-                SuburbanPerElecHeatingUsedforSpaceHeating,
-                SuburbanPerResFFSpaceHeatingNGUsed,
-                SuburbanPerElecHeatingUsedforWaterHeating,
-                SuburbanPerResFFWaterHeatingNGUsed,
-                SuburbanPerResFFSpaceHeatingFOKerUsed,
-                SuburbanPerResFFWaterHeatingFOKerUsed,
-                SuburbanPerResFFSpaceHeatingLPGUsed,
-                SuburbanPerResFFWaterHeatingLPGUsed,
-                RuralBTUPerCapUsed,
-                RuralPerResElectrification,
-                RuralPerResElecUsed,
-                PerRuralElecBTUPerCapUsedSpaceHeating,
-                PerRuralElecBTUPerCapUsedWaterHeating,
-                PerRuralElecBTUPerCapUsedOther,
-                RuralPerResNGUsed,
-                PerRuralNGBTUPerCapUsedSpaceHeating,
-                PerRuralNGBTUPerCapUsedWaterHeating,
-                PerRuralNGBTUPerCapUsedOther,
-                RuralPerResFOKerUsed,
-                PerRuralFOKerBTUPerCapUsedSpaceHeating,
-                PerRuralFOKerBTUPerCapUsedWaterHeating,
-                PerRuralFOKerBTUPerCapUsedOther,
-                RuralPerResLPGUsed,
-                PerRuralLPGBTUPerCapUsedSpaceHeating,
-                PerRuralLPGBTUPerCapUsedWaterHeating,
-                PerRuralLPGBTUPerCapUsedOther,
-                RuralPerResFFNGUsed,
-                RuralPerResFFFOKerUsed,
-                RuralPerResFFLPGUsed,
-                RuralPerElecHeatingUsedforSpaceHeating,
-                RuralPerResFFSpaceHeatingNGUsed,
-                RuralPerElecHeatingUsedforWaterHeating,
-                RuralPerResFFWaterHeatingNGUsed,
-                RuralPerResFFSpaceHeatingFOKerUsed,
-                RuralPerResFFWaterHeatingFOKerUsed,
-                RuralPerResFFSpaceHeatingLPGUsed,
-                RuralPerResFFWaterHeatingLPGUsed,
-                BTUperMWh,
-                GridLoss,
-                PerCoal,
-                LB_CO2e_MWh_Coal,
-                PerOil,
-                LB_CO2e_MWh_Oil,
-                PerNG,
-                LB_CO2e_MWh_NG,
-                PerOtherFos,
-                LB_CO2e_MWh_OtherFos,
-                MMTperLB,
-                PerCombCapture,
-                BTUperCCF,
-                MCFperCCF,
-                LB_CO2e_MCF_NG,
-                BTUperGallonFOKer,
-                MMTCO2e_ThBarrel_FOKer,
-                ThBarrelperGallon,
-                BTUperGallonLPG,
-                MMTCO2e_ThBarrel_LPG,
-                ComIndPerElectrification,
-                ComIndPerFossilFuelUsed2015,
-                ComIndBBtuUsed,
-                PerComIndEnergyUse,
-                ComIndPerFFNGUsed,
-                PerEnergyToUseComIndNG,
-                BTUPerBBtu,
-                CFperCCF,
-                MillionCFperCF,
-                MMTCO2ePerMillionCFNG_CH4,
-                MMTCO2ePerMillionCFNG_CO2,
-                UrbanTrees2015,
-                PerUrbanTreeCoverage,
-                ForestSequestration2015,
-                ForestLossGain2015,
-                PerForestCoverage,
-            ),
-        ],
-    }
-
-    # Updates source data for pie chart
-    source3.data = {
-        "FuelType": [
-            "Coal",
-            "Oil",
-            "Natural Gas",
-            "Nuclear",
-            "Solar",
-            "Wind",
-            "Biomass",
-            "Hydropower",
-            "Geothermal",
-            "Other Fossil Fuel",
-        ],
-        "Percentage": [
-            PerCoal,
-            PerOil,
-            PerNG,
-            PerNuclear,
-            PerSolar,
-            PerWind,
-            PerBio,
-            PerHydro,
-            PerGeo,
-            PerOtherFos,
-        ],
-        "angle": [
-            (
-                PerCoal
-                / (
-                    PerBio
-                    + PerCoal
-                    + PerHydro
-                    + PerNG
-                    + PerNuclear
-                    + PerOil
-                    + PerOtherFos
-                    + PerSolar
-                    + PerWind
-                    + PerGeo
-                )
-                * (2 * pi)
-            ),
-            (
-                PerOil
-                / (
-                    PerBio
-                    + PerCoal
-                    + PerHydro
-                    + PerNG
-                    + PerNuclear
-                    + PerOil
-                    + PerOtherFos
-                    + PerSolar
-                    + PerWind
-                    + PerGeo
-                )
-                * (2 * pi)
-            ),
-            (
-                PerNG
-                / (
-                    PerBio
-                    + PerCoal
-                    + PerHydro
-                    + PerNG
-                    + PerNuclear
-                    + PerOil
-                    + PerOtherFos
-                    + PerSolar
-                    + PerWind
-                    + PerGeo
-                )
-                * (2 * pi)
-            ),
-            (
-                PerNuclear
-                / (
-                    PerBio
-                    + PerCoal
-                    + PerHydro
-                    + PerNG
-                    + PerNuclear
-                    + PerOil
-                    + PerOtherFos
-                    + PerSolar
-                    + PerWind
-                    + PerGeo
-                )
-                * (2 * pi)
-            ),
-            (
-                PerSolar
-                / (
-                    PerBio
-                    + PerCoal
-                    + PerHydro
-                    + PerNG
-                    + PerNuclear
-                    + PerOil
-                    + PerOtherFos
-                    + PerSolar
-                    + PerWind
-                    + PerGeo
-                )
-                * (2 * pi)
-            ),
-            (
-                PerWind
-                / (
-                    PerBio
-                    + PerCoal
-                    + PerHydro
-                    + PerNG
-                    + PerNuclear
-                    + PerOil
-                    + PerOtherFos
-                    + PerSolar
-                    + PerWind
-                    + PerGeo
-                )
-                * (2 * pi)
-            ),
-            (
-                PerBio
-                / (
-                    PerBio
-                    + PerCoal
-                    + PerHydro
-                    + PerNG
-                    + PerNuclear
-                    + PerOil
-                    + PerOtherFos
-                    + PerSolar
-                    + PerWind
-                    + PerGeo
-                )
-                * (2 * pi)
-            ),
-            (
-                PerHydro
-                / (
-                    PerBio
-                    + PerCoal
-                    + PerHydro
-                    + PerNG
-                    + PerNuclear
-                    + PerOil
-                    + PerOtherFos
-                    + PerSolar
-                    + PerWind
-                    + PerGeo
-                )
-                * (2 * pi)
-            ),
-            (
-                PerGeo
-                / (
-                    PerBio
-                    + PerCoal
-                    + PerHydro
-                    + PerNG
-                    + PerNuclear
-                    + PerOil
-                    + PerOtherFos
-                    + PerSolar
-                    + PerWind
-                    + PerGeo
-                )
-                * (2 * pi)
-            ),
-            (
-                PerOtherFos
-                / (
-                    PerBio
-                    + PerCoal
-                    + PerHydro
-                    + PerNG
-                    + PerNuclear
-                    + PerOil
-                    + PerOtherFos
-                    + PerSolar
-                    + PerWind
-                    + PerGeo
-                )
-                * (2 * pi)
-            ),
-        ],
-        "color": Spectral10,
-    }
-    # Updates the paragraph widget text based on the new text inputs
-    if (
-        round(
-            (
-                PerCoal
-                + PerOil
-                + PerNG
-                + PerNuclear
-                + PerSolar
-                + PerWind
-                + PerBio
-                + PerHydro
-                + PerGeo
-                + PerOtherFos
-            ),
-            2,
-        )
-        > 100
-    ):
-        GridTextParagraph.text = CalcGridText(
-            PerCoal,
-            PerOil,
-            PerNG,
-            PerNuclear,
-            PerSolar,
-            PerWind,
-            PerBio,
-            PerHydro,
-            PerGeo,
-            PerOtherFos,
-        )
-        GridTextParagraph.style = {"color": "red"}
-    elif (
-        round(
-            (
-                PerCoal
-                + PerOil
-                + PerNG
-                + PerNuclear
-                + PerSolar
-                + PerWind
-                + PerBio
-                + PerHydro
-                + PerOtherFos
-            ),
-            2,
-        )
-        < 100
-    ):
-        GridTextParagraph.text = CalcGridText(
-            PerCoal,
-            PerOil,
-            PerNG,
-            PerNuclear,
-            PerSolar,
-            PerWind,
-            PerBio,
-            PerHydro,
-            PerGeo,
-            PerOtherFos,
-        )
-        GridTextParagraph.style = {"color": "orange"}
-    else:
-        GridTextParagraph.text = CalcGridText(
-            PerCoal,
-            PerOil,
-            PerNG,
-            PerNuclear,
-            PerSolar,
-            PerWind,
-            PerBio,
-            PerHydro,
-            PerGeo,
-            PerOtherFos,
-        )
-        GridTextParagraph.style = {"color": "black"}
-
-
 # Creates Widgets
 
 # Grid Inputs
-PerCoalTextInput = TextInput(value=str(round(PerCoal, 1)), title="% Coal in Grid Mix")
-PerCoalTextInput.on_change("value", callback)
+grid_coalTextInput = TextInput(value=str(round(grid_coal, 1)), title="% Coal in Grid Mix")
+grid_coalTextInput.on_change("value", callback)
 
-PerOilTextInput = TextInput(value=str(round(PerOil, 1)), title="% Oil in Grid Mix")
-PerOilTextInput.on_change("value", callback)
+grid_oilTextInput = TextInput(value=str(round(grid_oil, 1)), title="% Oil in Grid Mix")
+grid_oilTextInput.on_change("value", callback)
 
-PerNGTextInput = TextInput(value=str(round(PerNG, 1)), title="% Natural Gas in Grid Mix")
-PerNGTextInput.on_change("value", callback)
+grid_ngTextInput = TextInput(value=str(round(grid_ng, 1)), title="% Natural Gas in Grid Mix")
+grid_ngTextInput.on_change("value", callback)
 
-PerNuclearTextInput = TextInput(value=str(round(PerNuclear, 1)), title="% Nuclear in Grid Mix")
-PerNuclearTextInput.on_change("value", callback)
+grid_nuclearTextInput = TextInput(value=str(round(grid_nuclear, 1)), title="% Nuclear in Grid Mix")
+grid_nuclearTextInput.on_change("value", callback)
 
-PerSolarTextInput = TextInput(value=str(round(PerSolar, 1)), title="% Solar in Grid Mix")
-PerSolarTextInput.on_change("value", callback)
+grid_solarTextInput = TextInput(value=str(round(grid_solar, 1)), title="% Solar in Grid Mix")
+grid_solarTextInput.on_change("value", callback)
 
-PerWindTextInput = TextInput(value=str(round(PerWind, 1)), title="% Wind in Grid Mix")
-PerWindTextInput.on_change("value", callback)
+grid_windTextInput = TextInput(value=str(round(grid_wind, 1)), title="% Wind in Grid Mix")
+grid_windTextInput.on_change("value", callback)
 
-PerBioTextInput = TextInput(value=str(round(PerBio, 1)), title="% Biomass in Grid Mix")
-PerBioTextInput.on_change("value", callback)
+grid_bioTextInput = TextInput(value=str(round(grid_bio, 1)), title="% Biomass in Grid Mix")
+grid_bioTextInput.on_change("value", callback)
 
-PerHydroTextInput = TextInput(value=str(round(PerHydro, 1)), title="% Hydropower in Grid Mix")
-PerHydroTextInput.on_change("value", callback)
+grid_hydroTextInput = TextInput(value=str(round(grid_hydro, 1)), title="% Hydropower in Grid Mix")
+grid_hydroTextInput.on_change("value", callback)
 
-PerGeoTextInput = TextInput(value=str(round(PerGeo, 1)), title="% Geothermal in Grid Mix")
-PerGeoTextInput.on_change("value", callback)
+grid_geoTextInput = TextInput(value=str(round(grid_geo, 1)), title="% Geothermal in Grid Mix")
+grid_geoTextInput.on_change("value", callback)
 
-PerOtherFosTextInput = TextInput(
-    value=str(round(PerOtherFos, 1)), title="% Other Fossil Fuel in Grid Mix"
+grid_other_ffTextInput = TextInput(
+    value=str(round(grid_other_ff, 1)), title="% Other Fossil Fuel in Grid Mix"
 )
-PerOtherFosTextInput.on_change("value", callback)
+grid_other_ffTextInput.on_change("value", callback)
 
 PerNetZeroCarbonTextInput = TextInput(
-    value=str(round(PerNuclear + PerSolar + PerWind + PerBio + PerHydro + PerGeo)),
+    value=str(round(grid_nuclear + grid_solar + grid_wind + grid_bio + grid_hydro + grid_geo)),
     title="% Net Zero Carbon Sources in Grid Mix",
 )
 PerNetZeroCarbonTextInput.on_change("value", callback)
 
 # Population Inputs
-PopFactorSlider = Slider(start=-100, end=100, value=0, step=10, title="% Change in Population")
-PopFactorSlider.on_change("value", callback)
+pop_factorSlider = Slider(start=-100, end=100, value=0, step=10, title="% Change in Population")
+pop_factorSlider.on_change("value", callback)
 
-PerUrbanPopTextInput = TextInput(
-    value=str(round(PerUrbanPop, 1)), title="% of Population Living in Urban Municipalities"
+urban_pop_percentTextInput = TextInput(
+    value=str(round(urban_pop_percent, 1)), title="% of Population Living in Urban Municipalities"
 )
-PerUrbanPopTextInput.on_change("value", callback)
+urban_pop_percentTextInput.on_change("value", callback)
 
-PerSuburbanPopTextInput = TextInput(
-    value=str(round(PerSuburbanPop, 1)), title="% of Population Living in Suburban Municipalities",
+suburban_pop_percentTextInput = TextInput(
+    value=str(round(suburban_pop_percent, 1)),
+    title="% of Population Living in Suburban Municipalities",
 )
-PerSuburbanPopTextInput.on_change("value", callback)
+suburban_pop_percentTextInput.on_change("value", callback)
 
-PerRuralPopTextInput = TextInput(
-    value=str(round(PerRuralPop, 1)), title="% of Population Living in Rural Municipalities"
+rural_pop_percentTextInput = TextInput(
+    value=str(round(rural_pop_percent, 1)), title="% of Population Living in Rural Municipalities"
 )
-PerRuralPopTextInput.on_change("value", callback)
+rural_pop_percentTextInput.on_change("value", callback)
 
 # Stationary Energy Inputs - Residential
 PerCapResEnergyUseSlider = Slider(
@@ -5330,41 +5180,38 @@ RegionalFleetMPGSlider = Slider(
 )
 RegionalFleetMPGSlider.on_change("value", callback)
 
-#     EVEffSlider = Slider(start=0.1, end=10, value=1/EVEff, step=.1, title = "EV Efficiency (mi/kWh)")
-#     EVEffSlider.on_change('value', callback)
-
 # Mobile Energy Inputs - Rail Transit
 PerTransRailRidershipSlider = Slider(
     start=-100, end=100, value=0, step=1, title="% Change in Transit Ridership"
 )
 PerTransRailRidershipSlider.on_change("value", callback)
 
-TransRailUrbanPerElectrificationSlider = Slider(
+TransRailUrbanPerElecMotionSlider = Slider(
     start=0,
     end=100,
     value=TransRailUrbanPerElecMotion,
     step=1,
     title="% Electrification of Rail Transit Urban Areas",
 )
-TransRailUrbanPerElectrificationSlider.on_change("value", callback)
+TransRailUrbanPerElecMotionSlider.on_change("value", callback)
 
-TransRailSuburbanPerElectrificationSlider = Slider(
+TransRailSuburbanPerElecMotionSlider = Slider(
     start=0,
     end=100,
     value=TransRailRuralPerElecMotion,
     step=1,
     title="% Electrification of Rail Transit in Suburban Areas",
 )
-TransRailSuburbanPerElectrificationSlider.on_change("value", callback)
+TransRailSuburbanPerElecMotionSlider.on_change("value", callback)
 
-TransRailRuralPerElectrificationSlider = Slider(
+TransRailRuralPerElecMotionSlider = Slider(
     start=0,
     end=100,
     value=TransRailRuralPerElecMotion,
     step=1,
     title="% Electrification of Rail Transit in Rural Areas",
 )
-TransRailRuralPerElectrificationSlider.on_change("value", callback)
+TransRailRuralPerElecMotionSlider.on_change("value", callback)
 
 # Mobile Energy Inputs - Aviation
 PerAviationSlider = Slider(start=-100, end=100, value=0, step=1, title="% Change in Air Travel")
@@ -5376,14 +5223,14 @@ PerFreightRailSlider = Slider(
 )
 PerFreightRailSlider.on_change("value", callback)
 
-FreightRailPerElectrificationSlider = Slider(
+FreightRailPerElecMotionSlider = Slider(
     start=0,
     end=100,
     value=FreightRailPerElecMotion,
     step=1,
     title="% Electrification of Rail Freight",
 )
-FreightRailPerElectrificationSlider.on_change("value", callback)
+FreightRailPerElecMotionSlider.on_change("value", callback)
 
 # Mobile Energy Inputs - Inter-city Rail
 PerInterCityRailSlider = Slider(
@@ -5391,14 +5238,14 @@ PerInterCityRailSlider = Slider(
 )
 PerInterCityRailSlider.on_change("value", callback)
 
-InterCityRailPerElectrificationSlider = Slider(
+InterCityRailPerElecMotionSlider = Slider(
     start=0,
     end=100,
     value=InterCityRailPerElecMotion,
     step=1,
     title="% Electrification of Inter-city Rail",
 )
-InterCityRailPerElectrificationSlider.on_change("value", callback)
+InterCityRailPerElecMotionSlider.on_change("value", callback)
 
 # Mobile Energy Inputs - Marine and Port
 PerMarinePortSlider = Slider(
@@ -5477,20 +5324,23 @@ AirCaptureSlider.on_change("value", callback)
 
 # widgets
 widgetPop = Column(
-    PopFactorSlider, PerUrbanPopTextInput, PerSuburbanPopTextInput, PerRuralPopTextInput
+    pop_factorSlider,
+    urban_pop_percentTextInput,
+    suburban_pop_percentTextInput,
+    rural_pop_percentTextInput,
 )
 widgetGrid = Column(
     GridTextParagraph,
-    PerCoalTextInput,
-    PerOilTextInput,
-    PerNGTextInput,
-    PerNuclearTextInput,
-    PerSolarTextInput,
-    PerWindTextInput,
-    PerBioTextInput,
-    PerHydroTextInput,
-    PerGeoTextInput,
-    PerOtherFosTextInput,
+    grid_coalTextInput,
+    grid_oilTextInput,
+    grid_ngTextInput,
+    grid_nuclearTextInput,
+    grid_solarTextInput,
+    grid_windTextInput,
+    grid_bioTextInput,
+    grid_hydroTextInput,
+    grid_geoTextInput,
+    grid_other_ffTextInput,
 )
 widgetResidential = Column(
     PerCapResEnergyUseSlider,
@@ -5502,16 +5352,16 @@ widgetCommInd = Column(PerComIndEnergyUseSlider, ComIndPerElectrificationSlider)
 widgetMobileHighway = Column(VMTperCapSlider, PerEVMTSlider, RegionalFleetMPGSlider)
 widgetMobileRailTrans = Column(
     PerTransRailRidershipSlider,
-    TransRailUrbanPerElectrificationSlider,
-    TransRailSuburbanPerElectrificationSlider,
-    TransRailRuralPerElectrificationSlider,
+    TransRailUrbanPerElecMotionSlider,
+    TransRailSuburbanPerElecMotionSlider,
+    TransRailRuralPerElecMotionSlider,
 )
 widgetMobileOther = Column(
     PerAviationSlider,
     PerFreightRailSlider,
-    FreightRailPerElectrificationSlider,
+    FreightRailPerElecMotionSlider,
     PerInterCityRailSlider,
-    InterCityRailPerElectrificationSlider,
+    InterCityRailPerElecMotionSlider,
     PerMarinePortSlider,
     MarinePortPerElectrificationSlider,
     PerOffroadSlider,
