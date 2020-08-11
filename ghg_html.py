@@ -21,10 +21,6 @@ ComInd2015 = 27.96  # non-residential/commercial & industrial
 MobHighway2015 = 17.94
 MobTransit2015 = 0.18
 MobAviation2015 = 3.90
-FreightRail2015 = 0.26
-InterCityRail2015 = 0.04
-MarinePort2015 = 0.31
-OffRoad2015 = 0.52
 MobOther2015 = 1.12  # includes freight & intercity rail, marine & port-related, off-road vehicles and equipment
 Ag2015 = 0.41  # agriculture
 Waste2015 = 2.01  # landfills
@@ -33,53 +29,32 @@ IP2015 = 5.52  # Includes Hydrogen production, iron & steel production, industri
 UrbanTrees2015 = -1.025
 ForestSequestration2015 = -1.109
 ForestLossGain2015 = 0.380
-LULUCF2015 = (
-    UrbanTrees2015 + ForestSequestration2015 + ForestLossGain2015
-)  # Includes urban trees, forest loss/gain and sequestration
 ResNGCon2015 = 115884601.50 / 1000  # NG Consumpton 2015 (million CF)
 ComIndNGCon2015 = 139139475 / 1000  # NG Consumpton 2015 (million CF)
-NGSystems2015 = (ResNGCon2015 + ComIndNGCon2015) * (
-    MMTCO2ePerMillionCFNG_CH4 + MMTCO2ePerMillionCFNG_CO2
+NonEnergy2015 = (
+    Ag2015
+    + Waste2015
+    + WasteWater2015
+    + IP2015
+    + UrbanTrees2015
+    + ForestSequestration2015
+    + ForestLossGain2015
+    + (ResNGCon2015 + ComIndNGCon2015) * (MMTCO2ePerMillionCFNG_CH4 + MMTCO2ePerMillionCFNG_CO2)
 )
-NonEnergy2015 = Ag2015 + Waste2015 + WasteWater2015 + IP2015 + LULUCF2015 + NGSystems2015
 
 # Demographics
 UrbanPop2015 = 1691830
-UrbanHH2015 = 646527
-UrbanEmp2015 = 905494
-UrbanPopEmp2015 = UrbanPop2015 + UrbanEmp2015
-UrbanHHEmp2015 = UrbanHH2015 + UrbanEmp2015
 
 SuburbanPop2015 = 3693658
-SuburbanHH2015 = 1337275
-SuburbanEmp2015 = 2145807
-SuburbanPopEmp2015 = SuburbanPop2015 + SuburbanEmp2015
-SuburbanHHEmp2015 = SuburbanHH2015 + SuburbanEmp2015
 
 RuralPop2015 = 332445
-RuralHH2015 = 117760
-RuralEmp2015 = 116936
-RuralPopEmp2015 = RuralPop2015 + RuralEmp2015
-RuralHHEmp2015 = UrbanHH2015 + RuralEmp2015
 
-TotalPop2015 = UrbanPop2015 + SuburbanPop2015 + RuralPop2015
-TotalHH2015 = UrbanHH2015 + SuburbanHH2015 + RuralHH2015
-TotalEmp2015 = UrbanEmp2015 + SuburbanEmp2015 + RuralEmp2015
-TotalPopEmp2015 = TotalPop2015 + TotalEmp2015
-TotalHHEmp2015 = TotalHH2015 + TotalEmp2015
+Population = UrbanPop2015 + SuburbanPop2015 + RuralPop2015
 
-Population = TotalPop2015
 PopFactor = 0
-PerUrbanPop = UrbanPop2015 / TotalPop2015 * 100
-PerSuburbanPop = SuburbanPop2015 / TotalPop2015 * 100
-PerRuralPop = RuralPop2015 / TotalPop2015 * 100
-
-Employment = TotalEmp2015
-EmpFactor = 0
-PerUrbanEmp = 28.6
-PerSuburbanEmp = 67.7
-PerRuralEmp = 3.7
-
+PerUrbanPop = UrbanPop2015 / Population * 100
+PerSuburbanPop = SuburbanPop2015 / Population * 100
+PerRuralPop = RuralPop2015 / Population * 100
 
 # Average Emissions pr MWh of fossil fuels from eGRID 2014/2016 for RFCE (Future reference - should we pull plant-level data for this?)
 LB_CO2e_MWh_Coal = (2169.484351 + 2225.525) / 2
@@ -101,7 +76,6 @@ PerNuclear = 40.10
 PerWind = 1.16
 PerSolar = 0.30
 PerGeo = 0.00
-PerUnknown = 0.01
 GridLoss = 0.047287092
 
 MMTCO2e_ThBarrel_FOKer = 0.000428929
@@ -129,9 +103,6 @@ BTUperBarrelFOKer = 5770000
 BTUperGallonFOKer = BTUperBarrelFOKer * (1 / GalperBarrel)
 BTUperBarrelLPG = 3540000
 BTUperGallonLPG = BTUperBarrelLPG * (1 / GalperBarrel)
-BTUperGallonDiesel = BTUperGallonFOKer
-BTUperBarrelGasoline = 5060000
-BTUperGallonGasoline = BTUperBarrelGasoline * (1 / GalperBarrel)
 
 # MTCO2e per BBtu - From ComInd 2015
 MTCO2ePerBBtuNG = 53.20
@@ -147,7 +118,6 @@ MTCO2ePerBBtuSpecialNaphthas = 72.62
 
 # Residential Stationary ENERGY
 PerCapResEnergyUse = 0
-ResEnergyScenario = 0
 
 UrbanPerCapElec = 2.41  # MWh/person
 SuburbanPerCapElec = 3.17  # MWh/person
@@ -690,27 +660,16 @@ PerEnergyToUseComIndSpecialNaphthas = (
 )
 PerComIndEnergyUse = 0
 
-ComIndElecMWh = 34910791.94  # Grid loss accounted for in function below
 ComIndElecBBtu = 119120.51
-ComIndNGCCF = 139139474.97
 ComIndNGBBtu = 145987.03
-ComIndCoalThShortTons = 278.31
 ComIndCoalBBtu = 6581.08
-ComIndDFOThBarrel = 4220.19
 ComIndDFOBBtu = 24342.05
-ComIndKerThBarrel = 7.39
 ComIndKerBBtu = 41.91
-ComIndLPGThBarrel = 729.98
 ComIndLPGBBtu = 2581.22
-ComIndMotGasThBarrel = 2487.11
 ComIndMotGasBBtu = 12584.78
-ComIndRFOThBarrel = 41.58
 ComIndRFOBBtu = 261.42
-ComIndPetCokeThBarrel = 2396.58
 ComIndPetCokeBBtu = 15067.33
-ComIndStillGasThBarrel = 4271.42
 ComIndStillGasBBtu = 25628.52
-ComIndSpecialNaphthasThBarrel = 14.05
 ComIndSpecialNaphthasBBtu = 73.71
 
 
@@ -778,7 +737,6 @@ VMTperCap = 0
 PerEVMT = 0  # % VMT from PEVs
 EVEff = 0.3  # kWh/mile
 
-VMT2015 = 38074346851
 RegionalFleetMPG = 19.744607425  # mpg imputed from 2015 inventory
 CO2eperGallonGasoline = (
     20.50758459351  # lbs co2e per gallon of gasoline (imputed from 2015 inventory)
@@ -856,15 +814,7 @@ TransRailUrbanPerElectrification = TransRailUrbanPerElecMotion
 TransRailSuburbanPerElectrification = TransRailSuburbanPerElecMotion
 TransRailRuralPerElectrification = TransRailRuralPerElecMotion
 
-# TransRailUrbanPerDieselMotion = TransRailUrbanBTUPerCapDieselMotion/TransRailUrbanBTUPerCapMotion*100
-# TransRailSuburbanPerDieselMotion = TransRailSuburbanBTUPerCapDieselMotion/TransRailSuburbanBTUPerCapMotion*100
-# TransRailRuralPerDieselMotion = TransRailRuralBTUPerCapDieselMotion/TransRailRuralBTUPerCapMotion*100
-
-# TransRailUrbanPerDieselMotion = 100-TransRailUrbanPerElectrification
-# TransRailSuburbanPerDieselMotion = 100-TransRailSuburbanPerElectrification
-# TransRailRuralPerDieselMotion = 100-TransRailRuralPerElectrification
-
-## Mobile-Other GHG Factors
+# Mobile-Other GHG Factors
 
 # Freight Rail
 PerFreightRail = 0
@@ -878,7 +828,6 @@ FreightRailBBtuMotion = FreightRailElecBBtuMotion + FreightRailDieselBBtuMotion
 
 FreightRailPerElecMotion = FreightRailElecBBtuMotion / FreightRailBBtuMotion * 100
 FreightRailPerElectrification = FreightRailPerElecMotion
-FreightRailPerDieselMotion = 100 - FreightRailPerElectrification
 
 FreightRailMTCO2ePerBBtuDiesel = 74.5937203
 
@@ -894,7 +843,6 @@ InterCityRailBBtuMotion = InterCityRailElecBBtuMotion + InterCityRailDieselBBtuM
 
 InterCityRailPerElecMotion = InterCityRailElecBBtuMotion / InterCityRailBBtuMotion * 100
 InterCityRailPerElectrification = InterCityRailPerElecMotion
-InterCityRailPerDieselMotion = 100 - InterCityRailPerElectrification
 
 InterCityRailMTCO2ePerBBtuDiesel = 73.978
 
@@ -2956,27 +2904,8 @@ categories = [
     "Mobile-Other",
     "Non-Energy",
 ]
-categories2 = [
-    "Residential",
-    "Commercial/Industrial",
-    "Mobile-Highway",
-    "Mobile-Transit",
-    "Mobile Aviation",
-    "Mobile-Other",
-    "Non-Energy",
-]
-years = ["2015", "Scenario"]
-
 data = {
-    "Category": [
-        "Residential",
-        "Commercial/Industrial",
-        "Mobile-Highway",
-        "Mobile-Transit",
-        "Mobile-Aviation",
-        "Mobile-Other",
-        "Non-Energy",
-    ],
+    "Category": categories,
     "2015": [
         Residential2015,
         ComInd2015,
@@ -3430,7 +3359,7 @@ data = {
 source = ColumnDataSource(data=data)
 
 # Configure vertical bar plot
-plot = figure(
+bar_chart = figure(
     x_range=data["Category"],
     y_range=(0, 50),
     plot_height=500,
@@ -3439,8 +3368,8 @@ plot = figure(
     title="Greenhouse Gas Emissions in Greater Philadelphia",
 )
 
-plot.vbar(
-    x=dodge("Category", -0.15, range=plot.x_range),
+bar_chart.vbar(
+    x=dodge("Category", -0.15, range=bar_chart.x_range),
     top="2015",
     source=source,
     width=0.2,
@@ -3448,8 +3377,8 @@ plot.vbar(
     legend_label="2015",
 )
 
-plot.vbar(
-    x=dodge("Category", 0.15, range=plot.x_range),
+bar_chart.vbar(
+    x=dodge("Category", 0.15, range=bar_chart.x_range),
     top="Scenario",
     source=source,
     width=0.2,
@@ -3457,8 +3386,8 @@ plot.vbar(
     legend_label="Scenario",
 )
 
-plot.xaxis.major_label_orientation = np.pi / 4
-plot.x_range.range_padding = 0.1
+bar_chart.xaxis.major_label_orientation = np.pi / 4
+bar_chart.x_range.range_padding = 0.1
 
 # Transpose data
 data2 = {
@@ -3935,7 +3864,7 @@ sectors = [
 ]
 
 # Configure stacked bar plot
-plot2 = figure(
+stacked_bar_chart = figure(
     x_range=data2["Year"],
     y_range=(0, 100),
     plot_height=500,
@@ -3944,14 +3873,15 @@ plot2 = figure(
     title="Greenhouse Gas Emissions in Greater Philadelphia",
 )
 
-plot2.vbar_stack(
+stacked_bar_chart.vbar_stack(
     categories, x="Year", width=0.4, color=Viridis7, source=source2, legend_label=sectors
 )
-#     plot2.vbar_stack(categories, x='Year', width=0.4, color=Viridis7, source=source2, legend=[value(x) for x in categories])
 
-plot2.legend[0].items.reverse()  # Reverses legend items to match order of occurence in stack
-plot2_legend = plot2.legend[0]
-plot2.add_layout(plot2_legend, "right")
+stacked_bar_chart.legend[
+    0
+].items.reverse()  # Reverses legend items to match order of occurence in stack
+stacked_bar_chart_legend = stacked_bar_chart.legend[0]
+stacked_bar_chart.add_layout(stacked_bar_chart_legend, "right")
 
 # Configure data and plot for pie chart
 
@@ -3974,7 +3904,7 @@ data3["color"] = Spectral10
 
 source3 = ColumnDataSource(data=data3)
 
-plot3 = figure(
+electric_grid_pie_chart = figure(
     title="Electricity Grid Resource Mix",
     toolbar_location=None,
     plot_height=400,
@@ -3984,7 +3914,7 @@ plot3 = figure(
     x_range=(-0.5, 1.0),
 )
 
-plot3.wedge(
+electric_grid_pie_chart.wedge(
     x=0,
     y=1,
     radius=0.3,
@@ -3996,9 +3926,9 @@ plot3.wedge(
     source=source3,
 )
 
-plot3.axis.axis_label = None
-plot3.axis.visible = False
-plot3.grid.grid_line_color = None
+electric_grid_pie_chart.axis.axis_label = None
+electric_grid_pie_chart.axis.visible = False
+electric_grid_pie_chart.grid.grid_line_color = None
 
 # Initializes paragraph widget based on calculating grid mix and assigning it to text within the paragraph to be updated
 GridTextParagraph = Paragraph(
@@ -5544,9 +5474,8 @@ PerCombCaptureSlider.on_change("value", callback)
 AirCaptureSlider = Slider(start=0, end=100, value=0, step=1, title="MMTCO2e Captured from the Air")
 AirCaptureSlider.on_change("value", callback)
 
-# Defines widgetboxes
 
-# Simple widgets
+# widgets
 widgetPop = Column(
     PopFactorSlider, PerUrbanPopTextInput, PerSuburbanPopTextInput, PerRuralPopTextInput
 )
@@ -5598,30 +5527,7 @@ widgetNonEnergy = Column(
 )
 widgetCarbonCapture = Column(PerCombCaptureSlider, AirCaptureSlider)
 
-# JavaScript function to allow sliders and other inputs to be toggled for better viewing
-#     col = row(widgetPop, widgetGrid, widgetResidential, widgetCommInd, widgetMobileHighway, widgetMobileRailTrans, widgetMobileOther, widgetNonEnergy, widgetCarbonCapture)
-
-#     checkbox = CheckboxGroup(labels=["Population", "Grid Mix", "Stationary Energy - Residential",
-#                                      "Stationary Energy - Commercial/Industrial", "Mobile - Highway", "Mobile - Rail Transit",
-#                                      "Mobile - Other", "Non-Energy", "Carbon Capture"], active=[0,1,2,3,4,5,6,7,8])
-
-#     callbackJS = CustomJS(args=dict(plots=[widgetPop, widgetGrid, widgetResidential, widgetCommInd,
-#                                            widgetMobileHighway, widgetMobileRailTrans, widgetMobileOther,
-#                                            widgetNonEnergy, widgetCarbonCapture],
-#                                     col=col, checkbox=checkbox),
-#                           code="""
-#     const children = []
-#     for (const i of checkbox.active) {
-#         children.push(plots[i])
-#     }
-#     col.children = children
-#     """)
-#     checkbox.js_on_change('active', callbackJS)
-
-# Sets layouts
-layout1 = row(plot, plot2)
-#     layout2 = gridplot([checkbox, col], ncols=1)
-layout2 = [
+user_inputs = [
     widgetPop,
     widgetGrid,
     widgetResidential,
@@ -5633,5 +5539,5 @@ layout2 = [
     widgetCarbonCapture,
 ]
 
-# curdoc().add_root(column(plot2, PopFactorSlider))
-curdoc().add_root(column(layout1, PopFactorSlider))
+curdoc().add_root(column(bar_chart, stacked_bar_chart, electric_grid_pie_chart))
+curdoc().add_root(column(user_inputs))
