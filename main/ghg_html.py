@@ -39,9 +39,9 @@ GHG_IP = 5.52  # Includes Hydrogen production, iron & steel production, industri
 GHG_URBAN_TREES = -1.025
 GHG_FORESTS = -1.109
 GHG_FOREST_CHANGE = 0.380
-ResNGCon2015 = 115884601.50 / 1000  # NG Consumpton 2015 (million CF)
-ComIndNGCon2015 = 139139475 / 1000  # NG Consumpton 2015 (million CF)
-NonEnergy2015 = (
+RES_NG = 115884601.50 / 1000  # NG Consumpton 2015 (million CF)
+CI_NG = 139139475 / 1000  # NG Consumpton 2015 (million CF)
+GHG_NON_ENERGY = (
     GHG_AG
     + GHG_SOLID_WASTE
     + GHG_WASTEWATER
@@ -49,7 +49,7 @@ NonEnergy2015 = (
     + GHG_URBAN_TREES
     + GHG_FORESTS
     + GHG_FOREST_CHANGE
-    + (ResNGCon2015 + ComIndNGCon2015) * (MMTCO2ePerMillionCFNG_CH4 + MMTCO2ePerMillionCFNG_CO2)
+    + (RES_NG + CI_NG) * (MMTCO2ePerMillionCFNG_CH4 + MMTCO2ePerMillionCFNG_CO2)
 )
 
 # Demographics
@@ -64,10 +64,10 @@ rural_pop_percent = RURAL_POP / POP * 100
 
 # Average Emissions pr MWh of fossil fuels from eGRID 2014/2016 for RFCE
 # NOTE: Future reference - should we pull plant-level data for this?)
-LB_CO2e_MWh_Coal = (2169.484351 + 2225.525) / 2
-LB_CO2e_MWh_Oil = (1600.098812 + 1341.468) / 2
-LB_CO2e_MWh_NG = (929.651872 + 897.037) / 2
-LB_CO2e_MWh_OtherFos = (1488.036692 + 1334.201) / 2
+CO2_LB_MWH_COAL = (2169.484351 + 2225.525) / 2
+CO2_LB_MWH_OIL = (1600.098812 + 1341.468) / 2
+CO2_LB_MWH_NG = (929.651872 + 897.037) / 2
+CO2_LB_MWH_OTHER_FF = (1488.036692 + 1334.201) / 2
 
 # Percent of carbon emissions from combustion of fossil fuels for electricity that are captured and stored
 PerCombCapture = 0
@@ -85,28 +85,26 @@ grid_solar = 0.30
 grid_geo = 0.00
 GRID_LOSS = 0.047287092
 
-MMTCO2e_ThBarrel_FOKer = 0.000428929
-MMTCO2e_ThBarrel_LPG = 0.000219762
-LB_CO2e_MCF_NG = 123.0744706
+CO2_MMT_KB_FOK = 0.000428929
+CO2_MMT_KB_LPG = 0.000219762
+CO2_LB_KCF_NG = 123.0744706
 
-MMTperLB = 0.00000000045359
-ThBarrelperGallon = 1 / 42000
+MMT_LB = 0.00000000045359
+KB_G = 1 / 42000
 MCFperCCF = 0.1
 MillionCFperCF = 0.000001
-GalperBarrel = 42
-kWhperMWh = 1000
-MMTperMT = 0.000001
+MT_TO_MMT = 0.000001
 
 # Btu Conversions
-BTUperkWh = 3412
-BTUperMWh = BTUperkWh * kWhperMWh
-BTUperCFPA = 1048
-BTUperCFNJ = 1050
-BTUperCCF = mean([BTUperCFPA, BTUperCFNJ]) * 100
-BTUperBarrelFOKer = 5770000
-BTUperGallonFOKer = BTUperBarrelFOKer * (1 / GalperBarrel)
-BTUperBarrelLPG = 3540000
-BTUperGallonLPG = BTUperBarrelLPG * (1 / GalperBarrel)
+BTU_KWH = 3412
+BTU_MWH = BTU_KWH * 1000
+BTU_CF_NG_PA = 1048
+BTU_CF_NG_NJ = 1050
+BTU_CCF_AVG = mean([BTU_CF_NG_PA, BTU_CF_NG_NJ]) * 100
+BTU_B_FKO = 5770000
+BTU_GAL_FOK = BTU_B_FKO * (1 / 42)
+BTU_B_LPG = 3540000
+BTU_GAL_LPG = BTU_B_LPG * (1 / 42)
 
 # MTCO2e per BBtu - From ComInd 2015
 MTCO2ePerBBtuNG = 53.20
@@ -127,33 +125,33 @@ UrbanPerCapElec = 2.41  # MWh/person
 SuburbanPerCapElec = 3.17  # MWh/person
 RuralPerCapElec = 3.81  # MWh/person
 
-UrbanBTUPerCapElec = UrbanPerCapElec * BTUperMWh  # BTU/Person
-SuburbanBTUPerCapElec = SuburbanPerCapElec * BTUperMWh  # BTU/Person
-RuralBTUPerCapElec = RuralPerCapElec * BTUperMWh  # BTU/Person
+UrbanBTUPerCapElec = UrbanPerCapElec * BTU_MWH  # BTU/Person
+SuburbanBTUPerCapElec = SuburbanPerCapElec * BTU_MWH  # BTU/Person
+RuralBTUPerCapElec = RuralPerCapElec * BTU_MWH  # BTU/Person
 
 UrbanPerCapNG = 246.04  # CCF/person
 SuburbanPerCapNG = 193.00  # CCF/person
 RuralPerCapNG = 89.35  # CCF/person
 
-UrbanBTUPerCapNG = UrbanPerCapNG * BTUperCCF  # BTU/Person
-SuburbanBTUPerCapNG = SuburbanPerCapNG * BTUperCCF  # BTU/Person
-RuralBTUPerCapNG = RuralPerCapNG * BTUperCCF  # BTU/Person
+UrbanBTUPerCapNG = UrbanPerCapNG * BTU_CCF_AVG  # BTU/Person
+SuburbanBTUPerCapNG = SuburbanPerCapNG * BTU_CCF_AVG  # BTU/Person
+RuralBTUPerCapNG = RuralPerCapNG * BTU_CCF_AVG  # BTU/Person
 
 UrbanPerCapFOKer = 14.50  # gallons/person
 SuburbanPerCapFOKer = 43.32  # gallons/person
 RuralPerCapFOKer = 80.84  # gallons/person
 
-UrbanBTUPerCapFOKer = UrbanPerCapFOKer * BTUperGallonFOKer  # BTU/Person
-SuburbanBTUPerCapFOKer = SuburbanPerCapFOKer * BTUperGallonFOKer  # BTU/Person
-RuralBTUPerCapFOKer = RuralPerCapFOKer * BTUperGallonFOKer  # BTU/Person
+UrbanBTUPerCapFOKer = UrbanPerCapFOKer * BTU_GAL_FOK  # BTU/Person
+SuburbanBTUPerCapFOKer = SuburbanPerCapFOKer * BTU_GAL_FOK  # BTU/Person
+RuralBTUPerCapFOKer = RuralPerCapFOKer * BTU_GAL_FOK  # BTU/Person
 
 UrbanPerCapLPG = 3.46  # gallons/person
 SuburbanPerCapLPG = 8.44  # gallons/person
 RuralPerCapLPG = 44.38  # gallons/person
 
-UrbanBTUPerCapLPG = UrbanPerCapLPG * BTUperGallonLPG  # BTU/Person
-SuburbanBTUPerCapLPG = SuburbanPerCapLPG * BTUperGallonLPG  # BTU/Person
-RuralBTUPerCapLPG = RuralPerCapLPG * BTUperGallonLPG  # BTU/Person
+UrbanBTUPerCapLPG = UrbanPerCapLPG * BTU_GAL_LPG  # BTU/Person
+SuburbanBTUPerCapLPG = SuburbanPerCapLPG * BTU_GAL_LPG  # BTU/Person
+RuralBTUPerCapLPG = RuralPerCapLPG * BTU_GAL_LPG  # BTU/Person
 
 # End uses for residential fuels from EIA 2015 by % of Trillion BTUs
 PerResElecSpaceHeating = 12.84
@@ -759,22 +757,22 @@ TransRailUrbanPerCapElec = 115.85  # kWh/person
 TransRailSuburbanPerCapElec = 66.10  # kWh/person
 TransRailRuralPerCapElec = 21.37  # kWh/person
 
-TransRailUrbanBTUPerCapElec = TransRailUrbanPerCapElec * BTUperkWh  # BTU/Person
-TransRailSuburbanBTUPerCapElec = TransRailSuburbanPerCapElec * BTUperkWh  # BTU/Person
-TransRailRuralBTUPerCapElec = TransRailRuralPerCapElec * BTUperkWh  # BTU/Person
+TransRailUrbanBTUPerCapElec = TransRailUrbanPerCapElec * BTU_KWH  # BTU/Person
+TransRailSuburbanBTUPerCapElec = TransRailSuburbanPerCapElec * BTU_KWH  # BTU/Person
+TransRailRuralBTUPerCapElec = TransRailRuralPerCapElec * BTU_KWH  # BTU/Person
 
 TransRailUrbanPerCapDiesel = 0.1995  # gallons/person
 TransRailSuburbanPerCapDiesel = 0.1138  # gallons/person
 TransRailRuralPerCapDiesel = 0.0368  # gallons/person
 
 TransRailUrbanBTUPerCapDiesel = (
-    TransRailUrbanPerCapDiesel * ThBarrelperGallon * TransRailBBtuPerThBarrelDiesel * 1000000000
+    TransRailUrbanPerCapDiesel * KB_G * TransRailBBtuPerThBarrelDiesel * 1000000000
 )  # BTU/Person
 TransRailSuburbanBTUPerCapDiesel = (
-    TransRailSuburbanPerCapDiesel * ThBarrelperGallon * TransRailBBtuPerThBarrelDiesel * 1000000000
+    TransRailSuburbanPerCapDiesel * KB_G * TransRailBBtuPerThBarrelDiesel * 1000000000
 )  # BTU/Person
 TransRailRuralBTUPerCapDiesel = (
-    TransRailRuralPerCapDiesel * ThBarrelperGallon * TransRailBBtuPerThBarrelDiesel * 1000000000
+    TransRailRuralPerCapDiesel * KB_G * TransRailBBtuPerThBarrelDiesel * 1000000000
 )  # BTU/Person
 
 TransRailUrbanBTUPerCapElecMotion = TransRailUrbanBTUPerCapElec * PerEnergyToMotionRailElec / 100
@@ -1007,25 +1005,12 @@ def CalcResGHG(
     RuralPerResFFWaterHeatingFOKerUsed,
     RuralPerResFFSpaceHeatingLPGUsed,
     RuralPerResFFWaterHeatingLPGUsed,
-    BTUperMWh,
     grid_coal,
-    LB_CO2e_MWh_Coal,
     grid_oil,
-    LB_CO2e_MWh_Oil,
     grid_ng,
-    LB_CO2e_MWh_NG,
     grid_other_ff,
-    LB_CO2e_MWh_OtherFos,
-    MMTperLB,
     PerCombCapture,
-    BTUperCCF,
     MCFperCCF,
-    LB_CO2e_MCF_NG,
-    BTUperGallonFOKer,
-    MMTCO2e_ThBarrel_FOKer,
-    ThBarrelperGallon,
-    BTUperGallonLPG,
-    MMTCO2e_ThBarrel_LPG,
 ):
     """
     Residential function uses split of energy per community type by BTU of energy and population
@@ -1882,16 +1867,16 @@ def CalcResGHG(
     # Begins calculating GHG emissions
     ResElecGHG = (
         (UrbanResElecBTU + SuburbanResElecBTU + RuralResElecBTU)
-        * (1 / BTUperMWh)
+        * (1 / BTU_MWH)
         / (1 - GRID_LOSS)
         * (
             (
-                (grid_coal / 100 * LB_CO2e_MWh_Coal)
-                + (grid_oil / 100 * LB_CO2e_MWh_Oil)
-                + (grid_ng / 100 * LB_CO2e_MWh_NG)
-                + (grid_other_ff / 100 * LB_CO2e_MWh_OtherFos)
+                (grid_coal / 100 * CO2_LB_MWH_COAL)
+                + (grid_oil / 100 * CO2_LB_MWH_OIL)
+                + (grid_ng / 100 * CO2_LB_MWH_NG)
+                + (grid_other_ff / 100 * CO2_LB_MWH_OTHER_FF)
             )
-            * MMTperLB
+            * MMT_LB
         )
         * (1 - PerCombCapture / 100)
     )
@@ -1899,24 +1884,24 @@ def CalcResGHG(
     ResNGBTU = UrbanResNGBTU + SuburbanResNGBTU + RuralResNGBTU
     ResNGGHG = (
         ResNGBTU
-        * (1 / BTUperCCF)
+        * (1 / BTU_CCF_AVG)
         * (1 + PerCapResEnergyUse / 100)
         * MCFperCCF
-        * LB_CO2e_MCF_NG
-        * MMTperLB
+        * CO2_LB_KCF_NG
+        * MMT_LB
     )
     ResFOKerGHG = (
         (UrbanResFOKerBTU + SuburbanResFOKerBTU + RuralResFOKerBTU)
-        * (1 / BTUperGallonFOKer)
+        * (1 / BTU_GAL_FOK)
         * (1 + PerCapResEnergyUse / 100)
-        * (MMTCO2e_ThBarrel_FOKer * ThBarrelperGallon)
+        * (CO2_MMT_KB_FOK * KB_G)
     )
 
     ResLPGGHG = (
         (UrbanResLPGBTU + SuburbanResLPGBTU + RuralResLPGBTU)
-        * (1 / BTUperGallonLPG)
+        * (1 / BTU_GAL_LPG)
         * (1 + PerCapResEnergyUse / 100)
-        * (MMTCO2e_ThBarrel_LPG * ThBarrelperGallon)
+        * (CO2_MMT_KB_LPG * KB_G)
     )
 
     ResGHG = ResElecGHG + ResNGGHG + ResFOKerGHG + ResLPGGHG
@@ -1929,22 +1914,15 @@ def CalcComIndGHG(
     ComIndBBtuUsed,
     PerComIndEnergyUse,
     PerEnergyToUseComIndElec,
-    BTUperMWh,
     grid_coal,
-    LB_CO2e_MWh_Coal,
     grid_oil,
-    LB_CO2e_MWh_Oil,
     grid_ng,
-    LB_CO2e_MWh_NG,
     grid_other_ff,
-    LB_CO2e_MWh_OtherFos,
-    MMTperLB,
     PerCombCapture,
     ComIndPerFossilFuelUsed2015,
     ComIndPerFFNGUsed,
     PerEnergyToUseComIndNG,
     MTCO2ePerBBtuNG,
-    MMTperMT,
     ComIndPerFFCoalUsed,
     PerEnergyToUseComIndCoal,
     MTCO2ePerBBtuCoal,
@@ -1984,16 +1962,16 @@ def CalcComIndGHG(
         * (ComIndPerElectrification / 100)
         / (PerEnergyToUseComIndElec / 100)
         * 1000000000
-        * (1 / BTUperMWh)
+        * (1 / BTU_MWH)
         / (1 - GRID_LOSS)
         * (
             (
-                (grid_coal / 100 * LB_CO2e_MWh_Coal)
-                + (grid_oil / 100 * LB_CO2e_MWh_Oil)
-                + (grid_ng / 100 * LB_CO2e_MWh_NG)
-                + (grid_other_ff / 100 * LB_CO2e_MWh_OtherFos)
+                (grid_coal / 100 * CO2_LB_MWH_COAL)
+                + (grid_oil / 100 * CO2_LB_MWH_OIL)
+                + (grid_ng / 100 * CO2_LB_MWH_NG)
+                + (grid_other_ff / 100 * CO2_LB_MWH_OTHER_FF)
             )
-            * MMTperLB
+            * MMT_LB
         )
         * (1 - PerCombCapture / 100)
     )
@@ -2006,7 +1984,7 @@ def CalcComIndGHG(
         * (ComIndPerFFNGUsed / 100)
         / (PerEnergyToUseComIndNG / 100)
         * MTCO2ePerBBtuNG
-        * MMTperMT
+        * MT_TO_MMT
     )
 
     ComIndCoalGHG = (
@@ -2017,7 +1995,7 @@ def CalcComIndGHG(
         * (ComIndPerFFCoalUsed / 100)
         / (PerEnergyToUseComIndCoal / 100)
         * MTCO2ePerBBtuCoal
-        * MMTperMT
+        * MT_TO_MMT
     )
 
     ComIndDFOGHG = (
@@ -2028,7 +2006,7 @@ def CalcComIndGHG(
         * (ComIndPerFFDFOUsed / 100)
         / (PerEnergyToUseComIndDFO / 100)
         * MTCO2ePerBBtuDFO
-        * MMTperMT
+        * MT_TO_MMT
     )
 
     ComIndKerGHG = (
@@ -2039,7 +2017,7 @@ def CalcComIndGHG(
         * (ComIndPerFFKerUsed / 100)
         / (PerEnergyToUseComIndKer / 100)
         * MTCO2ePerBBtuKer
-        * MMTperMT
+        * MT_TO_MMT
     )
 
     ComIndLPGGHG = (
@@ -2050,7 +2028,7 @@ def CalcComIndGHG(
         * (ComIndPerFFLPGUsed / 100)
         / (PerEnergyToUseComIndLPG / 100)
         * MTCO2ePerBBtuLPG
-        * MMTperMT
+        * MT_TO_MMT
     )
 
     ComIndMotGasGHG = (
@@ -2061,7 +2039,7 @@ def CalcComIndGHG(
         * (ComIndPerFFMotGasUsed / 100)
         / (PerEnergyToUseComIndMotGas / 100)
         * MTCO2ePerBBtuMotGas
-        * MMTperMT
+        * MT_TO_MMT
     )
 
     ComIndRFOGHG = (
@@ -2072,7 +2050,7 @@ def CalcComIndGHG(
         * (ComIndPerFFRFOUsed / 100)
         / (PerEnergyToUseComIndRFO / 100)
         * MTCO2ePerBBtuRFO
-        * MMTperMT
+        * MT_TO_MMT
     )
 
     ComIndPetCokeGHG = (
@@ -2083,7 +2061,7 @@ def CalcComIndGHG(
         * (ComIndPerFFPetCokeUsed / 100)
         / (PerEnergyToUseComIndPetCoke / 100)
         * MTCO2ePerBBtuPetCoke
-        * MMTperMT
+        * MT_TO_MMT
     )
 
     ComIndStillGasGHG = (
@@ -2094,7 +2072,7 @@ def CalcComIndGHG(
         * (ComIndPerFFStillGasUsed / 100)
         / (PerEnergyToUseComIndStillGas / 100)
         * MTCO2ePerBBtuStillGas
-        * MMTperMT
+        * MT_TO_MMT
     )
 
     ComIndSpecialNaphthasGHG = (
@@ -2105,7 +2083,7 @@ def CalcComIndGHG(
         * (ComIndPerFFSpecialNaphthasUsed / 100)
         / (PerEnergyToUseComIndSpecialNaphthas / 100)
         * MTCO2ePerBBtuSpecialNaphthas
-        * MMTperMT
+        * MT_TO_MMT
     )
 
     ComIndGHG = (
@@ -2137,16 +2115,11 @@ def CalcMobHighwayGHG(
     PerEVMT,
     RegionalFleetMPG,
     CO2eperGallonGasoline,
-    MMTperLB,
     EVEff,
     grid_coal,
-    LB_CO2e_MWh_Coal,
     grid_oil,
-    LB_CO2e_MWh_Oil,
     grid_ng,
-    LB_CO2e_MWh_NG,
     grid_other_ff,
-    LB_CO2e_MWh_OtherFos,
     PerCombCapture,
 ):
     VMT = (
@@ -2157,18 +2130,18 @@ def CalcMobHighwayGHG(
 
     EVMT = VMT * PerEVMT / 100
 
-    MobHighwayGHG = (VMT - EVMT) / RegionalFleetMPG * CO2eperGallonGasoline * MMTperLB + (
+    MobHighwayGHG = (VMT - EVMT) / RegionalFleetMPG * CO2eperGallonGasoline * MMT_LB + (
         EVMT
         * EVEff
         * 0.001
         / (1 - GRID_LOSS)
         * (
-            (grid_coal / 100 * LB_CO2e_MWh_Coal)
-            + (grid_oil / 100 * LB_CO2e_MWh_Oil)
-            + (grid_ng / 100 * LB_CO2e_MWh_NG)
-            + (grid_other_ff / 100 * LB_CO2e_MWh_OtherFos)
+            (grid_coal / 100 * CO2_LB_MWH_COAL)
+            + (grid_oil / 100 * CO2_LB_MWH_OIL)
+            + (grid_ng / 100 * CO2_LB_MWH_NG)
+            + (grid_other_ff / 100 * CO2_LB_MWH_OTHER_FF)
         )
-        * MMTperLB
+        * MMT_LB
     ) * (1 - PerCombCapture / 100)
 
     return MobHighwayGHG
@@ -2181,7 +2154,6 @@ def CalcMobAviationGHG(pop_factor, PerAviation):
 
 def CalcMobTransitGHG(
     pop_factor,
-    BTUperMWh,
     urban_pop_percent,
     TransRailUrbanPerElecMotion,
     TransRailSuburbanPerElecMotion,
@@ -2193,17 +2165,11 @@ def CalcMobTransitGHG(
     TransRailRuralBTUPerCapMotion,
     PerEnergyToMotionRailElec,
     grid_coal,
-    LB_CO2e_MWh_Coal,
     grid_oil,
-    LB_CO2e_MWh_Oil,
     grid_ng,
-    LB_CO2e_MWh_NG,
     grid_other_ff,
-    LB_CO2e_MWh_OtherFos,
-    MMTperLB,
     PerCombCapture,
     TransRailMTCO2ePerBBtuDiesel,
-    MMTperMT,
     PerEnergyToMotionRailDiesel,
     PerTransRailRidership,
 ):
@@ -2214,7 +2180,7 @@ def CalcMobTransitGHG(
     MobTransitElecGHG = (
         POP
         * (1 + pop_factor / 100)
-        * (1 / BTUperMWh)
+        * (1 / BTU_MWH)
         / (1 - GRID_LOSS)
         * (
             (
@@ -2242,12 +2208,12 @@ def CalcMobTransitGHG(
         / (PerEnergyToMotionRailElec / 100)
         * (
             (
-                (grid_coal / 100 * LB_CO2e_MWh_Coal)
-                + (grid_oil / 100 * LB_CO2e_MWh_Oil)
-                + (grid_ng / 100 * LB_CO2e_MWh_NG)
-                + (grid_other_ff / 100 * LB_CO2e_MWh_OtherFos)
+                (grid_coal / 100 * CO2_LB_MWH_COAL)
+                + (grid_oil / 100 * CO2_LB_MWH_OIL)
+                + (grid_ng / 100 * CO2_LB_MWH_NG)
+                + (grid_other_ff / 100 * CO2_LB_MWH_OTHER_FF)
             )
-            * MMTperLB
+            * MMT_LB
         )
         * (1 - PerCombCapture / 100)
     )
@@ -2257,7 +2223,7 @@ def CalcMobTransitGHG(
         * (1 + pop_factor / 100)
         * TransRailMTCO2ePerBBtuDiesel
         * (1 / 1000000000)
-        * MMTperMT
+        * MT_TO_MMT
         * (
             (
                 urban_pop_percent
@@ -2293,19 +2259,12 @@ def CalcMobOtherGHG(
     FreightRailBBtuMotion,
     FreightRailPerElecMotion,
     PerEnergyToMotionRailElec,
-    BTUperMWh,
     grid_coal,
-    LB_CO2e_MWh_Coal,
     grid_oil,
-    LB_CO2e_MWh_Oil,
     grid_ng,
-    LB_CO2e_MWh_NG,
     grid_other_ff,
-    LB_CO2e_MWh_OtherFos,
-    MMTperLB,
     PerCombCapture,
     FreightRailMTCO2ePerBBtuDiesel,
-    MMTperMT,
     PerEnergyToMotionRailDiesel,
     PerFreightRail,
     InterCityRailBBtuMotion,
@@ -2349,16 +2308,16 @@ def CalcMobOtherGHG(
         * (FreightRailPerElecMotion / 100)
         / (PerEnergyToMotionRailElec / 100)
         * 1000000000
-        * (1 / BTUperMWh)
+        * (1 / BTU_MWH)
         / (1 - GRID_LOSS)
         * (
             (
-                (grid_coal / 100 * LB_CO2e_MWh_Coal)
-                + (grid_oil / 100 * LB_CO2e_MWh_Oil)
-                + (grid_ng / 100 * LB_CO2e_MWh_NG)
-                + (grid_other_ff / 100 * LB_CO2e_MWh_OtherFos)
+                (grid_coal / 100 * CO2_LB_MWH_COAL)
+                + (grid_oil / 100 * CO2_LB_MWH_OIL)
+                + (grid_ng / 100 * CO2_LB_MWH_NG)
+                + (grid_other_ff / 100 * CO2_LB_MWH_OTHER_FF)
             )
-            * MMTperLB
+            * MMT_LB
         )
         * (1 - PerCombCapture / 100)
     )
@@ -2367,7 +2326,7 @@ def CalcMobOtherGHG(
         FreightRailBBtuMotion
         * (FreightRailPerDieselMotion / 100)
         * FreightRailMTCO2ePerBBtuDiesel
-        * MMTperMT
+        * MT_TO_MMT
         / (PerEnergyToMotionRailDiesel / 100)
     )
 
@@ -2379,16 +2338,16 @@ def CalcMobOtherGHG(
         * (InterCityRailPerElecMotion / 100)
         / (PerEnergyToMotionRailElec / 100)
         * 1000000000
-        * (1 / BTUperMWh)
+        * (1 / BTU_MWH)
         / (1 - GRID_LOSS)
         * (
             (
-                (grid_coal / 100 * LB_CO2e_MWh_Coal)
-                + (grid_oil / 100 * LB_CO2e_MWh_Oil)
-                + (grid_ng / 100 * LB_CO2e_MWh_NG)
-                + (grid_other_ff / 100 * LB_CO2e_MWh_OtherFos)
+                (grid_coal / 100 * CO2_LB_MWH_COAL)
+                + (grid_oil / 100 * CO2_LB_MWH_OIL)
+                + (grid_ng / 100 * CO2_LB_MWH_NG)
+                + (grid_other_ff / 100 * CO2_LB_MWH_OTHER_FF)
             )
-            * MMTperLB
+            * MMT_LB
         )
         * (1 - PerCombCapture / 100)
     )
@@ -2397,7 +2356,7 @@ def CalcMobOtherGHG(
         InterCityRailBBtuMotion
         * (InterCityRailPerDieselMotion / 100)
         * InterCityRailMTCO2ePerBBtuDiesel
-        * MMTperMT
+        * MT_TO_MMT
         / (PerEnergyToMotionRailDiesel / 100)
     )
 
@@ -2415,16 +2374,16 @@ def CalcMobOtherGHG(
         * (MarinePortPerElectrification / 100)
         / (PerEnergyToMotionMarineElec / 100)
         * 1000000000
-        * (1 / BTUperMWh)
+        * (1 / BTU_MWH)
         / (1 - GRID_LOSS)
         * (
             (
-                (grid_coal / 100 * LB_CO2e_MWh_Coal)
-                + (grid_oil / 100 * LB_CO2e_MWh_Oil)
-                + (grid_ng / 100 * LB_CO2e_MWh_NG)
-                + (grid_other_ff / 100 * LB_CO2e_MWh_OtherFos)
+                (grid_coal / 100 * CO2_LB_MWH_COAL)
+                + (grid_oil / 100 * CO2_LB_MWH_OIL)
+                + (grid_ng / 100 * CO2_LB_MWH_NG)
+                + (grid_other_ff / 100 * CO2_LB_MWH_OTHER_FF)
             )
-            * MMTperLB
+            * MMT_LB
         )
         * (1 - PerCombCapture / 100)
     )
@@ -2435,7 +2394,7 @@ def CalcMobOtherGHG(
         * (MarinePortPerFossilFuelMotion / 100)
         * (1 + MarinePortPerChangedFossilFuelMotion)
         * MarinePortMTCO2ePerBBtuRFO
-        * MMTperMT
+        * MT_TO_MMT
         / (PerEnergyToMotionMarineRFO / 100)
     )
 
@@ -2445,7 +2404,7 @@ def CalcMobOtherGHG(
         * (MarinePortPerFossilFuelMotion / 100)
         * (1 + MarinePortPerChangedFossilFuelMotion)
         * MarinePortMTCO2ePerBBtuDFO
-        * MMTperMT
+        * MT_TO_MMT
         / (PerEnergyToMotionMarineDFO / 100)
     )
 
@@ -2463,16 +2422,16 @@ def CalcMobOtherGHG(
         * (OffroadPerElectrification / 100)
         / (PerEnergyToMotionOffroadElec / 100)
         * 1000000000
-        * (1 / BTUperMWh)
+        * (1 / BTU_MWH)
         / (1 - GRID_LOSS)
         * (
             (
-                (grid_coal / 100 * LB_CO2e_MWh_Coal)
-                + (grid_oil / 100 * LB_CO2e_MWh_Oil)
-                + (grid_ng / 100 * LB_CO2e_MWh_NG)
-                + (grid_other_ff / 100 * LB_CO2e_MWh_OtherFos)
+                (grid_coal / 100 * CO2_LB_MWH_COAL)
+                + (grid_oil / 100 * CO2_LB_MWH_OIL)
+                + (grid_ng / 100 * CO2_LB_MWH_NG)
+                + (grid_other_ff / 100 * CO2_LB_MWH_OTHER_FF)
             )
-            * MMTperLB
+            * MMT_LB
         )
         * (1 - PerCombCapture / 100)
     )
@@ -2483,7 +2442,7 @@ def CalcMobOtherGHG(
         * (OffroadPerFossilFuelMotion / 100)
         * (1 + OffroadPerChangedFossilFuelMotion)
         * OffroadMTCO2ePerBBtuMotGas
-        * MMTperMT
+        * MT_TO_MMT
         / (PerEnergyToMotionOffroadMotGas / 100)
     )
 
@@ -2493,7 +2452,7 @@ def CalcMobOtherGHG(
         * (OffroadPerFossilFuelMotion / 100)
         * (1 + OffroadPerChangedFossilFuelMotion)
         * OffroadMTCO2ePerBBtuDFO
-        * MMTperMT
+        * MT_TO_MMT
         / (PerEnergyToMotionOffroadDFO / 100)
     )
 
@@ -2503,7 +2462,7 @@ def CalcMobOtherGHG(
         * (OffroadPerFossilFuelMotion / 100)
         * (1 + OffroadPerChangedFossilFuelMotion)
         * OffroadMTCO2ePerBBtuLPG
-        * MMTperMT
+        * MT_TO_MMT
         / (PerEnergyToMotionOffroadLPG / 100)
     )
 
@@ -2625,25 +2584,12 @@ def CalcNonEnergyGHG(
     RuralPerResFFWaterHeatingFOKerUsed,
     RuralPerResFFSpaceHeatingLPGUsed,
     RuralPerResFFWaterHeatingLPGUsed,
-    BTUperMWh,
     grid_coal,
-    LB_CO2e_MWh_Coal,
     grid_oil,
-    LB_CO2e_MWh_Oil,
     grid_ng,
-    LB_CO2e_MWh_NG,
     grid_other_ff,
-    LB_CO2e_MWh_OtherFos,
-    MMTperLB,
     PerCombCapture,
-    BTUperCCF,
     MCFperCCF,
-    LB_CO2e_MCF_NG,
-    BTUperGallonFOKer,
-    MMTCO2e_ThBarrel_FOKer,
-    ThBarrelperGallon,
-    BTUperGallonLPG,
-    MMTCO2e_ThBarrel_LPG,
     ComIndPerElectrification,
     ComIndPerFossilFuelUsed2015,
     ComIndBBtuUsed,
@@ -2766,25 +2712,12 @@ def CalcNonEnergyGHG(
         RuralPerResFFWaterHeatingFOKerUsed,
         RuralPerResFFSpaceHeatingLPGUsed,
         RuralPerResFFWaterHeatingLPGUsed,
-        BTUperMWh,
         grid_coal,
-        LB_CO2e_MWh_Coal,
         grid_oil,
-        LB_CO2e_MWh_Oil,
         grid_ng,
-        LB_CO2e_MWh_NG,
         grid_other_ff,
-        LB_CO2e_MWh_OtherFos,
-        MMTperLB,
         PerCombCapture,
-        BTUperCCF,
         MCFperCCF,
-        LB_CO2e_MCF_NG,
-        BTUperGallonFOKer,
-        MMTCO2e_ThBarrel_FOKer,
-        ThBarrelperGallon,
-        BTUperGallonLPG,
-        MMTCO2e_ThBarrel_LPG,
     )[1]
 
     ComIndPerFossilFuelUsed = 100 - ComIndPerElectrification
@@ -2804,7 +2737,7 @@ def CalcNonEnergyGHG(
 
     NGSystemsGHG = (
         (ResNGConsumption + ComIndNGConsumption)
-        * (1 / BTUperCCF)
+        * (1 / BTU_CCF_AVG)
         * 100
         * MillionCFperCF
         * (MMTCO2ePerMillionCFNG_CH4 + MMTCO2ePerMillionCFNG_CO2)
@@ -2932,7 +2865,7 @@ def callback(attr, old, new):
             GHG_TRANSIT,
             GHG_AVIATION,
             GHG_OTHER_MOBILE,
-            NonEnergy2015,
+            GHG_NON_ENERGY,
         ],
         "Scenario": [
             CalcResGHG(
@@ -3040,47 +2973,27 @@ def callback(attr, old, new):
                 RuralPerResFFWaterHeatingFOKerUsed,
                 RuralPerResFFSpaceHeatingLPGUsed,
                 RuralPerResFFWaterHeatingLPGUsed,
-                BTUperMWh,
                 grid_coal,
-                LB_CO2e_MWh_Coal,
                 grid_oil,
-                LB_CO2e_MWh_Oil,
                 grid_ng,
-                LB_CO2e_MWh_NG,
                 grid_other_ff,
-                LB_CO2e_MWh_OtherFos,
-                MMTperLB,
                 PerCombCapture,
-                BTUperCCF,
                 MCFperCCF,
-                LB_CO2e_MCF_NG,
-                BTUperGallonFOKer,
-                MMTCO2e_ThBarrel_FOKer,
-                ThBarrelperGallon,
-                BTUperGallonLPG,
-                MMTCO2e_ThBarrel_LPG,
             )[0],
             CalcComIndGHG(
                 ComIndPerElectrification,
                 ComIndBBtuUsed,
                 PerComIndEnergyUse,
                 PerEnergyToUseComIndElec,
-                BTUperMWh,
                 grid_coal,
-                LB_CO2e_MWh_Coal,
                 grid_oil,
-                LB_CO2e_MWh_Oil,
                 grid_ng,
-                LB_CO2e_MWh_NG,
                 grid_other_ff,
-                LB_CO2e_MWh_OtherFos,
-                MMTperLB,
                 PerCombCapture,
                 ComIndPerFossilFuelUsed2015,
                 ComIndPerFFNGUsed,
                 PerEnergyToUseComIndNG,
                 MTCO2ePerBBtuNG,
-                MMTperMT,
                 ComIndPerFFCoalUsed,
                 PerEnergyToUseComIndCoal,
                 MTCO2ePerBBtuCoal,
@@ -3121,21 +3034,15 @@ def callback(attr, old, new):
                 PerEVMT,
                 RegionalFleetMPG,
                 CO2eperGallonGasoline,
-                MMTperLB,
                 EVEff,
                 grid_coal,
-                LB_CO2e_MWh_Coal,
                 grid_oil,
-                LB_CO2e_MWh_Oil,
                 grid_ng,
-                LB_CO2e_MWh_NG,
                 grid_other_ff,
-                LB_CO2e_MWh_OtherFos,
                 PerCombCapture,
             ),
             CalcMobTransitGHG(
                 pop_factor,
-                BTUperMWh,
                 urban_pop_percent,
                 TransRailUrbanPerElecMotion,
                 TransRailSuburbanPerElecMotion,
@@ -3147,17 +3054,11 @@ def callback(attr, old, new):
                 TransRailRuralBTUPerCapMotion,
                 PerEnergyToMotionRailElec,
                 grid_coal,
-                LB_CO2e_MWh_Coal,
                 grid_oil,
-                LB_CO2e_MWh_Oil,
                 grid_ng,
-                LB_CO2e_MWh_NG,
                 grid_other_ff,
-                LB_CO2e_MWh_OtherFos,
-                MMTperLB,
                 PerCombCapture,
                 TransRailMTCO2ePerBBtuDiesel,
-                MMTperMT,
                 PerEnergyToMotionRailDiesel,
                 PerTransRailRidership,
             ),
@@ -3166,19 +3067,12 @@ def callback(attr, old, new):
                 FreightRailBBtuMotion,
                 FreightRailPerElecMotion,
                 PerEnergyToMotionRailElec,
-                BTUperMWh,
                 grid_coal,
-                LB_CO2e_MWh_Coal,
                 grid_oil,
-                LB_CO2e_MWh_Oil,
                 grid_ng,
-                LB_CO2e_MWh_NG,
                 grid_other_ff,
-                LB_CO2e_MWh_OtherFos,
-                MMTperLB,
                 PerCombCapture,
                 FreightRailMTCO2ePerBBtuDiesel,
-                MMTperMT,
                 PerEnergyToMotionRailDiesel,
                 PerFreightRail,
                 InterCityRailBBtuMotion,
@@ -3320,25 +3214,12 @@ def callback(attr, old, new):
                 RuralPerResFFWaterHeatingFOKerUsed,
                 RuralPerResFFSpaceHeatingLPGUsed,
                 RuralPerResFFWaterHeatingLPGUsed,
-                BTUperMWh,
                 grid_coal,
-                LB_CO2e_MWh_Coal,
                 grid_oil,
-                LB_CO2e_MWh_Oil,
                 grid_ng,
-                LB_CO2e_MWh_NG,
                 grid_other_ff,
-                LB_CO2e_MWh_OtherFos,
-                MMTperLB,
                 PerCombCapture,
-                BTUperCCF,
                 MCFperCCF,
-                LB_CO2e_MCF_NG,
-                BTUperGallonFOKer,
-                MMTCO2e_ThBarrel_FOKer,
-                ThBarrelperGallon,
-                BTUperGallonLPG,
-                MMTCO2e_ThBarrel_LPG,
                 ComIndPerElectrification,
                 ComIndPerFossilFuelUsed2015,
                 ComIndBBtuUsed,
@@ -3464,25 +3345,12 @@ def callback(attr, old, new):
                 RuralPerResFFWaterHeatingFOKerUsed,
                 RuralPerResFFSpaceHeatingLPGUsed,
                 RuralPerResFFWaterHeatingLPGUsed,
-                BTUperMWh,
                 grid_coal,
-                LB_CO2e_MWh_Coal,
                 grid_oil,
-                LB_CO2e_MWh_Oil,
                 grid_ng,
-                LB_CO2e_MWh_NG,
                 grid_other_ff,
-                LB_CO2e_MWh_OtherFos,
-                MMTperLB,
                 PerCombCapture,
-                BTUperCCF,
                 MCFperCCF,
-                LB_CO2e_MCF_NG,
-                BTUperGallonFOKer,
-                MMTCO2e_ThBarrel_FOKer,
-                ThBarrelperGallon,
-                BTUperGallonLPG,
-                MMTCO2e_ThBarrel_LPG,
             )[0],
         ],
         "Commercial/Industrial": [
@@ -3492,22 +3360,15 @@ def callback(attr, old, new):
                 ComIndBBtuUsed,
                 PerComIndEnergyUse,
                 PerEnergyToUseComIndElec,
-                BTUperMWh,
                 grid_coal,
-                LB_CO2e_MWh_Coal,
                 grid_oil,
-                LB_CO2e_MWh_Oil,
                 grid_ng,
-                LB_CO2e_MWh_NG,
                 grid_other_ff,
-                LB_CO2e_MWh_OtherFos,
-                MMTperLB,
                 PerCombCapture,
                 ComIndPerFossilFuelUsed2015,
                 ComIndPerFFNGUsed,
                 PerEnergyToUseComIndNG,
                 MTCO2ePerBBtuNG,
-                MMTperMT,
                 ComIndPerFFCoalUsed,
                 PerEnergyToUseComIndCoal,
                 MTCO2ePerBBtuCoal,
@@ -3551,16 +3412,11 @@ def callback(attr, old, new):
                 PerEVMT,
                 RegionalFleetMPG,
                 CO2eperGallonGasoline,
-                MMTperLB,
                 EVEff,
                 grid_coal,
-                LB_CO2e_MWh_Coal,
                 grid_oil,
-                LB_CO2e_MWh_Oil,
                 grid_ng,
-                LB_CO2e_MWh_NG,
                 grid_other_ff,
-                LB_CO2e_MWh_OtherFos,
                 PerCombCapture,
             ),
         ],
@@ -3568,7 +3424,6 @@ def callback(attr, old, new):
             GHG_TRANSIT,
             CalcMobTransitGHG(
                 pop_factor,
-                BTUperMWh,
                 urban_pop_percent,
                 TransRailUrbanPerElecMotion,
                 TransRailSuburbanPerElecMotion,
@@ -3580,41 +3435,28 @@ def callback(attr, old, new):
                 TransRailRuralBTUPerCapMotion,
                 PerEnergyToMotionRailElec,
                 grid_coal,
-                LB_CO2e_MWh_Coal,
                 grid_oil,
-                LB_CO2e_MWh_Oil,
                 grid_ng,
-                LB_CO2e_MWh_NG,
                 grid_other_ff,
-                LB_CO2e_MWh_OtherFos,
-                MMTperLB,
                 PerCombCapture,
                 TransRailMTCO2ePerBBtuDiesel,
-                MMTperMT,
                 PerEnergyToMotionRailDiesel,
                 PerTransRailRidership,
             ),
         ],
-        "Mobile-Aviation": [GHG_AVIATION, CalcMobAviationGHG(pop_factor, PerAviation),],
+        "Mobile-Aviation": [GHG_AVIATION, CalcMobAviationGHG(pop_factor, PerAviation)],
         "Mobile-Other": [
             GHG_OTHER_MOBILE,
             CalcMobOtherGHG(
                 FreightRailBBtuMotion,
                 FreightRailPerElecMotion,
                 PerEnergyToMotionRailElec,
-                BTUperMWh,
                 grid_coal,
-                LB_CO2e_MWh_Coal,
                 grid_oil,
-                LB_CO2e_MWh_Oil,
                 grid_ng,
-                LB_CO2e_MWh_NG,
                 grid_other_ff,
-                LB_CO2e_MWh_OtherFos,
-                MMTperLB,
                 PerCombCapture,
                 FreightRailMTCO2ePerBBtuDiesel,
-                MMTperMT,
                 PerEnergyToMotionRailDiesel,
                 PerFreightRail,
                 InterCityRailBBtuMotion,
@@ -3649,7 +3491,7 @@ def callback(attr, old, new):
             ),
         ],
         "Non-Energy": [
-            NonEnergy2015,
+            GHG_NON_ENERGY,
             CalcNonEnergyGHG(
                 PerAg,
                 PerWaste,
@@ -3759,25 +3601,12 @@ def callback(attr, old, new):
                 RuralPerResFFWaterHeatingFOKerUsed,
                 RuralPerResFFSpaceHeatingLPGUsed,
                 RuralPerResFFWaterHeatingLPGUsed,
-                BTUperMWh,
                 grid_coal,
-                LB_CO2e_MWh_Coal,
                 grid_oil,
-                LB_CO2e_MWh_Oil,
                 grid_ng,
-                LB_CO2e_MWh_NG,
                 grid_other_ff,
-                LB_CO2e_MWh_OtherFos,
-                MMTperLB,
                 PerCombCapture,
-                BTUperCCF,
                 MCFperCCF,
-                LB_CO2e_MCF_NG,
-                BTUperGallonFOKer,
-                MMTCO2e_ThBarrel_FOKer,
-                ThBarrelperGallon,
-                BTUperGallonLPG,
-                MMTCO2e_ThBarrel_LPG,
                 ComIndPerElectrification,
                 ComIndPerFossilFuelUsed2015,
                 ComIndBBtuUsed,
@@ -4071,7 +3900,7 @@ data = {
         GHG_TRANSIT,
         GHG_AVIATION,
         GHG_OTHER_MOBILE,
-        NonEnergy2015,
+        GHG_NON_ENERGY,
     ],
     "Scenario": [
         CalcResGHG(
@@ -4179,47 +4008,27 @@ data = {
             RuralPerResFFWaterHeatingFOKerUsed,
             RuralPerResFFSpaceHeatingLPGUsed,
             RuralPerResFFWaterHeatingLPGUsed,
-            BTUperMWh,
             grid_coal,
-            LB_CO2e_MWh_Coal,
             grid_oil,
-            LB_CO2e_MWh_Oil,
             grid_ng,
-            LB_CO2e_MWh_NG,
             grid_other_ff,
-            LB_CO2e_MWh_OtherFos,
-            MMTperLB,
             PerCombCapture,
-            BTUperCCF,
             MCFperCCF,
-            LB_CO2e_MCF_NG,
-            BTUperGallonFOKer,
-            MMTCO2e_ThBarrel_FOKer,
-            ThBarrelperGallon,
-            BTUperGallonLPG,
-            MMTCO2e_ThBarrel_LPG,
         )[0],
         CalcComIndGHG(
             ComIndPerElectrification,
             ComIndBBtuUsed,
             PerComIndEnergyUse,
             PerEnergyToUseComIndElec,
-            BTUperMWh,
             grid_coal,
-            LB_CO2e_MWh_Coal,
             grid_oil,
-            LB_CO2e_MWh_Oil,
             grid_ng,
-            LB_CO2e_MWh_NG,
             grid_other_ff,
-            LB_CO2e_MWh_OtherFos,
-            MMTperLB,
             PerCombCapture,
             ComIndPerFossilFuelUsed2015,
             ComIndPerFFNGUsed,
             PerEnergyToUseComIndNG,
             MTCO2ePerBBtuNG,
-            MMTperMT,
             ComIndPerFFCoalUsed,
             PerEnergyToUseComIndCoal,
             MTCO2ePerBBtuCoal,
@@ -4260,21 +4069,15 @@ data = {
             PerEVMT,
             RegionalFleetMPG,
             CO2eperGallonGasoline,
-            MMTperLB,
             EVEff,
             grid_coal,
-            LB_CO2e_MWh_Coal,
             grid_oil,
-            LB_CO2e_MWh_Oil,
             grid_ng,
-            LB_CO2e_MWh_NG,
             grid_other_ff,
-            LB_CO2e_MWh_OtherFos,
             PerCombCapture,
         ),
         CalcMobTransitGHG(
             pop_factor,
-            BTUperMWh,
             urban_pop_percent,
             TransRailUrbanPerElecMotion,
             TransRailSuburbanPerElecMotion,
@@ -4286,17 +4089,11 @@ data = {
             TransRailRuralBTUPerCapMotion,
             PerEnergyToMotionRailElec,
             grid_coal,
-            LB_CO2e_MWh_Coal,
             grid_oil,
-            LB_CO2e_MWh_Oil,
             grid_ng,
-            LB_CO2e_MWh_NG,
             grid_other_ff,
-            LB_CO2e_MWh_OtherFos,
-            MMTperLB,
             PerCombCapture,
             TransRailMTCO2ePerBBtuDiesel,
-            MMTperMT,
             PerEnergyToMotionRailDiesel,
             PerTransRailRidership,
         ),
@@ -4305,19 +4102,12 @@ data = {
             FreightRailBBtuMotion,
             FreightRailPerElecMotion,
             PerEnergyToMotionRailElec,
-            BTUperMWh,
             grid_coal,
-            LB_CO2e_MWh_Coal,
             grid_oil,
-            LB_CO2e_MWh_Oil,
             grid_ng,
-            LB_CO2e_MWh_NG,
             grid_other_ff,
-            LB_CO2e_MWh_OtherFos,
-            MMTperLB,
             PerCombCapture,
             FreightRailMTCO2ePerBBtuDiesel,
-            MMTperMT,
             PerEnergyToMotionRailDiesel,
             PerFreightRail,
             InterCityRailBBtuMotion,
@@ -4459,25 +4249,12 @@ data = {
             RuralPerResFFWaterHeatingFOKerUsed,
             RuralPerResFFSpaceHeatingLPGUsed,
             RuralPerResFFWaterHeatingLPGUsed,
-            BTUperMWh,
             grid_coal,
-            LB_CO2e_MWh_Coal,
             grid_oil,
-            LB_CO2e_MWh_Oil,
             grid_ng,
-            LB_CO2e_MWh_NG,
             grid_other_ff,
-            LB_CO2e_MWh_OtherFos,
-            MMTperLB,
             PerCombCapture,
-            BTUperCCF,
             MCFperCCF,
-            LB_CO2e_MCF_NG,
-            BTUperGallonFOKer,
-            MMTCO2e_ThBarrel_FOKer,
-            ThBarrelperGallon,
-            BTUperGallonLPG,
-            MMTCO2e_ThBarrel_LPG,
             ComIndPerElectrification,
             ComIndPerFossilFuelUsed2015,
             ComIndBBtuUsed,
@@ -4636,25 +4413,12 @@ data2 = {
             RuralPerResFFWaterHeatingFOKerUsed,
             RuralPerResFFSpaceHeatingLPGUsed,
             RuralPerResFFWaterHeatingLPGUsed,
-            BTUperMWh,
             grid_coal,
-            LB_CO2e_MWh_Coal,
             grid_oil,
-            LB_CO2e_MWh_Oil,
             grid_ng,
-            LB_CO2e_MWh_NG,
             grid_other_ff,
-            LB_CO2e_MWh_OtherFos,
-            MMTperLB,
             PerCombCapture,
-            BTUperCCF,
             MCFperCCF,
-            LB_CO2e_MCF_NG,
-            BTUperGallonFOKer,
-            MMTCO2e_ThBarrel_FOKer,
-            ThBarrelperGallon,
-            BTUperGallonLPG,
-            MMTCO2e_ThBarrel_LPG,
         )[0],
     ],
     "Commercial/Industrial": [
@@ -4664,22 +4428,15 @@ data2 = {
             ComIndBBtuUsed,
             PerComIndEnergyUse,
             PerEnergyToUseComIndElec,
-            BTUperMWh,
             grid_coal,
-            LB_CO2e_MWh_Coal,
             grid_oil,
-            LB_CO2e_MWh_Oil,
             grid_ng,
-            LB_CO2e_MWh_NG,
             grid_other_ff,
-            LB_CO2e_MWh_OtherFos,
-            MMTperLB,
             PerCombCapture,
             ComIndPerFossilFuelUsed2015,
             ComIndPerFFNGUsed,
             PerEnergyToUseComIndNG,
             MTCO2ePerBBtuNG,
-            MMTperMT,
             ComIndPerFFCoalUsed,
             PerEnergyToUseComIndCoal,
             MTCO2ePerBBtuCoal,
@@ -4723,16 +4480,11 @@ data2 = {
             PerEVMT,
             RegionalFleetMPG,
             CO2eperGallonGasoline,
-            MMTperLB,
             EVEff,
             grid_coal,
-            LB_CO2e_MWh_Coal,
             grid_oil,
-            LB_CO2e_MWh_Oil,
             grid_ng,
-            LB_CO2e_MWh_NG,
             grid_other_ff,
-            LB_CO2e_MWh_OtherFos,
             PerCombCapture,
         ),
     ],
@@ -4740,7 +4492,6 @@ data2 = {
         GHG_TRANSIT,
         CalcMobTransitGHG(
             pop_factor,
-            BTUperMWh,
             urban_pop_percent,
             TransRailUrbanPerElecMotion,
             TransRailSuburbanPerElecMotion,
@@ -4752,17 +4503,11 @@ data2 = {
             TransRailRuralBTUPerCapMotion,
             PerEnergyToMotionRailElec,
             grid_coal,
-            LB_CO2e_MWh_Coal,
             grid_oil,
-            LB_CO2e_MWh_Oil,
             grid_ng,
-            LB_CO2e_MWh_NG,
             grid_other_ff,
-            LB_CO2e_MWh_OtherFos,
-            MMTperLB,
             PerCombCapture,
             TransRailMTCO2ePerBBtuDiesel,
-            MMTperMT,
             PerEnergyToMotionRailDiesel,
             PerTransRailRidership,
         ),
@@ -4774,19 +4519,12 @@ data2 = {
             FreightRailBBtuMotion,
             FreightRailPerElecMotion,
             PerEnergyToMotionRailElec,
-            BTUperMWh,
             grid_coal,
-            LB_CO2e_MWh_Coal,
             grid_oil,
-            LB_CO2e_MWh_Oil,
             grid_ng,
-            LB_CO2e_MWh_NG,
             grid_other_ff,
-            LB_CO2e_MWh_OtherFos,
-            MMTperLB,
             PerCombCapture,
             FreightRailMTCO2ePerBBtuDiesel,
-            MMTperMT,
             PerEnergyToMotionRailDiesel,
             PerFreightRail,
             InterCityRailBBtuMotion,
@@ -4821,7 +4559,7 @@ data2 = {
         ),
     ],
     "Non-Energy": [
-        NonEnergy2015,
+        GHG_NON_ENERGY,
         CalcNonEnergyGHG(
             PerAg,
             PerWaste,
@@ -4931,25 +4669,12 @@ data2 = {
             RuralPerResFFWaterHeatingFOKerUsed,
             RuralPerResFFSpaceHeatingLPGUsed,
             RuralPerResFFWaterHeatingLPGUsed,
-            BTUperMWh,
             grid_coal,
-            LB_CO2e_MWh_Coal,
             grid_oil,
-            LB_CO2e_MWh_Oil,
             grid_ng,
-            LB_CO2e_MWh_NG,
             grid_other_ff,
-            LB_CO2e_MWh_OtherFos,
-            MMTperLB,
             PerCombCapture,
-            BTUperCCF,
             MCFperCCF,
-            LB_CO2e_MCF_NG,
-            BTUperGallonFOKer,
-            MMTCO2e_ThBarrel_FOKer,
-            ThBarrelperGallon,
-            BTUperGallonLPG,
-            MMTCO2e_ThBarrel_LPG,
             ComIndPerElectrification,
             ComIndPerFossilFuelUsed2015,
             ComIndBBtuUsed,
