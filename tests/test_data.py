@@ -14,7 +14,7 @@ print("Non-Energy = ", NonEnergyGHG)
 
 
 def test_calc_res_ghg():
-    res_ghg, res_ngbtu = g.CalcResGHG(
+    res_ghg, res_ngbtu = g.calc_res_ghg(
         g.pop_factor,
         g.urban_pop_percent,
         g.UrbanBTUPerCapUsed,
@@ -130,7 +130,7 @@ def test_calc_res_ghg():
 
 
 def test_calc_ci_ghg():
-    ci_ghg = g.CalcComIndGHG(
+    ci_ghg = g.calc_ci_ghg(
         g.ComIndPerElectrification,
         g.ComIndBBtuUsed,
         g.PerComIndEnergyUse,
@@ -143,41 +143,31 @@ def test_calc_ci_ghg():
         g.ComIndPerFossilFuelUsed2015,
         g.ComIndPerFFNGUsed,
         g.PerEnergyToUseComIndNG,
-        g.MTCO2ePerBBtuNG,
         g.ComIndPerFFCoalUsed,
         g.PerEnergyToUseComIndCoal,
-        g.MTCO2ePerBBtuCoal,
         g.ComIndPerFFDFOUsed,
         g.PerEnergyToUseComIndDFO,
-        g.MTCO2ePerBBtuDFO,
         g.ComIndPerFFKerUsed,
         g.PerEnergyToUseComIndKer,
-        g.MTCO2ePerBBtuKer,
         g.ComIndPerFFLPGUsed,
         g.PerEnergyToUseComIndLPG,
-        g.MTCO2ePerBBtuLPG,
         g.ComIndPerFFMotGasUsed,
         g.PerEnergyToUseComIndMotGas,
-        g.MTCO2ePerBBtuMotGas,
         g.ComIndPerFFRFOUsed,
         g.PerEnergyToUseComIndRFO,
-        g.MTCO2ePerBBtuRFO,
         g.ComIndPerFFPetCokeUsed,
         g.PerEnergyToUseComIndPetCoke,
-        g.MTCO2ePerBBtuPetCoke,
         g.ComIndPerFFStillGasUsed,
         g.PerEnergyToUseComIndStillGas,
-        g.MTCO2ePerBBtuStillGas,
         g.ComIndPerSpecialNaphthasUsed,
         g.PerEnergyToUseComIndSpecialNaphthas,
-        g.MTCO2ePerBBtuSpecialNaphthas,
     )
 
     assert ci_ghg == 27.47829273576916
 
 
 def test_calc_mob_highway_GHG():
-    ghg = g.CalcMobHighwayGHG(
+    ghg = g.calc_highway_ghg(
         g.urban_pop_percent,
         g.pop_factor,
         g.UrbanVMTperPop,
@@ -201,13 +191,13 @@ def test_calc_mob_highway_GHG():
 
 
 def test_calc_mob_aviation_ghg():
-    ghg = g.CalcMobAviationGHG(g.pop_factor, g.PerAviation)
+    ghg = g.calc_aviation_ghg(g.pop_factor, g.PerAviation)
 
     assert ghg == 3.9
 
 
 def test_calc_mob_transit_ghg():
-    ghg = g.CalcMobTransitGHG(
+    ghg = g.calc_transit_ghg(
         g.pop_factor,
         g.urban_pop_percent,
         g.TransRailUrbanPerElecMotion,
@@ -232,8 +222,8 @@ def test_calc_mob_transit_ghg():
     assert ghg == 0.17340094875122483
 
 
-def test_calc_mob_other_ghg():
-    ghg = g.CalcMobOtherGHG(
+def test_calc_other_mobile_ghg():
+    ghg = g.calc_other_mobile_ghg(
         g.FreightRailBBtuMotion,
         g.FreightRailPerElecMotion,
         g.PerEnergyToMotionRailElec,
@@ -279,7 +269,7 @@ def test_calc_mob_other_ghg():
 
 
 def test_calc_non_energy_ghg():
-    ghg = g.CalcNonEnergyGHG(
+    ghg = g.calc_non_energy_ghg(
         g.PerAg,
         g.PerWaste,
         g.pop_factor,

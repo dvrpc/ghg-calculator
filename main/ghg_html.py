@@ -57,6 +57,7 @@ URBAN_POP = 1691830
 SUBURBAN_POP = 3693658
 RURAL_POP = 332445
 POP = URBAN_POP + SUBURBAN_POP + RURAL_POP
+
 pop_factor = 0
 urban_pop_percent = URBAN_POP / POP * 100
 suburban_pop_percent = SUBURBAN_POP / POP * 100
@@ -95,7 +96,7 @@ MCFperCCF = 0.1
 MillionCFperCF = 0.000001
 MT_TO_MMT = 0.000001
 
-# Btu Conversions
+# BTU Conversions
 BTU_KWH = 3412
 BTU_MWH = BTU_KWH * 1000
 BTU_CF_NG_PA = 1048
@@ -107,16 +108,16 @@ BTU_B_LPG = 3540000
 BTU_GAL_LPG = BTU_B_LPG * (1 / 42)
 
 # MTCO2e per BBtu - From ComInd 2015
-MTCO2ePerBBtuNG = 53.20
-MTCO2ePerBBtuCoal = 95.13
-MTCO2ePerBBtuDFO = 74.39
-MTCO2ePerBBtuKer = 73.63
-MTCO2ePerBBtuLPG = 65.15
-MTCO2ePerBBtuMotGas = 71.60
-MTCO2ePerBBtuRFO = 75.35
-MTCO2ePerBBtuPetCoke = 102.36
-MTCO2ePerBBtuStillGas = 66.96
-MTCO2ePerBBtuSpecialNaphthas = 72.62
+CO2_MMT_BBTU_NG = 53.20
+CO2_MMT_BBTU_COAL = 95.13
+CO2_MMT_BBTU_DFO = 74.39
+CO2_MMT_BBTU_KER = 73.63
+CO2_MMT_BBTU_LPG = 65.15
+CO2_MMT_BBTU_MOTOR_GAS = 71.60
+CO2_MMT_BBTU_RFO = 75.35
+CO2_MMT_BBTU_PETCOKE = 102.36
+CO2_MMT_BBTU_STILL_GAS = 66.96
+CO2_MMT_BBTU_NAPHTHAS = 72.62
 
 # Residential Stationary ENERGY
 PerCapResEnergyUse = 0
@@ -900,7 +901,7 @@ PerUrbanTreeCoverage = 0
 PerForestCoverage = 0
 
 
-def CalcResGHG(
+def calc_res_ghg(
     pop_factor,
     urban_pop_percent,
     UrbanBTUPerCapUsed,
@@ -1013,8 +1014,8 @@ def CalcResGHG(
     MCFperCCF,
 ):
     """
-    Residential function uses split of energy per community type by BTU of energy and population
-    Begins calculating BTUs of residential energy use from urban areas.
+    Determine BTU of energy by sub-sector (urban, suburban, rural) and from that calculate
+    ghg emissions.
     """
     UrbanResBTUUsed = (
         POP
@@ -1157,7 +1158,8 @@ def CalcResGHG(
         * (UrbanPerResFFWaterHeatingLPGUsed / 100)
     )
 
-    # If statement determines whether fossil fuels (and all uses) are switched to electricity or if electricity heating uses are switched to fossil fuel heating uses
+    # Determine whether fossil fuels (and all uses) are switched to electricity or if electricity
+    # heating uses are switched to fossil fuel heating uses
     if UrbanPerChangedFossilFuelUsed >= 0:
         UrbanResElecBTU = (
             (UrbanResElecSpaceHeatingBTUUsed / (PerEnergyToUseResElecSpaceHeating / 100))
@@ -1296,7 +1298,6 @@ def CalcResGHG(
             )
         )
 
-    # Begins calculating energy use in suburban areas
     SuburbanResBTUUsed = (
         POP
         * (1 + pop_factor / 100)
@@ -1444,7 +1445,8 @@ def CalcResGHG(
         * (SuburbanPerResFFWaterHeatingLPGUsed / 100)
     )
 
-    # If statement determines whether fossil fuels (and all uses) are switched to electricity or if electricity heating uses are switched to fossil fuel heating uses
+    # Determine whether fossil fuels (and all uses) are switched to electricity or if electricity
+    # heating uses are switched to fossil fuel heating uses
     if SuburbanPerChangedFossilFuelUsed >= 0:
         SuburbanResElecBTU = (
             (SuburbanResElecSpaceHeatingBTUUsed / (PerEnergyToUseResElecSpaceHeating / 100))
@@ -1583,7 +1585,6 @@ def CalcResGHG(
             )
         )
 
-    # Begins calculating BTUs of residential energy use from rural areas
     RuralResBTUUsed = (
         POP
         * (1 + pop_factor / 100)
@@ -1725,7 +1726,8 @@ def CalcResGHG(
         * (RuralPerResFFWaterHeatingLPGUsed / 100)
     )
 
-    # If statement determines whether fossil fuels (and all uses) are switched to electricity or if electricity heating uses are switched to fossil fuel heating uses
+    # Determine whether fossil fuels (and all uses) are switched to electricity or if electricity
+    # heating uses are switched to fossil fuel heating uses
     if RuralPerChangedFossilFuelUsed >= 0:
         RuralResElecBTU = (
             (RuralResElecSpaceHeatingBTUUsed / (PerEnergyToUseResElecSpaceHeating / 100))
@@ -1864,7 +1866,7 @@ def CalcResGHG(
             )
         )
 
-    # Begins calculating GHG emissions
+    # Calculate GHG emissions
     ResElecGHG = (
         (UrbanResElecBTU + SuburbanResElecBTU + RuralResElecBTU)
         * (1 / BTU_MWH)
@@ -1909,7 +1911,7 @@ def CalcResGHG(
     return ResGHG, ResNGBTU
 
 
-def CalcComIndGHG(
+def calc_ci_ghg(
     ComIndPerElectrification,
     ComIndBBtuUsed,
     PerComIndEnergyUse,
@@ -1922,34 +1924,24 @@ def CalcComIndGHG(
     ComIndPerFossilFuelUsed2015,
     ComIndPerFFNGUsed,
     PerEnergyToUseComIndNG,
-    MTCO2ePerBBtuNG,
     ComIndPerFFCoalUsed,
     PerEnergyToUseComIndCoal,
-    MTCO2ePerBBtuCoal,
     ComIndPerFFDFOUsed,
     PerEnergyToUseComIndDFO,
-    MTCO2ePerBBtuDFO,
     ComIndPerFFKerUsed,
     PerEnergyToUseComIndKer,
-    MTCO2ePerBBtuKer,
     ComIndPerFFLPGUsed,
     PerEnergyToUseComIndLPG,
-    MTCO2ePerBBtuLPG,
     ComIndPerFFMotGasUsed,
     PerEnergyToUseComIndMotGas,
-    MTCO2ePerBBtuMotGas,
     ComIndPerFFRFOUsed,
     PerEnergyToUseComIndRFO,
-    MTCO2ePerBBtuRFO,
     ComIndPerFFPetCokeUsed,
     PerEnergyToUseComIndPetCoke,
-    MTCO2ePerBBtuPetCoke,
     ComIndPerFFStillGasUsed,
     PerEnergyToUseComIndStillGas,
-    MTCO2ePerBBtuStillGas,
     ComIndPerSpecialNaphthasUsed,
     PerEnergyToUseComIndSpecialNaphthas,
-    MTCO2ePerBBtuSpecialNaphthas,
 ):
     ComIndPerFossilFuelUsed = 100 - ComIndPerElectrification
     PerChangedFossilFuelUsed = (
@@ -1983,7 +1975,7 @@ def CalcComIndGHG(
         * (1 + PerChangedFossilFuelUsed)
         * (ComIndPerFFNGUsed / 100)
         / (PerEnergyToUseComIndNG / 100)
-        * MTCO2ePerBBtuNG
+        * CO2_MMT_BBTU_NG
         * MT_TO_MMT
     )
 
@@ -1994,7 +1986,7 @@ def CalcComIndGHG(
         * (1 + PerChangedFossilFuelUsed)
         * (ComIndPerFFCoalUsed / 100)
         / (PerEnergyToUseComIndCoal / 100)
-        * MTCO2ePerBBtuCoal
+        * CO2_MMT_BBTU_COAL
         * MT_TO_MMT
     )
 
@@ -2005,7 +1997,7 @@ def CalcComIndGHG(
         * (1 + PerChangedFossilFuelUsed)
         * (ComIndPerFFDFOUsed / 100)
         / (PerEnergyToUseComIndDFO / 100)
-        * MTCO2ePerBBtuDFO
+        * CO2_MMT_BBTU_DFO
         * MT_TO_MMT
     )
 
@@ -2016,7 +2008,7 @@ def CalcComIndGHG(
         * (1 + PerChangedFossilFuelUsed)
         * (ComIndPerFFKerUsed / 100)
         / (PerEnergyToUseComIndKer / 100)
-        * MTCO2ePerBBtuKer
+        * CO2_MMT_BBTU_KER
         * MT_TO_MMT
     )
 
@@ -2027,7 +2019,7 @@ def CalcComIndGHG(
         * (1 + PerChangedFossilFuelUsed)
         * (ComIndPerFFLPGUsed / 100)
         / (PerEnergyToUseComIndLPG / 100)
-        * MTCO2ePerBBtuLPG
+        * CO2_MMT_BBTU_LPG
         * MT_TO_MMT
     )
 
@@ -2038,7 +2030,7 @@ def CalcComIndGHG(
         * (1 + PerChangedFossilFuelUsed)
         * (ComIndPerFFMotGasUsed / 100)
         / (PerEnergyToUseComIndMotGas / 100)
-        * MTCO2ePerBBtuMotGas
+        * CO2_MMT_BBTU_MOTOR_GAS
         * MT_TO_MMT
     )
 
@@ -2049,7 +2041,7 @@ def CalcComIndGHG(
         * (1 + PerChangedFossilFuelUsed)
         * (ComIndPerFFRFOUsed / 100)
         / (PerEnergyToUseComIndRFO / 100)
-        * MTCO2ePerBBtuRFO
+        * CO2_MMT_BBTU_RFO
         * MT_TO_MMT
     )
 
@@ -2060,7 +2052,7 @@ def CalcComIndGHG(
         * (1 + PerChangedFossilFuelUsed)
         * (ComIndPerFFPetCokeUsed / 100)
         / (PerEnergyToUseComIndPetCoke / 100)
-        * MTCO2ePerBBtuPetCoke
+        * CO2_MMT_BBTU_PETCOKE
         * MT_TO_MMT
     )
 
@@ -2071,7 +2063,7 @@ def CalcComIndGHG(
         * (1 + PerChangedFossilFuelUsed)
         * (ComIndPerFFStillGasUsed / 100)
         / (PerEnergyToUseComIndStillGas / 100)
-        * MTCO2ePerBBtuStillGas
+        * CO2_MMT_BBTU_STILL_GAS
         * MT_TO_MMT
     )
 
@@ -2082,11 +2074,11 @@ def CalcComIndGHG(
         * (1 + PerChangedFossilFuelUsed)
         * (ComIndPerFFSpecialNaphthasUsed / 100)
         / (PerEnergyToUseComIndSpecialNaphthas / 100)
-        * MTCO2ePerBBtuSpecialNaphthas
+        * CO2_MMT_BBTU_NAPHTHAS
         * MT_TO_MMT
     )
 
-    ComIndGHG = (
+    return (
         ComIndElecGHG
         + ComIndNGGHG
         + ComIndCoalGHG
@@ -2100,10 +2092,8 @@ def CalcComIndGHG(
         + ComIndSpecialNaphthasGHG
     )
 
-    return ComIndGHG
 
-
-def CalcMobHighwayGHG(
+def calc_highway_ghg(
     urban_pop_percent,
     pop_factor,
     UrbanVMTperPop,
@@ -2130,7 +2120,7 @@ def CalcMobHighwayGHG(
 
     EVMT = VMT * PerEVMT / 100
 
-    MobHighwayGHG = (VMT - EVMT) / RegionalFleetMPG * CO2eperGallonGasoline * MMT_LB + (
+    highway_ghg = (VMT - EVMT) / RegionalFleetMPG * CO2eperGallonGasoline * MMT_LB + (
         EVMT
         * EVEff
         * 0.001
@@ -2144,15 +2134,14 @@ def CalcMobHighwayGHG(
         * MMT_LB
     ) * (1 - PerCombCapture / 100)
 
-    return MobHighwayGHG
+    return highway_ghg
 
 
-def CalcMobAviationGHG(pop_factor, PerAviation):
-    MobAviationGHG = GHG_AVIATION * (1 + pop_factor / 100) * (1 + PerAviation / 100)
-    return MobAviationGHG
+def calc_aviation_ghg(pop_factor, PerAviation):
+    return GHG_AVIATION * (1 + pop_factor / 100) * (1 + PerAviation / 100)
 
 
-def CalcMobTransitGHG(
+def calc_transit_ghg(
     pop_factor,
     urban_pop_percent,
     TransRailUrbanPerElecMotion,
@@ -2250,12 +2239,10 @@ def CalcMobTransitGHG(
         / (PerEnergyToMotionRailDiesel / 100)
     )
 
-    MobTransitGHG = (MobTransitElecGHG + MobTransitDieselGHG) * (1 + PerTransRailRidership / 100)
-
-    return MobTransitGHG
+    return (MobTransitElecGHG + MobTransitDieselGHG) * (1 + PerTransRailRidership / 100)
 
 
-def CalcMobOtherGHG(
+def calc_other_mobile_ghg(
     FreightRailBBtuMotion,
     FreightRailPerElecMotion,
     PerEnergyToMotionRailElec,
@@ -2470,12 +2457,10 @@ def CalcMobOtherGHG(
         1 + PerOffroad / 100
     )
 
-    MobOtherGHG = FreightRailGHG + InterCityRailGHG + MarinePortGHG + OffroadGHG
-
-    return MobOtherGHG
+    return FreightRailGHG + InterCityRailGHG + MarinePortGHG + OffroadGHG
 
 
-def CalcNonEnergyGHG(
+def calc_non_energy_ghg(
     PerAg,
     PerWaste,
     pop_factor,
@@ -2607,7 +2592,7 @@ def CalcNonEnergyGHG(
     WasteWaterGHG = GHG_WASTEWATER * (1 + PerWasteWater / 100) * (1 + pop_factor / 100)
     IndProcGHG = GHG_IP * (1 + PerIP / 100)
 
-    ResNGConsumption = CalcResGHG(
+    ResNGConsumption = calc_res_ghg(
         pop_factor,
         urban_pop_percent,
         UrbanBTUPerCapUsed,
@@ -2747,14 +2732,10 @@ def CalcNonEnergyGHG(
         GHG_FORESTS + GHG_FOREST_CHANGE
     ) * (1 + PerForestCoverage / 100)
 
-    NonEnergyGHG = (
-        AgricultureGHG + SolidWasteGHG + WasteWaterGHG + IndProcGHG + NGSystemsGHG + LULUCFGHG
-    )
-
-    return NonEnergyGHG
+    return AgricultureGHG + SolidWasteGHG + WasteWaterGHG + IndProcGHG + NGSystemsGHG + LULUCFGHG
 
 
-def CalcGridText(
+def grid_text(
     grid_coal,
     grid_oil,
     grid_ng,
@@ -2766,32 +2747,23 @@ def CalcGridText(
     grid_geo,
     grid_other_ff,
 ):
-    """
-    Creates function for creating paragraph widget text for grid mix to update based on recalculated
-    grid mix with user input.
-    """
-    GridText = (
-        """Input percentages. Make sure the grid mix sums to 100%. The current sum is: """
-        + str(
-            round(
-                (
-                    grid_coal
-                    + grid_oil
-                    + grid_ng
-                    + grid_nuclear
-                    + grid_solar
-                    + grid_wind
-                    + grid_bio
-                    + grid_hydro
-                    + grid_geo
-                    + grid_other_ff
-                ),
-                2,
-            )
-        )
-        + "%."
+    """Create text to give user current sum of grid mix choices."""
+    t = sum(
+        [
+            grid_coal,
+            grid_oil,
+            grid_ng,
+            grid_nuclear,
+            grid_solar,
+            grid_wind,
+            grid_bio,
+            grid_hydro,
+            grid_geo,
+            grid_other_ff,
+        ]
     )
-    return GridText
+
+    return f"Input percentages. Make sure the grid mix sums to 100%. The current sum is {t:.1f}%."
 
 
 def callback(attr, old, new):
@@ -2868,7 +2840,7 @@ def callback(attr, old, new):
             GHG_NON_ENERGY,
         ],
         "Scenario": [
-            CalcResGHG(
+            calc_res_ghg(
                 pop_factor,
                 urban_pop_percent,
                 UrbanBTUPerCapUsed,
@@ -2980,7 +2952,7 @@ def callback(attr, old, new):
                 PerCombCapture,
                 MCFperCCF,
             )[0],
-            CalcComIndGHG(
+            calc_ci_ghg(
                 ComIndPerElectrification,
                 ComIndBBtuUsed,
                 PerComIndEnergyUse,
@@ -2993,36 +2965,26 @@ def callback(attr, old, new):
                 ComIndPerFossilFuelUsed2015,
                 ComIndPerFFNGUsed,
                 PerEnergyToUseComIndNG,
-                MTCO2ePerBBtuNG,
                 ComIndPerFFCoalUsed,
                 PerEnergyToUseComIndCoal,
-                MTCO2ePerBBtuCoal,
                 ComIndPerFFDFOUsed,
                 PerEnergyToUseComIndDFO,
-                MTCO2ePerBBtuDFO,
                 ComIndPerFFKerUsed,
                 PerEnergyToUseComIndKer,
-                MTCO2ePerBBtuKer,
                 ComIndPerFFLPGUsed,
                 PerEnergyToUseComIndLPG,
-                MTCO2ePerBBtuLPG,
                 ComIndPerFFMotGasUsed,
                 PerEnergyToUseComIndMotGas,
-                MTCO2ePerBBtuMotGas,
                 ComIndPerFFRFOUsed,
                 PerEnergyToUseComIndRFO,
-                MTCO2ePerBBtuRFO,
                 ComIndPerFFPetCokeUsed,
                 PerEnergyToUseComIndPetCoke,
-                MTCO2ePerBBtuPetCoke,
                 ComIndPerFFStillGasUsed,
                 PerEnergyToUseComIndStillGas,
-                MTCO2ePerBBtuStillGas,
                 ComIndPerSpecialNaphthasUsed,
                 PerEnergyToUseComIndSpecialNaphthas,
-                MTCO2ePerBBtuSpecialNaphthas,
             ),
-            CalcMobHighwayGHG(
+            calc_highway_ghg(
                 urban_pop_percent,
                 pop_factor,
                 UrbanVMTperPop,
@@ -3041,7 +3003,7 @@ def callback(attr, old, new):
                 grid_other_ff,
                 PerCombCapture,
             ),
-            CalcMobTransitGHG(
+            calc_transit_ghg(
                 pop_factor,
                 urban_pop_percent,
                 TransRailUrbanPerElecMotion,
@@ -3062,8 +3024,8 @@ def callback(attr, old, new):
                 PerEnergyToMotionRailDiesel,
                 PerTransRailRidership,
             ),
-            CalcMobAviationGHG(pop_factor, PerAviation),
-            CalcMobOtherGHG(
+            calc_aviation_ghg(pop_factor, PerAviation),
+            calc_other_mobile_ghg(
                 FreightRailBBtuMotion,
                 FreightRailPerElecMotion,
                 PerEnergyToMotionRailElec,
@@ -3105,7 +3067,7 @@ def callback(attr, old, new):
                 PerEnergyToMotionOffroadLPG,
                 PerOffroad,
             ),
-            CalcNonEnergyGHG(
+            calc_non_energy_ghg(
                 PerAg,
                 PerWaste,
                 pop_factor,
@@ -3240,7 +3202,7 @@ def callback(attr, old, new):
         "Year": ["2015", "Scenario"],
         "Residential": [
             GHG_RES,
-            CalcResGHG(
+            calc_res_ghg(
                 pop_factor,
                 urban_pop_percent,
                 UrbanBTUPerCapUsed,
@@ -3355,7 +3317,7 @@ def callback(attr, old, new):
         ],
         "Commercial/Industrial": [
             GHG_CI,
-            CalcComIndGHG(
+            calc_ci_ghg(
                 ComIndPerElectrification,
                 ComIndBBtuUsed,
                 PerComIndEnergyUse,
@@ -3368,39 +3330,29 @@ def callback(attr, old, new):
                 ComIndPerFossilFuelUsed2015,
                 ComIndPerFFNGUsed,
                 PerEnergyToUseComIndNG,
-                MTCO2ePerBBtuNG,
                 ComIndPerFFCoalUsed,
                 PerEnergyToUseComIndCoal,
-                MTCO2ePerBBtuCoal,
                 ComIndPerFFDFOUsed,
                 PerEnergyToUseComIndDFO,
-                MTCO2ePerBBtuDFO,
                 ComIndPerFFKerUsed,
                 PerEnergyToUseComIndKer,
-                MTCO2ePerBBtuKer,
                 ComIndPerFFLPGUsed,
                 PerEnergyToUseComIndLPG,
-                MTCO2ePerBBtuLPG,
                 ComIndPerFFMotGasUsed,
                 PerEnergyToUseComIndMotGas,
-                MTCO2ePerBBtuMotGas,
                 ComIndPerFFRFOUsed,
                 PerEnergyToUseComIndRFO,
-                MTCO2ePerBBtuRFO,
                 ComIndPerFFPetCokeUsed,
                 PerEnergyToUseComIndPetCoke,
-                MTCO2ePerBBtuPetCoke,
                 ComIndPerFFStillGasUsed,
                 PerEnergyToUseComIndStillGas,
-                MTCO2ePerBBtuStillGas,
                 ComIndPerSpecialNaphthasUsed,
                 PerEnergyToUseComIndSpecialNaphthas,
-                MTCO2ePerBBtuSpecialNaphthas,
             ),
         ],
         "Mobile-Highway": [
             GHG_HIGHWAY,
-            CalcMobHighwayGHG(
+            calc_highway_ghg(
                 urban_pop_percent,
                 pop_factor,
                 UrbanVMTperPop,
@@ -3422,7 +3374,7 @@ def callback(attr, old, new):
         ],
         "Mobile-Transit": [
             GHG_TRANSIT,
-            CalcMobTransitGHG(
+            calc_transit_ghg(
                 pop_factor,
                 urban_pop_percent,
                 TransRailUrbanPerElecMotion,
@@ -3444,10 +3396,10 @@ def callback(attr, old, new):
                 PerTransRailRidership,
             ),
         ],
-        "Mobile-Aviation": [GHG_AVIATION, CalcMobAviationGHG(pop_factor, PerAviation)],
+        "Mobile-Aviation": [GHG_AVIATION, calc_aviation_ghg(pop_factor, PerAviation)],
         "Mobile-Other": [
             GHG_OTHER_MOBILE,
-            CalcMobOtherGHG(
+            calc_other_mobile_ghg(
                 FreightRailBBtuMotion,
                 FreightRailPerElecMotion,
                 PerEnergyToMotionRailElec,
@@ -3492,7 +3444,7 @@ def callback(attr, old, new):
         ],
         "Non-Energy": [
             GHG_NON_ENERGY,
-            CalcNonEnergyGHG(
+            calc_non_energy_ghg(
                 PerAg,
                 PerWaste,
                 pop_factor,
@@ -3831,7 +3783,7 @@ def callback(attr, old, new):
         )
         > 100
     ):
-        GridTextParagraph.text = CalcGridText(
+        GridTextParagraph.text = grid_text(
             grid_coal,
             grid_oil,
             grid_ng,
@@ -3861,7 +3813,7 @@ def callback(attr, old, new):
         )
         < 100
     ):
-        GridTextParagraph.text = CalcGridText(
+        GridTextParagraph.text = grid_text(
             grid_coal,
             grid_oil,
             grid_ng,
@@ -3875,7 +3827,7 @@ def callback(attr, old, new):
         )
         GridTextParagraph.style = {"color": "orange"}
     else:
-        GridTextParagraph.text = CalcGridText(
+        GridTextParagraph.text = grid_text(
             grid_coal,
             grid_oil,
             grid_ng,
@@ -3903,7 +3855,7 @@ data = {
         GHG_NON_ENERGY,
     ],
     "Scenario": [
-        CalcResGHG(
+        calc_res_ghg(
             pop_factor,
             urban_pop_percent,
             UrbanBTUPerCapUsed,
@@ -4015,7 +3967,7 @@ data = {
             PerCombCapture,
             MCFperCCF,
         )[0],
-        CalcComIndGHG(
+        calc_ci_ghg(
             ComIndPerElectrification,
             ComIndBBtuUsed,
             PerComIndEnergyUse,
@@ -4028,36 +3980,26 @@ data = {
             ComIndPerFossilFuelUsed2015,
             ComIndPerFFNGUsed,
             PerEnergyToUseComIndNG,
-            MTCO2ePerBBtuNG,
             ComIndPerFFCoalUsed,
             PerEnergyToUseComIndCoal,
-            MTCO2ePerBBtuCoal,
             ComIndPerFFDFOUsed,
             PerEnergyToUseComIndDFO,
-            MTCO2ePerBBtuDFO,
             ComIndPerFFKerUsed,
             PerEnergyToUseComIndKer,
-            MTCO2ePerBBtuKer,
             ComIndPerFFLPGUsed,
             PerEnergyToUseComIndLPG,
-            MTCO2ePerBBtuLPG,
             ComIndPerFFMotGasUsed,
             PerEnergyToUseComIndMotGas,
-            MTCO2ePerBBtuMotGas,
             ComIndPerFFRFOUsed,
             PerEnergyToUseComIndRFO,
-            MTCO2ePerBBtuRFO,
             ComIndPerFFPetCokeUsed,
             PerEnergyToUseComIndPetCoke,
-            MTCO2ePerBBtuPetCoke,
             ComIndPerFFStillGasUsed,
             PerEnergyToUseComIndStillGas,
-            MTCO2ePerBBtuStillGas,
             ComIndPerSpecialNaphthasUsed,
             PerEnergyToUseComIndSpecialNaphthas,
-            MTCO2ePerBBtuSpecialNaphthas,
         ),
-        CalcMobHighwayGHG(
+        calc_highway_ghg(
             urban_pop_percent,
             pop_factor,
             UrbanVMTperPop,
@@ -4076,7 +4018,7 @@ data = {
             grid_other_ff,
             PerCombCapture,
         ),
-        CalcMobTransitGHG(
+        calc_transit_ghg(
             pop_factor,
             urban_pop_percent,
             TransRailUrbanPerElecMotion,
@@ -4097,8 +4039,8 @@ data = {
             PerEnergyToMotionRailDiesel,
             PerTransRailRidership,
         ),
-        CalcMobAviationGHG(pop_factor, PerAviation),
-        CalcMobOtherGHG(
+        calc_aviation_ghg(pop_factor, PerAviation),
+        calc_other_mobile_ghg(
             FreightRailBBtuMotion,
             FreightRailPerElecMotion,
             PerEnergyToMotionRailElec,
@@ -4140,7 +4082,7 @@ data = {
             PerEnergyToMotionOffroadLPG,
             PerOffroad,
         ),
-        CalcNonEnergyGHG(
+        calc_non_energy_ghg(
             PerAg,
             PerWaste,
             pop_factor,
@@ -4308,7 +4250,7 @@ data2 = {
     "Year": ["2015", "Scenario"],
     "Residential": [
         GHG_RES,
-        CalcResGHG(
+        calc_res_ghg(
             pop_factor,
             urban_pop_percent,
             UrbanBTUPerCapUsed,
@@ -4423,7 +4365,7 @@ data2 = {
     ],
     "Commercial/Industrial": [
         GHG_CI,
-        CalcComIndGHG(
+        calc_ci_ghg(
             ComIndPerElectrification,
             ComIndBBtuUsed,
             PerComIndEnergyUse,
@@ -4436,39 +4378,29 @@ data2 = {
             ComIndPerFossilFuelUsed2015,
             ComIndPerFFNGUsed,
             PerEnergyToUseComIndNG,
-            MTCO2ePerBBtuNG,
             ComIndPerFFCoalUsed,
             PerEnergyToUseComIndCoal,
-            MTCO2ePerBBtuCoal,
             ComIndPerFFDFOUsed,
             PerEnergyToUseComIndDFO,
-            MTCO2ePerBBtuDFO,
             ComIndPerFFKerUsed,
             PerEnergyToUseComIndKer,
-            MTCO2ePerBBtuKer,
             ComIndPerFFLPGUsed,
             PerEnergyToUseComIndLPG,
-            MTCO2ePerBBtuLPG,
             ComIndPerFFMotGasUsed,
             PerEnergyToUseComIndMotGas,
-            MTCO2ePerBBtuMotGas,
             ComIndPerFFRFOUsed,
             PerEnergyToUseComIndRFO,
-            MTCO2ePerBBtuRFO,
             ComIndPerFFPetCokeUsed,
             PerEnergyToUseComIndPetCoke,
-            MTCO2ePerBBtuPetCoke,
             ComIndPerFFStillGasUsed,
             PerEnergyToUseComIndStillGas,
-            MTCO2ePerBBtuStillGas,
             ComIndPerSpecialNaphthasUsed,
             PerEnergyToUseComIndSpecialNaphthas,
-            MTCO2ePerBBtuSpecialNaphthas,
         ),
     ],
     "Mobile-Highway": [
         GHG_HIGHWAY,
-        CalcMobHighwayGHG(
+        calc_highway_ghg(
             urban_pop_percent,
             pop_factor,
             UrbanVMTperPop,
@@ -4490,7 +4422,7 @@ data2 = {
     ],
     "Mobile-Transit": [
         GHG_TRANSIT,
-        CalcMobTransitGHG(
+        calc_transit_ghg(
             pop_factor,
             urban_pop_percent,
             TransRailUrbanPerElecMotion,
@@ -4512,10 +4444,10 @@ data2 = {
             PerTransRailRidership,
         ),
     ],
-    "Mobile-Aviation": [GHG_AVIATION, CalcMobAviationGHG(pop_factor, PerAviation)],
+    "Mobile-Aviation": [GHG_AVIATION, calc_aviation_ghg(pop_factor, PerAviation)],
     "Mobile-Other": [
         GHG_OTHER_MOBILE,
-        CalcMobOtherGHG(
+        calc_other_mobile_ghg(
             FreightRailBBtuMotion,
             FreightRailPerElecMotion,
             PerEnergyToMotionRailElec,
@@ -4560,7 +4492,7 @@ data2 = {
     ],
     "Non-Energy": [
         GHG_NON_ENERGY,
-        CalcNonEnergyGHG(
+        calc_non_energy_ghg(
             PerAg,
             PerWaste,
             pop_factor,
@@ -4761,7 +4693,7 @@ electric_grid_pie_chart.grid.grid_line_color = None
 
 # Initializes paragraph widget based on calculating grid mix and assigning it to text within the paragraph to be updated
 GridTextParagraph = Paragraph(
-    text=CalcGridText(
+    text=grid_text(
         grid_coal,
         grid_oil,
         grid_ng,
