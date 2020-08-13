@@ -1,6 +1,6 @@
 """Test that the funcs that calculate GHG continue to return correct values during refactor."""
 
-from main import ghg_html as g
+from main import ghg_calc as g
 
 """
 print("Stationary - Residential = ", ResGHG)
