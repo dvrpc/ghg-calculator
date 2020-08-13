@@ -2499,278 +2499,46 @@ def callback(attr, old, new):
         "AirCapture": AirCaptureSlider.value,  # TK, possibly
     }
 
-    source.data = wrangle_data_for_bar_chart(user_inputs)
-    source2.data = wrangle_data_for_stacked_chart(user_inputs)
+    bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
+    stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
+    pie_chart_source.data = wrangle_data_for_pie_chart(user_inputs)
 
-    # Update source data for pie chart
-    source3.data = {
-        "FuelType": [
-            "Coal",
-            "Oil",
-            "Natural Gas",
-            "Nuclear",
-            "Solar",
-            "Wind",
-            "Biomass",
-            "Hydropower",
-            "Geothermal",
-            "Other Fossil Fuel",
-        ],
-        "Percentage": [
-            grid_coal,
-            grid_oil,
-            grid_ng,
-            grid_nuclear,
-            grid_solar,
-            grid_wind,
-            grid_bio,
-            grid_hydro,
-            grid_geo,
-            grid_other_ff,
-        ],
-        "angle": [
-            (
-                grid_coal
-                / (
-                    grid_bio
-                    + grid_coal
-                    + grid_hydro
-                    + grid_ng
-                    + grid_nuclear
-                    + grid_oil
-                    + grid_other_ff
-                    + grid_solar
-                    + grid_wind
-                    + grid_geo
-                )
-                * (2 * pi)
-            ),
-            (
-                grid_oil
-                / (
-                    grid_bio
-                    + grid_coal
-                    + grid_hydro
-                    + grid_ng
-                    + grid_nuclear
-                    + grid_oil
-                    + grid_other_ff
-                    + grid_solar
-                    + grid_wind
-                    + grid_geo
-                )
-                * (2 * pi)
-            ),
-            (
-                grid_ng
-                / (
-                    grid_bio
-                    + grid_coal
-                    + grid_hydro
-                    + grid_ng
-                    + grid_nuclear
-                    + grid_oil
-                    + grid_other_ff
-                    + grid_solar
-                    + grid_wind
-                    + grid_geo
-                )
-                * (2 * pi)
-            ),
-            (
-                grid_nuclear
-                / (
-                    grid_bio
-                    + grid_coal
-                    + grid_hydro
-                    + grid_ng
-                    + grid_nuclear
-                    + grid_oil
-                    + grid_other_ff
-                    + grid_solar
-                    + grid_wind
-                    + grid_geo
-                )
-                * (2 * pi)
-            ),
-            (
-                grid_solar
-                / (
-                    grid_bio
-                    + grid_coal
-                    + grid_hydro
-                    + grid_ng
-                    + grid_nuclear
-                    + grid_oil
-                    + grid_other_ff
-                    + grid_solar
-                    + grid_wind
-                    + grid_geo
-                )
-                * (2 * pi)
-            ),
-            (
-                grid_wind
-                / (
-                    grid_bio
-                    + grid_coal
-                    + grid_hydro
-                    + grid_ng
-                    + grid_nuclear
-                    + grid_oil
-                    + grid_other_ff
-                    + grid_solar
-                    + grid_wind
-                    + grid_geo
-                )
-                * (2 * pi)
-            ),
-            (
-                grid_bio
-                / (
-                    grid_bio
-                    + grid_coal
-                    + grid_hydro
-                    + grid_ng
-                    + grid_nuclear
-                    + grid_oil
-                    + grid_other_ff
-                    + grid_solar
-                    + grid_wind
-                    + grid_geo
-                )
-                * (2 * pi)
-            ),
-            (
-                grid_hydro
-                / (
-                    grid_bio
-                    + grid_coal
-                    + grid_hydro
-                    + grid_ng
-                    + grid_nuclear
-                    + grid_oil
-                    + grid_other_ff
-                    + grid_solar
-                    + grid_wind
-                    + grid_geo
-                )
-                * (2 * pi)
-            ),
-            (
-                grid_geo
-                / (
-                    grid_bio
-                    + grid_coal
-                    + grid_hydro
-                    + grid_ng
-                    + grid_nuclear
-                    + grid_oil
-                    + grid_other_ff
-                    + grid_solar
-                    + grid_wind
-                    + grid_geo
-                )
-                * (2 * pi)
-            ),
-            (
-                grid_other_ff
-                / (
-                    grid_bio
-                    + grid_coal
-                    + grid_hydro
-                    + grid_ng
-                    + grid_nuclear
-                    + grid_oil
-                    + grid_other_ff
-                    + grid_solar
-                    + grid_wind
-                    + grid_geo
-                )
-                * (2 * pi)
-            ),
-        ],
-        "color": Spectral10,
-    }
     # Update the paragraph widget text based on the new text inputs
-    if (
-        round(
-            (
-                grid_coal
-                + grid_oil
-                + grid_ng
-                + grid_nuclear
-                + grid_solar
-                + grid_wind
-                + grid_bio
-                + grid_hydro
-                + grid_geo
-                + grid_other_ff
-            ),
-            2,
-        )
-        > 100
-    ):
-        GridTextParagraph.text = grid_text(
-            grid_coal,
-            grid_oil,
-            grid_ng,
-            grid_nuclear,
-            grid_solar,
-            grid_wind,
-            grid_bio,
-            grid_hydro,
-            grid_geo,
-            grid_other_ff,
-        )
+    grid_sum = round(
+        sum(
+            [
+                user_inputs["grid_bio"],
+                user_inputs["grid_coal"],
+                user_inputs["grid_geo"],
+                user_inputs["grid_hydro"],
+                user_inputs["grid_ng"],
+                user_inputs["grid_nuclear"],
+                user_inputs["grid_oil"],
+                user_inputs["grid_other_ff"],
+                user_inputs["grid_solar"],
+                user_inputs["grid_wind"],
+            ]
+        ),
+        1,
+    )
+    GridTextParagraph.text = grid_text(
+        user_inputs["grid_bio"],
+        user_inputs["grid_coal"],
+        user_inputs["grid_geo"],
+        user_inputs["grid_hydro"],
+        user_inputs["grid_ng"],
+        user_inputs["grid_nuclear"],
+        user_inputs["grid_oil"],
+        user_inputs["grid_other_ff"],
+        user_inputs["grid_solar"],
+        user_inputs["grid_wind"],
+    )
+    if grid_sum > 100:
         GridTextParagraph.style = {"color": "red"}
-    elif (
-        round(
-            (
-                grid_coal
-                + grid_oil
-                + grid_ng
-                + grid_nuclear
-                + grid_solar
-                + grid_wind
-                + grid_bio
-                + grid_hydro
-                + grid_other_ff
-            ),
-            2,
-        )
-        < 100
-    ):
-        GridTextParagraph.text = grid_text(
-            grid_coal,
-            grid_oil,
-            grid_ng,
-            grid_nuclear,
-            grid_solar,
-            grid_wind,
-            grid_bio,
-            grid_hydro,
-            grid_geo,
-            grid_other_ff,
-        )
+    elif grid_sum < 100:
         GridTextParagraph.style = {"color": "orange"}
     else:
-        GridTextParagraph.text = grid_text(
-            grid_coal,
-            grid_oil,
-            grid_ng,
-            grid_nuclear,
-            grid_solar,
-            grid_wind,
-            grid_bio,
-            grid_hydro,
-            grid_geo,
-            grid_other_ff,
-        )
         GridTextParagraph.style = {"color": "black"}
-
-
-# Create initial plots
 
 
 def wrangle_data_for_bar_chart(user_inputs):
@@ -2994,78 +2762,19 @@ def wrangle_data_for_stacked_chart(user_inputs):
     return data
 
 
-bar_chart_data = wrangle_data_for_bar_chart(user_inputs)
-source = ColumnDataSource(data=bar_chart_data)
-
-# Configure vertical bar plot
-bar_chart = figure(
-    x_range=bar_chart_data["Category"],
-    y_range=(0, 50),
-    plot_height=500,
-    plot_width=450,
-    y_axis_label="Million Metric Tons of CO2e",
-    title="Greenhouse Gas Emissions in Greater Philadelphia",
-    name="barchart",
-)
-
-bar_chart.vbar(
-    x=dodge("Category", -0.15, range=bar_chart.x_range),
-    top="2015",
-    source=source,
-    width=0.2,
-    color="steelblue",
-    legend_label="2015",
-)
-
-bar_chart.vbar(
-    x=dodge("Category", 0.15, range=bar_chart.x_range),
-    top="Scenario",
-    source=source,
-    width=0.2,
-    color="darkseagreen",
-    legend_label="Scenario",
-)
-
-bar_chart.xaxis.major_label_orientation = np.pi / 4
-bar_chart.x_range.range_padding = 0.1
-
-stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
-source2 = ColumnDataSource(data=stacked_chart_data)
-
-# Configure stacked bar plot
-stacked_bar_chart = figure(
-    x_range=stacked_chart_data["Year"],
-    y_range=(0, 100),
-    plot_height=500,
-    plot_width=500,
-    y_axis_label="Million Metric Tons of CO2e",
-    title="Greenhouse Gas Emissions in Greater Philadelphia",
-)
-
-stacked_bar_chart.vbar_stack(
-    sectors, x="Year", width=0.4, color=Viridis7, source=source2, legend_label=sectors
-)
-
-stacked_bar_chart.legend[
-    0
-].items.reverse()  # Reverses legend items to match order of occurence in stack
-stacked_bar_chart_legend = stacked_bar_chart.legend[0]
-stacked_bar_chart.add_layout(stacked_bar_chart_legend, "right")
-
-
 def wrangle_data_for_pie_chart(user_inputs):
     # Configure data and plot for pie chart
     x = {
-        "Coal": grid_coal,
-        "Oil": grid_oil,
-        "Natural Gas": grid_ng,
-        "Nuclear": grid_nuclear,
-        "Solar": grid_solar,
-        "Wind": grid_wind,
-        "Biomass": grid_bio,
-        "Hydropower": grid_hydro,
-        "Geothermal": grid_geo,
-        "Other Fossil Fuel": grid_other_ff,
+        "Coal": user_inputs["grid_coal"],
+        "Oil": user_inputs["grid_oil"],
+        "Natural Gas": user_inputs["grid_ng"],
+        "Nuclear": user_inputs["grid_nuclear"],
+        "Solar": user_inputs["grid_solar"],
+        "Wind": user_inputs["grid_wind"],
+        "Biomass": user_inputs["grid_bio"],
+        "Hydropower": user_inputs["grid_hydro"],
+        "Geothermal": user_inputs["grid_geo"],
+        "Other Fossil Fuel": user_inputs["grid_other_ff"],
     }
 
     data = pd.Series(x).reset_index(name="Percentage").rename(columns={"index": "FuelType"})
@@ -3075,10 +2784,61 @@ def wrangle_data_for_pie_chart(user_inputs):
     return data
 
 
-data3 = wrangle_data_for_pie_chart(user_inputs)
-source3 = ColumnDataSource(data=data3)
+# Create plots
 
-electric_grid_pie_chart = figure(
+bar_chart_data = wrangle_data_for_bar_chart(user_inputs)
+bar_chart_source = ColumnDataSource(data=bar_chart_data)
+bar_chart = figure(
+    x_range=bar_chart_data["Category"],
+    y_range=(0, 50),
+    plot_height=500,
+    plot_width=450,
+    y_axis_label="Million Metric Tons of CO2e",
+    title="Greenhouse Gas Emissions in Greater Philadelphia",
+    name="barchart",
+)
+bar_chart.vbar(
+    x=dodge("Category", -0.15, range=bar_chart.x_range),
+    top="2015",
+    source=bar_chart_source,
+    width=0.2,
+    color="steelblue",
+    legend_label="2015",
+)
+bar_chart.vbar(
+    x=dodge("Category", 0.15, range=bar_chart.x_range),
+    top="Scenario",
+    source=bar_chart_source,
+    width=0.2,
+    color="darkseagreen",
+    legend_label="Scenario",
+)
+bar_chart.xaxis.major_label_orientation = np.pi / 4
+bar_chart.x_range.range_padding = 0.1
+
+stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
+stacked_chart_source = ColumnDataSource(data=stacked_chart_data)
+stacked_bar_chart = figure(
+    x_range=stacked_chart_data["Year"],
+    y_range=(0, 100),
+    plot_height=500,
+    plot_width=500,
+    y_axis_label="Million Metric Tons of CO2e",
+    title="Greenhouse Gas Emissions in Greater Philadelphia",
+)
+stacked_bar_chart.vbar_stack(
+    sectors, x="Year", width=0.4, color=Viridis7, source=stacked_chart_source, legend_label=sectors
+)
+stacked_bar_chart.legend[
+    0
+].items.reverse()  # Reverses legend items to match order of occurence in stack
+stacked_bar_chart_legend = stacked_bar_chart.legend[0]
+stacked_bar_chart.add_layout(stacked_bar_chart_legend, "right")
+
+pie_chart_data = wrangle_data_for_pie_chart(user_inputs)
+pie_chart_source = ColumnDataSource(data=pie_chart_data)
+
+pie_chart = figure(
     title="Electricity Grid Resource Mix",
     toolbar_location=None,
     plot_height=400,
@@ -3088,7 +2848,7 @@ electric_grid_pie_chart = figure(
     x_range=(-0.5, 1.0),
 )
 
-electric_grid_pie_chart.wedge(
+pie_chart.wedge(
     x=0,
     y=1,
     radius=0.3,
@@ -3097,12 +2857,12 @@ electric_grid_pie_chart.wedge(
     line_color="white",
     fill_color="color",
     legend_field="FuelType",
-    source=source3,
+    source=pie_chart_source,
 )
 
-electric_grid_pie_chart.axis.axis_label = None
-electric_grid_pie_chart.axis.visible = False
-electric_grid_pie_chart.grid.grid_line_color = None
+pie_chart.axis.axis_label = None
+pie_chart.axis.visible = False
+pie_chart.grid.grid_line_color = None
 
 # Initializes paragraph widget based on calculating grid mix and assigning it to text within the paragraph to be updated
 GridTextParagraph = Paragraph(
@@ -3460,4 +3220,4 @@ all_widgets = [
 ]
 doc = curdoc()
 doc.add_root(column(all_widgets))
-doc.add_root(column(bar_chart, stacked_bar_chart, electric_grid_pie_chart))
+doc.add_root(column(bar_chart, stacked_bar_chart, pie_chart))
