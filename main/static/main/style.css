@@ -1,0 +1,84 @@
+:root {
+  --background: white;
+  --lightgray: hsl(0, 0, 30);
+}
+
+body {
+  margin: 0 auto;
+  padding: 10px 0px 0px 0px;
+  background-color: var(--background);
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas: "header" "main" "footer";
+}
+header {
+  padding-bottom: 10px;
+  grid-area: header;
+}
+main a {
+  color: blue;
+}
+main a:hover {
+  font-decoration: underline;
+}
+main {
+  background-color: transparent;
+  display: grid;
+  grid-area: main;
+  gap: 20px;
+  grid-template-columns: 2fr 1fr;
+  grid-template-areas: "left right";
+  padding-bottom: 20px;
+}
+main .left {
+  grid-area: left;
+  background-color: white;
+  padding: 10px;
+}
+main .right {
+  grid-area: right;
+  background-color: var(--light-gray);
+  padding: 10px;
+}
+.bold {
+  font-weight: bold;
+}
+.italic {
+  font-style: italic;
+}
+.center {
+  text-align: center;
+}
+.smaller {
+  font-size: .9rem;
+}
+.bigger {
+  font-size: 1.1rem;
+}
+/* Responsive layout */
+@media screen and (max-width: 768px) {
+  body {
+    padding: 0px;
+    margin: 0px;
+    grid-template-columns: auto auto;
+    grid-template-areas: "header header" "main main" "footer footer";
+  }
+  header {
+    margin-left: 20px;
+    margin-right: 20px;
+    grid-area: header;
+    display: grid;
+    grid-gap: 5px;
+    grid-template-columns: auto auto;
+    grid-template-areas: "search nav" "logo logo";
+  }
+  main  {
+    grid-template-columns: 1fr;
+    grid-template-areas: "left" "right";
+  }
+  footer img {
+    width: 125px;
+  }

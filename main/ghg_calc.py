@@ -2825,7 +2825,7 @@ def callback(attr, old, new):
     PerForestCoverage = PerForestCoverageSlider.value
 
     PerCombCapture = PerCombCaptureSlider.value
-    AirCapture = AirCaptureSlider.value  # TK
+    AirCapture = AirCaptureSlider.value  # TK, possibly
 
     # Update source data for vertical bar chart
     source.data = {
@@ -4222,6 +4222,7 @@ bar_chart = figure(
     plot_width=450,
     y_axis_label="Million Metric Tons of CO2e",
     title="Greenhouse Gas Emissions in Greater Philadelphia",
+    name="barchart",
 )
 
 bar_chart.vbar(
@@ -5045,6 +5046,6 @@ user_inputs = [
     widgetNonEnergy,
     widgetCarbonCapture,
 ]
-
-curdoc().add_root(column(bar_chart, stacked_bar_chart, electric_grid_pie_chart))
-curdoc().add_root(column(user_inputs))
+doc = curdoc()
+doc.add_root(column(bar_chart, stacked_bar_chart, electric_grid_pie_chart))
+doc.add_root(column(user_inputs))

@@ -1,14 +1,28 @@
-<html>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width" />
+  <meta name="description" content="">
   <link href="http://cdn.pydata.org/bokeh/release/bokeh-2.1.1.min.css" rel="stylesheet" type="text/css">
   <link href="http://cdn.pydata.org/bokeh/release/bokeh-widgets-2.1.1.min.css" rel=”stylesheet" type="text/css">
+  <link rel="stylesheet" href="{% static 'main/style.css' %}">
+  <title>GHG TOOL</title>
 </head>
-
 <body>
-  <h1> Holà! </h1>
-  {{ div|safe }}
-  <script src="http://cdn.pydata.org/bokeh/release/bokeh-2.1.1.min.js"></script">
-  <script src="http://cdn.pydata.org/bokeh/release/bokeh-widgets-2.1.1.min.js"></script>
-  {{ script|safe }}
+  <header>
+    <h1>Header</h1>
+  </header>
+  <main>
+    {% block main %}
+
+
+    {% endblock %}
+    </div>
+  </main>
+  <footer>
+    Footer
+  </footer>
 </body>
 </html>
