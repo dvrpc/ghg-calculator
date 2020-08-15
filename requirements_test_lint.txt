@@ -1,0 +1,5 @@
+pylint
+pylint-django
+pytest
+pytest-django
+mypy
