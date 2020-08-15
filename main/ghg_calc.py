@@ -4,7 +4,7 @@ from statistics import mean
 import numpy as np
 import pandas as pd
 
-from bokeh.layouts import row, column, layout
+from bokeh.layouts import row, column
 from bokeh.models import Slider, Column, ColumnDataSource, TextInput, Paragraph
 from bokeh.palettes import Viridis7, Spectral10
 from bokeh.plotting import figure, curdoc
@@ -2418,129 +2418,6 @@ def calc_non_energy_ghg(
     return AgricultureGHG + SolidWasteGHG + WasteWaterGHG + IndProcGHG + NGSystemsGHG + LULUCFGHG
 
 
-def grid_text(
-    grid_coal,
-    grid_oil,
-    grid_ng,
-    grid_nuclear,
-    grid_solar,
-    grid_wind,
-    grid_bio,
-    grid_hydro,
-    grid_geo,
-    grid_other_ff,
-):
-    """Create text to give user current sum of grid mix choices."""
-    t = sum(
-        [
-            grid_coal,
-            grid_oil,
-            grid_ng,
-            grid_nuclear,
-            grid_solar,
-            grid_wind,
-            grid_bio,
-            grid_hydro,
-            grid_geo,
-            grid_other_ff,
-        ]
-    )
-
-    return f"Input percentages. Make sure the grid mix sums to 100%. The current sum is {t:.1f}%."
-
-
-def callback(attr, old, new):
-    """Set variables according to user inputs."""
-    user_inputs = {
-        "grid_coal": float(grid_coalTextInput.value),
-        "grid_ng": float(grid_ngTextInput.value),
-        "grid_oil": float(grid_oilTextInput.value),
-        "grid_nuclear": float(grid_nuclearTextInput.value),
-        "grid_solar": float(grid_solarTextInput.value),
-        "grid_wind": float(grid_windTextInput.value),
-        "grid_bio": float(grid_bioTextInput.value),
-        "grid_hydro": float(grid_hydroTextInput.value),
-        "grid_geo": float(grid_geoTextInput.value),
-        "grid_other_ff": float(grid_other_ffTextInput.value),
-        "PerNetZeroCarbon": float(PerNetZeroCarbonTextInput.value),  # TK, possibly
-        "pop_factor": pop_factorSlider.value,
-        "urban_pop_percent": float(urban_pop_percentTextInput.value),
-        "suburban_pop_percent": float(suburban_pop_percentTextInput.value),
-        "rural_pop_percent": float(rural_pop_percentTextInput.value),
-        "PerCapResEnergyUse": PerCapResEnergyUseSlider.value,
-        "UrbanPerResElectrification": UrbanPerResElectrificationSlider.value,
-        "SuburbanPerResElectrification": SuburbanPerResElectrificationSlider.value,
-        "RuralPerResElectrification": RuralPerResElectrificationSlider.value,
-        "PerComIndEnergyUse": PerComIndEnergyUseSlider.value,
-        "ComIndPerElectrification": ComIndPerElectrificationSlider.value,
-        "VMTperCap": VMTperCapSlider.value,
-        "RegionalFleetMPG": RegionalFleetMPGSlider.value,
-        "PerEVMT": PerEVMTSlider.value,
-        "PerTransRailRidership": PerTransRailRidershipSlider.value,
-        "TransRailUrbanPerElecMotion": TransRailUrbanPerElecMotionSlider.value,
-        "TransRailSuburbanPerElecMotion": TransRailSuburbanPerElecMotionSlider.value,
-        "TransRailRuralPerElecMotion": TransRailRuralPerElecMotionSlider.value,
-        "PerFreightRail": PerFreightRailSlider.value,
-        "FreightRailPerElecMotion": FreightRailPerElecMotionSlider.value,
-        "PerInterCityRail": PerInterCityRailSlider.value,
-        "InterCityRailPerElecMotion": InterCityRailPerElecMotionSlider.value,
-        "PerMarinePort": PerMarinePortSlider.value,
-        "MarinePortPerElectrification": MarinePortPerElectrificationSlider.value,
-        "PerOffroad": PerOffroadSlider.value,
-        "OffroadPerElectrification": OffroadPerElectrificationSlider.value,
-        "PerAviation": PerAviationSlider.value,
-        "PerAg": PerAgSlider.value,
-        "PerWaste": PerWasteSlider.value,
-        "PerWasteWater": PerWasteWaterSlider.value,
-        "PerIP": PerIPSlider.value,
-        "PerUrbanTreeCoverage": PerUrbanTreeCoverageSlider.value,
-        "PerForestCoverage": PerForestCoverageSlider.value,
-        "PerCombCapture": PerCombCaptureSlider.value,
-        "AirCapture": AirCaptureSlider.value,  # TK, possibly
-    }
-
-    bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
-    stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
-    pie_chart_source.data = wrangle_data_for_pie_chart(user_inputs)
-
-    # Update the paragraph widget text based on the new text inputs
-    grid_sum = round(
-        sum(
-            [
-                user_inputs["grid_bio"],
-                user_inputs["grid_coal"],
-                user_inputs["grid_geo"],
-                user_inputs["grid_hydro"],
-                user_inputs["grid_ng"],
-                user_inputs["grid_nuclear"],
-                user_inputs["grid_oil"],
-                user_inputs["grid_other_ff"],
-                user_inputs["grid_solar"],
-                user_inputs["grid_wind"],
-            ]
-        ),
-        1,
-    )
-    GridTextParagraph.text = grid_text(
-        user_inputs["grid_bio"],
-        user_inputs["grid_coal"],
-        user_inputs["grid_geo"],
-        user_inputs["grid_hydro"],
-        user_inputs["grid_ng"],
-        user_inputs["grid_nuclear"],
-        user_inputs["grid_oil"],
-        user_inputs["grid_other_ff"],
-        user_inputs["grid_solar"],
-        user_inputs["grid_wind"],
-    )
-    if grid_sum > 100:
-        GridTextParagraph.style = {"color": "red"}
-    elif grid_sum < 100:
-        GridTextParagraph.style = {"color": "orange"}
-    else:
-        GridTextParagraph.style = {"color": "black"}
-
-
 def wrangle_data_for_bar_chart(user_inputs):
     data = {
         "Category": sectors,
@@ -2644,7 +2521,6 @@ def wrangle_data_for_bar_chart(user_inputs):
             ),
         ],
     }
-
     return data
 
 
@@ -2763,7 +2639,7 @@ def wrangle_data_for_stacked_chart(user_inputs):
 
 
 def wrangle_data_for_pie_chart(user_inputs):
-    # Configure data and plot for pie chart
+    """Configure data and plot for pie chart."""
     x = {
         "Coal": user_inputs["grid_coal"],
         "Oil": user_inputs["grid_oil"],
@@ -2784,7 +2660,97 @@ def wrangle_data_for_pie_chart(user_inputs):
     return data
 
 
-# Create plots
+def generate_text_and_style(user_inputs):
+    """Generate text and style for creating/updating grid mix Paragraph widget."""
+    total = round(
+        sum(
+            [
+                user_inputs["grid_coal"],
+                user_inputs["grid_oil"],
+                user_inputs["grid_ng"],
+                user_inputs["grid_nuclear"],
+                user_inputs["grid_solar"],
+                user_inputs["grid_wind"],
+                user_inputs["grid_bio"],
+                user_inputs["grid_hydro"],
+                user_inputs["grid_geo"],
+                user_inputs["grid_other_ff"],
+            ]
+        ),
+        1,
+    )
+
+    text = f"Input percentages. Make sure the grid mix sums to 100%. The current sum is {total}%."
+    if total > 100:
+        style = {"color": "red"}
+    elif total < 100:
+        style = {"color": "orange"}
+    else:
+        style = {"color": "black"}
+    return text, style
+
+
+def callback(attr, old, new):
+    """Set variables according to user inputs."""
+    user_inputs = {
+        "grid_coal": float(grid_coalTextInput.value),
+        "grid_ng": float(grid_ngTextInput.value),
+        "grid_oil": float(grid_oilTextInput.value),
+        "grid_nuclear": float(grid_nuclearTextInput.value),
+        "grid_solar": float(grid_solarTextInput.value),
+        "grid_wind": float(grid_windTextInput.value),
+        "grid_bio": float(grid_bioTextInput.value),
+        "grid_hydro": float(grid_hydroTextInput.value),
+        "grid_geo": float(grid_geoTextInput.value),
+        "grid_other_ff": float(grid_other_ffTextInput.value),
+        "PerNetZeroCarbon": float(PerNetZeroCarbonTextInput.value),  # TK, possibly
+        "pop_factor": pop_factorSlider.value,
+        "urban_pop_percent": float(urban_pop_percentTextInput.value),
+        "suburban_pop_percent": float(suburban_pop_percentTextInput.value),
+        "rural_pop_percent": float(rural_pop_percentTextInput.value),
+        "PerCapResEnergyUse": PerCapResEnergyUseSlider.value,
+        "UrbanPerResElectrification": UrbanPerResElectrificationSlider.value,
+        "SuburbanPerResElectrification": SuburbanPerResElectrificationSlider.value,
+        "RuralPerResElectrification": RuralPerResElectrificationSlider.value,
+        "PerComIndEnergyUse": PerComIndEnergyUseSlider.value,
+        "ComIndPerElectrification": ComIndPerElectrificationSlider.value,
+        "VMTperCap": VMTperCapSlider.value,
+        "RegionalFleetMPG": RegionalFleetMPGSlider.value,
+        "PerEVMT": PerEVMTSlider.value,
+        "PerTransRailRidership": PerTransRailRidershipSlider.value,
+        "TransRailUrbanPerElecMotion": TransRailUrbanPerElecMotionSlider.value,
+        "TransRailSuburbanPerElecMotion": TransRailSuburbanPerElecMotionSlider.value,
+        "TransRailRuralPerElecMotion": TransRailRuralPerElecMotionSlider.value,
+        "PerFreightRail": PerFreightRailSlider.value,
+        "FreightRailPerElecMotion": FreightRailPerElecMotionSlider.value,
+        "PerInterCityRail": PerInterCityRailSlider.value,
+        "InterCityRailPerElecMotion": InterCityRailPerElecMotionSlider.value,
+        "PerMarinePort": PerMarinePortSlider.value,
+        "MarinePortPerElectrification": MarinePortPerElectrificationSlider.value,
+        "PerOffroad": PerOffroadSlider.value,
+        "OffroadPerElectrification": OffroadPerElectrificationSlider.value,
+        "PerAviation": PerAviationSlider.value,
+        "PerAg": PerAgSlider.value,
+        "PerWaste": PerWasteSlider.value,
+        "PerWasteWater": PerWasteWaterSlider.value,
+        "PerIP": PerIPSlider.value,
+        "PerUrbanTreeCoverage": PerUrbanTreeCoverageSlider.value,
+        "PerForestCoverage": PerForestCoverageSlider.value,
+        "PerCombCapture": PerCombCaptureSlider.value,
+        "AirCapture": AirCaptureSlider.value,  # TK, possibly
+    }
+
+    # update the data for the charts
+    bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
+    stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
+    pie_chart_source.data = wrangle_data_for_pie_chart(user_inputs)
+
+    # update text and style for the grid paragraph widget
+    grid_text.text, grid_text.style = generate_text_and_style(user_inputs)
+
+
+###############
+# Create charts
 
 bar_chart_data = wrangle_data_for_bar_chart(user_inputs)
 bar_chart_source = ColumnDataSource(data=bar_chart_data)
@@ -2864,26 +2830,13 @@ pie_chart.axis.axis_label = None
 pie_chart.axis.visible = False
 pie_chart.grid.grid_line_color = None
 
-# Initializes paragraph widget based on calculating grid mix and assigning it to text within the paragraph to be updated
-GridTextParagraph = Paragraph(
-    text=grid_text(
-        grid_coal,
-        grid_oil,
-        grid_ng,
-        grid_nuclear,
-        grid_solar,
-        grid_wind,
-        grid_bio,
-        grid_hydro,
-        grid_geo,
-        grid_other_ff,
-    ),
-    style={"color": "black"},
-)
+###############################################################
+# create the input widgets that allow user to change the charts
 
-# Creates Widgets
+# electric grid mix
+text, style = generate_text_and_style(user_inputs)
+grid_text = Paragraph(text=text, style=style)
 
-# Grid Inputs
 grid_coalTextInput = TextInput(value=str(round(grid_coal, 1)), title="% Coal in Grid Mix")
 grid_coalTextInput.on_change("value", callback)
 
@@ -2922,7 +2875,7 @@ PerNetZeroCarbonTextInput = TextInput(
 )
 PerNetZeroCarbonTextInput.on_change("value", callback)
 
-# Population Inputs
+# population
 pop_factorSlider = Slider(start=-100, end=100, value=0, step=10, title="% Change in Population")
 pop_factorSlider.on_change("value", callback)
 
@@ -2942,7 +2895,7 @@ rural_pop_percentTextInput = TextInput(
 )
 rural_pop_percentTextInput.on_change("value", callback)
 
-# Stationary Energy Inputs - Residential
+# residential
 PerCapResEnergyUseSlider = Slider(
     start=-100, end=100, value=0, step=10, title="% Change in Per Capita Residential Energy Usage",
 )
@@ -2975,7 +2928,7 @@ RuralPerResElectrificationSlider = Slider(
 )
 RuralPerResElectrificationSlider.on_change("value", callback)
 
-# Stationary Energy Inputs - Commercial and Industrial
+# commercial and industrial
 PerComIndEnergyUseSlider = Slider(
     start=-100,
     end=100,
@@ -2994,7 +2947,7 @@ ComIndPerElectrificationSlider = Slider(
 )
 ComIndPerElectrificationSlider.on_change("value", callback)
 
-# Mobile Energy Inputs - Highway
+# highway
 VMTperCapSlider = Slider(start=-100, end=100, value=0, step=1, title="% Change in VMT per Capita")
 VMTperCapSlider.on_change("value", callback)
 
@@ -3010,7 +2963,7 @@ RegionalFleetMPGSlider = Slider(
 )
 RegionalFleetMPGSlider.on_change("value", callback)
 
-# Mobile Energy Inputs - Rail Transit
+# rail transit
 PerTransRailRidershipSlider = Slider(
     start=-100, end=100, value=0, step=1, title="% Change in Transit Ridership"
 )
@@ -3043,11 +2996,11 @@ TransRailRuralPerElecMotionSlider = Slider(
 )
 TransRailRuralPerElecMotionSlider.on_change("value", callback)
 
-# Mobile Energy Inputs - Aviation
+# aviation
 PerAviationSlider = Slider(start=-100, end=100, value=0, step=1, title="% Change in Air Travel")
 PerAviationSlider.on_change("value", callback)
 
-# Mobile Energy Inputs - Freight Rail
+# freight rail
 PerFreightRailSlider = Slider(
     start=-100, end=100, value=0, step=1, title="% Change in Freight Rail"
 )
@@ -3062,7 +3015,7 @@ FreightRailPerElecMotionSlider = Slider(
 )
 FreightRailPerElecMotionSlider.on_change("value", callback)
 
-# Mobile Energy Inputs - Inter-city Rail
+# inter-city rail
 PerInterCityRailSlider = Slider(
     start=-100, end=100, value=0, step=1, title="% Change in Inter-city Rail Travel"
 )
@@ -3077,7 +3030,7 @@ InterCityRailPerElecMotionSlider = Slider(
 )
 InterCityRailPerElecMotionSlider.on_change("value", callback)
 
-# Mobile Energy Inputs - Marine and Port
+# marine and port
 PerMarinePortSlider = Slider(
     start=-100, end=100, value=0, step=1, title="% Change in Marine and Port-related Activity"
 )
@@ -3092,7 +3045,7 @@ MarinePortPerElectrificationSlider = Slider(
 )
 MarinePortPerElectrificationSlider.on_change("value", callback)
 
-# Mobile Energy Inputs - Off-road
+# off-road
 PerOffroadSlider = Slider(
     start=-100, end=100, value=0, step=1, title="% Change in Offroad Vehicle Use"
 )
@@ -3107,7 +3060,7 @@ OffroadPerElectrificationSlider = Slider(
 )
 OffroadPerElectrificationSlider.on_change("value", callback)
 
-# Non-Energy Inputs
+# non-energy
 PerAgSlider = Slider(
     start=-100, end=100, value=0, step=1, title="% Change in Emissions from Agriculture"
 )
@@ -3138,7 +3091,7 @@ PerForestCoverageSlider = Slider(
 )
 PerForestCoverageSlider.on_change("value", callback)
 
-# Carbon Capture Inputs
+# carbon capture
 PerCombCaptureSlider = Slider(
     start=0,
     end=100,
@@ -3151,16 +3104,18 @@ PerCombCaptureSlider.on_change("value", callback)
 AirCaptureSlider = Slider(start=0, end=100, value=0, step=1, title="MMTCO2e Captured from the Air")
 AirCaptureSlider.on_change("value", callback)
 
+#########################
+# group the input widgets
 
-# widgets
-widgetPop = Column(
+population_inputs = Column(
     pop_factorSlider,
     urban_pop_percentTextInput,
     suburban_pop_percentTextInput,
     rural_pop_percentTextInput,
 )
-widgetGrid = Column(
-    GridTextParagraph,
+
+grid_inputs = Column(
+    grid_text,
     grid_coalTextInput,
     grid_oilTextInput,
     grid_ngTextInput,
@@ -3172,21 +3127,21 @@ widgetGrid = Column(
     grid_geoTextInput,
     grid_other_ffTextInput,
 )
-widgetResidential = Column(
+res_inputs = Column(
     PerCapResEnergyUseSlider,
     UrbanPerResElectrificationSlider,
     SuburbanPerResElectrificationSlider,
     RuralPerResElectrificationSlider,
 )
-widgetCommInd = Column(PerComIndEnergyUseSlider, ComIndPerElectrificationSlider)
-widgetMobileHighway = Column(VMTperCapSlider, PerEVMTSlider, RegionalFleetMPGSlider)
-widgetMobileRailTrans = Column(
+ci_inputs = Column(PerComIndEnergyUseSlider, ComIndPerElectrificationSlider)
+highway_inputs = Column(VMTperCapSlider, PerEVMTSlider, RegionalFleetMPGSlider)
+transit_inputs = Column(
     PerTransRailRidershipSlider,
     TransRailUrbanPerElecMotionSlider,
     TransRailSuburbanPerElecMotionSlider,
     TransRailRuralPerElecMotionSlider,
 )
-widgetMobileOther = Column(
+other_mobile_inputs = Column(
     PerAviationSlider,
     PerFreightRailSlider,
     FreightRailPerElecMotionSlider,
@@ -3197,7 +3152,7 @@ widgetMobileOther = Column(
     PerOffroadSlider,
     OffroadPerElectrificationSlider,
 )
-widgetNonEnergy = Column(
+non_energy_inputs = Column(
     PerAgSlider,
     PerWasteSlider,
     PerWasteWaterSlider,
@@ -3205,19 +3160,20 @@ widgetNonEnergy = Column(
     PerUrbanTreeCoverageSlider,
     PerForestCoverageSlider,
 )
-widgetCarbonCapture = Column(PerCombCaptureSlider, AirCaptureSlider)
+carbon_capture_inputs = Column(PerCombCaptureSlider, AirCaptureSlider)
 
-all_widgets = [
-    widgetPop,
-    widgetGrid,
-    widgetResidential,
-    widgetCommInd,
-    widgetMobileHighway,
-    widgetMobileRailTrans,
-    widgetMobileOther,
-    widgetNonEnergy,
-    widgetCarbonCapture,
+all_inputs = [
+    population_inputs,
+    grid_inputs,
+    res_inputs,
+    ci_inputs,
+    highway_inputs,
+    transit_inputs,
+    other_mobile_inputs,
+    non_energy_inputs,
+    carbon_capture_inputs,
 ]
+
 doc = curdoc()
-doc.add_root(column(all_widgets))
+doc.add_root(column(all_inputs))
 doc.add_root(column(bar_chart, stacked_bar_chart, pie_chart))
