@@ -71,7 +71,7 @@ CO2_LB_MWH_NG = (929.651872 + 897.037) / 2
 CO2_LB_MWH_OTHER_FF = (1488.036692 + 1334.201) / 2
 
 # Percent of carbon emissions from combustion of fossil fuels for electricity that are captured and stored
-PerCombCapture = 0
+ff_carbon_capture = 0
 
 # Electricity Mix from 2015 inventory
 grid_coal = 20.47
@@ -92,8 +92,6 @@ CO2_LB_KCF_NG = 123.0744706
 
 MMT_LB = 0.00000000045359
 KB_G = 1 / 42000
-MCFperCCF = 0.1
-MillionCFperCF = 0.000001
 MT_TO_MMT = 0.000001
 
 # BTU Conversions
@@ -120,203 +118,167 @@ CO2_MMT_BBTU_STILL_GAS = 66.96
 CO2_MMT_BBTU_NAPHTHAS = 72.62
 
 # Residential Stationary ENERGY
-PerCapResEnergyUse = 0
+res_energy_change = 0
 
-UrbanPerCapElec = 2.41  # MWh/person
-SuburbanPerCapElec = 3.17  # MWh/person
-RuralPerCapElec = 3.81  # MWh/person
+URBAN_ELEC_MWH_CAP = 2.41  # MWh/person
+SUBURBAN_ELEC_MWH_CAP = 3.17  # MWh/person
+RURAL_ELEC_MWH_CAP = 3.81  # MWh/person
 
-UrbanBTUPerCapElec = UrbanPerCapElec * BTU_MWH  # BTU/Person
-SuburbanBTUPerCapElec = SuburbanPerCapElec * BTU_MWH  # BTU/Person
-RuralBTUPerCapElec = RuralPerCapElec * BTU_MWH  # BTU/Person
+URBAN_NG_CCF_CAP = 246.04  # CCF/person
+SUBURBAN_NG_CCF_CAP = 193.00  # CCF/person
+RURAL_NG_CCF_CAP = 89.35  # CCF/person
 
-UrbanPerCapNG = 246.04  # CCF/person
-SuburbanPerCapNG = 193.00  # CCF/person
-RuralPerCapNG = 89.35  # CCF/person
+URBAN_FOK_GAL_CAP = 14.50  # gallons/person
+SUBURBAN_FOK_GAL_CAP = 43.32  # gallons/person
+RURAL_FOK_GAL_CAP = 80.84  # gallons/person
 
-UrbanBTUPerCapNG = UrbanPerCapNG * BTU_CCF_AVG  # BTU/Person
-SuburbanBTUPerCapNG = SuburbanPerCapNG * BTU_CCF_AVG  # BTU/Person
-RuralBTUPerCapNG = RuralPerCapNG * BTU_CCF_AVG  # BTU/Person
+URBAN_LPG_GAL_CAP = 3.46  # gallons/person
+SUBURBAN_LPG_GAL_CAP = 8.44  # gallons/person
+RURAL_LPG_GAL_CAP = 44.38  # gallons/person
 
-UrbanPerCapFOKer = 14.50  # gallons/person
-SuburbanPerCapFOKer = 43.32  # gallons/person
-RuralPerCapFOKer = 80.84  # gallons/person
+# End uses for residential fuels from EIA 2015 by decimal fraction of Trillion BTUs
+RES_ELEC_SPACE = 0.1284
+RES_ELEC_WATER = 0.1194
+RES_ELEC_OTHER = 0.7523
 
-UrbanBTUPerCapFOKer = UrbanPerCapFOKer * BTU_GAL_FOK  # BTU/Person
-SuburbanBTUPerCapFOKer = SuburbanPerCapFOKer * BTU_GAL_FOK  # BTU/Person
-RuralBTUPerCapFOKer = RuralPerCapFOKer * BTU_GAL_FOK  # BTU/Person
+RES_NG_SPACE = 0.7066
+RES_NG_WATER = 0.2224
+RES_NG_OTHER = 0.0697
 
-UrbanPerCapLPG = 3.46  # gallons/person
-SuburbanPerCapLPG = 8.44  # gallons/person
-RuralPerCapLPG = 44.38  # gallons/person
+RES_FOK_SPACE = 0.8333
+RES_FOK_WATER = 0.1613
+RES_FOK_OTHER = 0.0054
 
-UrbanBTUPerCapLPG = UrbanPerCapLPG * BTU_GAL_LPG  # BTU/Person
-SuburbanBTUPerCapLPG = SuburbanPerCapLPG * BTU_GAL_LPG  # BTU/Person
-RuralBTUPerCapLPG = RuralPerCapLPG * BTU_GAL_LPG  # BTU/Person
-
-# End uses for residential fuels from EIA 2015 by % of Trillion BTUs
-PerResElecSpaceHeating = 12.84
-PerResElecWaterHeating = 11.94
-PerResElecOther = 75.23
-
-PerResNGSpaceHeating = 70.66
-PerResNGWaterHeating = 22.24
-PerResNGOther = 6.97
-
-PerResFOKerSpaceHeating = 83.33
-PerResFOKerWaterHeating = 16.13
-PerResFOKerOther = 0.54
-
-PerResLPGSpaceHeating = 65.22
-PerResLPGWaterHeating = 19.57
-PerResLPGOther = 15.22
+RES_LPG_SPACE = 0.6522
+RES_LPG_WATER = 0.1957
+RES_LPG_OTHER = 0.1522
 
 # Energy to use efficiencies for residential end uses and fuels
-PerEnergyToUseResElecSpaceHeating = 100
-PerEnergyToUseResElecWaterHeating = 100
-PerEnergyToUseResElecOther = 100
-PerEnergyToUseResElecSpaceHeatingSwitch = 250
-PerEnergyToUseResElecWaterHeatingSwitch = 150
+RES_ELEC_SPACE_USEFUL = 1
+RES_ELEC_WATER_USEFUL = 1
+RES_ELEC_OTHER_USEFUL = 1
+RES_ELEC_WATER_USEFUL_REPLACE_FF = 25.0
+RES_ELEC_OTHER_USEFUL_REPLACE_FF = 15.0
 
-PerEnergyToUseResNGSpaceHeating = 80  # 80% 2014 federal minimum, 95% ENERGY STAR spec
-PerEnergyToUseResNGWaterHeating = 82  # 80-82% 2012 federal minimum, 90% ENERGY STAR spec
-PerEnergyToUseResNGOther = 80
+RES_NG_SPACE_USEFUL = 0.80  # 80% 2014 federal minimum, 95% ENERGY STAR spec
+RES_NG_WATER_USEFUL = 0.82  # 80-82% 2012 federal minimum, 90% ENERGY STAR spec
+RES_NG_OTHER_USEFUL = 0.80
 
-PerEnergyToUseResFOKerSpaceHeating = 80
-PerEnergyToUseResFOKerWaterHeating = 80
-PerEnergyToUseResFOKerOther = 80
+RES_FOK_SPACE_USEFUL = 0.80
+RES_FOK_WATER_USEFUL = 0.80
+RES_FOK_OTHER_USEFUL = 0.80
 
-PerEnergyToUseResLPGSpaceHeating = 80
-PerEnergyToUseResLPGWaterHeating = 80
-PerEnergyToUseResLPGOther = 80
+RES_LPG_SPACE_USEFUL = 0.80
+RES_LPG_WATER_USEFUL = 0.80
+RES_LPG_OTHER_USEFUL = 0.80
 
 # Btus per person per community type, fuel type, and end use
 UrbanBTUPerCapElecSpaceHeatingUsed = (
-    UrbanBTUPerCapElec * (PerResElecSpaceHeating / 100) * (PerEnergyToUseResElecSpaceHeating / 100)
+    URBAN_ELEC_MWH_CAP * (RES_ELEC_SPACE) * (RES_ELEC_SPACE_USEFUL) * BTU_MWH
 )
 UrbanBTUPerCapElecWaterHeatingUsed = (
-    UrbanBTUPerCapElec * (PerResElecWaterHeating / 100) * (PerEnergyToUseResElecWaterHeating / 100)
+    URBAN_ELEC_MWH_CAP * (RES_ELEC_WATER) * (RES_ELEC_WATER_USEFUL) * BTU_MWH
 )
 UrbanBTUPerCapElecOtherUsed = (
-    UrbanBTUPerCapElec * (PerResElecOther / 100) * (PerEnergyToUseResElecOther / 100)
+    URBAN_ELEC_MWH_CAP * (RES_ELEC_OTHER) * (RES_ELEC_OTHER_USEFUL) * BTU_MWH
 )
 SuburbanBTUPerCapElecSpaceHeatingUsed = (
-    SuburbanBTUPerCapElec
-    * (PerResElecSpaceHeating / 100)
-    * (PerEnergyToUseResElecSpaceHeating / 100)
+    SUBURBAN_ELEC_MWH_CAP * (RES_ELEC_SPACE) * (RES_ELEC_SPACE_USEFUL) * BTU_MWH
 )
 SuburbanBTUPerCapElecWaterHeatingUsed = (
-    SuburbanBTUPerCapElec
-    * (PerResElecWaterHeating / 100)
-    * (PerEnergyToUseResElecWaterHeating / 100)
+    SUBURBAN_ELEC_MWH_CAP * (RES_ELEC_WATER) * (RES_ELEC_WATER_USEFUL) * BTU_MWH
 )
 SuburbanBTUPerCapElecOtherUsed = (
-    SuburbanBTUPerCapElec * (PerResElecOther / 100) * (PerEnergyToUseResElecOther / 100)
+    SUBURBAN_ELEC_MWH_CAP * (RES_ELEC_OTHER) * (RES_ELEC_OTHER_USEFUL) * BTU_MWH
 )
 RuralBTUPerCapElecSpaceHeatingUsed = (
-    RuralBTUPerCapElec * (PerResElecSpaceHeating / 100) * (PerEnergyToUseResElecSpaceHeating / 100)
+    RURAL_ELEC_MWH_CAP * (RES_ELEC_SPACE) * (RES_ELEC_SPACE_USEFUL) * BTU_MWH
 )
 RuralBTUPerCapElecWaterHeatingUsed = (
-    RuralBTUPerCapElec * (PerResElecWaterHeating / 100) * (PerEnergyToUseResElecWaterHeating / 100)
+    RURAL_ELEC_MWH_CAP * (RES_ELEC_WATER) * (RES_ELEC_WATER_USEFUL) * BTU_MWH
 )
 RuralBTUPerCapElecOtherUsed = (
-    RuralBTUPerCapElec * (PerResElecOther / 100) * (PerEnergyToUseResElecOther / 100)
+    RURAL_ELEC_MWH_CAP * (RES_ELEC_OTHER) * (RES_ELEC_OTHER_USEFUL) * BTU_MWH
 )
 
 UrbanBTUPerCapNGSpaceHeatingUsed = (
-    UrbanBTUPerCapNG * (PerResNGSpaceHeating / 100) * (PerEnergyToUseResNGSpaceHeating / 100)
+    URBAN_NG_CCF_CAP * (RES_NG_SPACE) * (RES_NG_SPACE_USEFUL) * BTU_CCF_AVG
 )
 UrbanBTUPerCapNGWaterHeatingUsed = (
-    UrbanBTUPerCapNG * (PerResNGWaterHeating / 100) * (PerEnergyToUseResNGWaterHeating / 100)
+    URBAN_NG_CCF_CAP * (RES_NG_WATER) * (RES_NG_WATER_USEFUL) * BTU_CCF_AVG
 )
-UrbanBTUPerCapNGOtherUsed = (
-    UrbanBTUPerCapNG * (PerResNGOther / 100) * (PerEnergyToUseResNGOther / 100)
-)
+UrbanBTUPerCapNGOtherUsed = URBAN_NG_CCF_CAP * (RES_NG_OTHER) * (RES_NG_OTHER_USEFUL) * BTU_CCF_AVG
 SuburbanBTUPerCapNGSpaceHeatingUsed = (
-    SuburbanBTUPerCapNG * (PerResNGSpaceHeating / 100) * (PerEnergyToUseResNGSpaceHeating / 100)
+    SUBURBAN_NG_CCF_CAP * (RES_NG_SPACE) * (RES_NG_SPACE_USEFUL) * BTU_CCF_AVG
 )
 SuburbanBTUPerCapNGWaterHeatingUsed = (
-    SuburbanBTUPerCapNG * (PerResNGWaterHeating / 100) * (PerEnergyToUseResNGWaterHeating / 100)
+    SUBURBAN_NG_CCF_CAP * (RES_NG_WATER) * (RES_NG_WATER_USEFUL) * BTU_CCF_AVG
 )
 SuburbanBTUPerCapNGOtherUsed = (
-    SuburbanBTUPerCapNG * (PerResNGOther / 100) * (PerEnergyToUseResNGOther / 100)
+    SUBURBAN_NG_CCF_CAP * (RES_NG_OTHER) * (RES_NG_OTHER_USEFUL) * BTU_CCF_AVG
 )
 RuralBTUPerCapNGSpaceHeatingUsed = (
-    RuralBTUPerCapNG * (PerResNGSpaceHeating / 100) * (PerEnergyToUseResNGSpaceHeating / 100)
+    RURAL_NG_CCF_CAP * (RES_NG_SPACE) * (RES_NG_SPACE_USEFUL) * BTU_CCF_AVG
 )
 RuralBTUPerCapNGWaterHeatingUsed = (
-    RuralBTUPerCapNG * (PerResNGWaterHeating / 100) * (PerEnergyToUseResNGWaterHeating / 100)
+    RURAL_NG_CCF_CAP * (RES_NG_WATER) * (RES_NG_WATER_USEFUL) * BTU_CCF_AVG
 )
-RuralBTUPerCapNGOtherUsed = (
-    RuralBTUPerCapNG * (PerResNGOther / 100) * (PerEnergyToUseResNGOther / 100)
-)
+RuralBTUPerCapNGOtherUsed = RURAL_NG_CCF_CAP * (RES_NG_OTHER) * (RES_NG_OTHER_USEFUL) * BTU_CCF_AVG
 
 UrbanBTUPerCapFOKerSpaceHeatingUsed = (
-    UrbanBTUPerCapFOKer
-    * (PerResFOKerSpaceHeating / 100)
-    * (PerEnergyToUseResFOKerSpaceHeating / 100)
+    URBAN_FOK_GAL_CAP * (RES_FOK_SPACE) * (RES_FOK_SPACE_USEFUL) * BTU_GAL_FOK
 )
 UrbanBTUPerCapFOKerWaterHeatingUsed = (
-    UrbanBTUPerCapFOKer
-    * (PerResFOKerWaterHeating / 100)
-    * (PerEnergyToUseResFOKerWaterHeating / 100)
+    URBAN_FOK_GAL_CAP * (RES_FOK_WATER) * (RES_FOK_WATER_USEFUL) * BTU_GAL_FOK
 )
 UrbanBTUPerCapFOKerOtherUsed = (
-    UrbanBTUPerCapFOKer * (PerResFOKerOther / 100) * (PerEnergyToUseResFOKerOther / 100)
+    URBAN_FOK_GAL_CAP * (RES_FOK_OTHER) * (RES_FOK_OTHER_USEFUL) * BTU_GAL_FOK
 )
 SuburbanBTUPerCapFOKerSpaceHeatingUsed = (
-    SuburbanBTUPerCapFOKer
-    * (PerResFOKerSpaceHeating / 100)
-    * (PerEnergyToUseResFOKerSpaceHeating / 100)
+    SUBURBAN_FOK_GAL_CAP * (RES_FOK_SPACE) * (RES_FOK_SPACE_USEFUL) * BTU_GAL_FOK
 )
 SuburbanBTUPerCapFOKerWaterHeatingUsed = (
-    SuburbanBTUPerCapFOKer
-    * (PerResFOKerWaterHeating / 100)
-    * (PerEnergyToUseResFOKerWaterHeating / 100)
+    SUBURBAN_FOK_GAL_CAP * (RES_FOK_WATER) * (RES_FOK_WATER_USEFUL) * BTU_GAL_FOK
 )
 SuburbanBTUPerCapFOKerOtherUsed = (
-    SuburbanBTUPerCapFOKer * (PerResFOKerOther / 100) * (PerEnergyToUseResFOKerOther / 100)
+    SUBURBAN_FOK_GAL_CAP * (RES_FOK_OTHER) * (RES_FOK_OTHER_USEFUL) * BTU_GAL_FOK
 )
 RuralBTUPerCapFOKerSpaceHeatingUsed = (
-    RuralBTUPerCapFOKer
-    * (PerResFOKerSpaceHeating / 100)
-    * (PerEnergyToUseResFOKerSpaceHeating / 100)
+    RURAL_FOK_GAL_CAP * (RES_FOK_SPACE) * (RES_FOK_SPACE_USEFUL) * BTU_GAL_FOK
 )
 RuralBTUPerCapFOKerWaterHeatingUsed = (
-    RuralBTUPerCapFOKer
-    * (PerResFOKerWaterHeating / 100)
-    * (PerEnergyToUseResFOKerWaterHeating / 100)
+    RURAL_FOK_GAL_CAP * (RES_FOK_WATER) * (RES_FOK_WATER_USEFUL) * BTU_GAL_FOK
 )
 RuralBTUPerCapFOKerOtherUsed = (
-    RuralBTUPerCapFOKer * (PerResFOKerOther / 100) * (PerEnergyToUseResFOKerOther / 100)
+    RURAL_FOK_GAL_CAP * (RES_FOK_OTHER) * (RES_FOK_OTHER_USEFUL) * BTU_GAL_FOK
 )
 
 UrbanBTUPerCapLPGSpaceHeatingUsed = (
-    UrbanBTUPerCapLPG * (PerResLPGSpaceHeating / 100) * (PerEnergyToUseResLPGSpaceHeating / 100)
+    URBAN_LPG_GAL_CAP * (RES_LPG_SPACE) * (RES_LPG_SPACE_USEFUL) * BTU_GAL_LPG
 )
 UrbanBTUPerCapLPGWaterHeatingUsed = (
-    UrbanBTUPerCapLPG * (PerResLPGWaterHeating / 100) * (PerEnergyToUseResLPGWaterHeating / 100)
+    URBAN_LPG_GAL_CAP * (RES_LPG_WATER) * (RES_LPG_WATER_USEFUL) * BTU_GAL_LPG
 )
 UrbanBTUPerCapLPGOtherUsed = (
-    UrbanBTUPerCapLPG * (PerResLPGOther / 100) * (PerEnergyToUseResLPGOther / 100)
+    URBAN_LPG_GAL_CAP * (RES_LPG_OTHER) * (RES_LPG_OTHER_USEFUL) * BTU_GAL_LPG
 )
 SuburbanBTUPerCapLPGSpaceHeatingUsed = (
-    SuburbanBTUPerCapLPG * (PerResLPGSpaceHeating / 100) * (PerEnergyToUseResLPGSpaceHeating / 100)
+    SUBURBAN_LPG_GAL_CAP * (RES_LPG_SPACE) * (RES_LPG_SPACE_USEFUL) * BTU_GAL_LPG
 )
 SuburbanBTUPerCapLPGWaterHeatingUsed = (
-    SuburbanBTUPerCapLPG * (PerResLPGWaterHeating / 100) * (PerEnergyToUseResLPGWaterHeating / 100)
+    SUBURBAN_LPG_GAL_CAP * (RES_LPG_WATER) * (RES_LPG_WATER_USEFUL) * BTU_GAL_LPG
 )
 SuburbanBTUPerCapLPGOtherUsed = (
-    SuburbanBTUPerCapLPG * (PerResLPGOther / 100) * (PerEnergyToUseResLPGOther / 100)
+    SUBURBAN_LPG_GAL_CAP * (RES_LPG_OTHER) * (RES_LPG_OTHER_USEFUL) * BTU_GAL_LPG
 )
 RuralBTUPerCapLPGSpaceHeatingUsed = (
-    RuralBTUPerCapLPG * (PerResLPGSpaceHeating / 100) * (PerEnergyToUseResLPGSpaceHeating / 100)
+    RURAL_LPG_GAL_CAP * (RES_LPG_SPACE) * (RES_LPG_SPACE_USEFUL) * BTU_GAL_LPG
 )
 RuralBTUPerCapLPGWaterHeatingUsed = (
-    RuralBTUPerCapLPG * (PerResLPGWaterHeating / 100) * (PerEnergyToUseResLPGWaterHeating / 100)
+    RURAL_LPG_GAL_CAP * (RES_LPG_WATER) * (RES_LPG_WATER_USEFUL) * BTU_GAL_LPG
 )
 RuralBTUPerCapLPGOtherUsed = (
-    RuralBTUPerCapLPG * (PerResLPGOther / 100) * (PerEnergyToUseResLPGOther / 100)
+    RURAL_LPG_GAL_CAP * (RES_LPG_OTHER) * (RES_LPG_OTHER_USEFUL) * BTU_GAL_LPG
 )
 
 UrbanBTUPerCapElecUsed = (
@@ -919,8 +881,8 @@ user_inputs = {
     "OffroadPerElectrification": OffroadPerElectrification,
     "PerAg": PerAg,
     "PerAviation": PerAviation,
-    "PerCapResEnergyUse": PerCapResEnergyUse,
-    "PerCombCapture": PerCombCapture,
+    "res_energy_change": res_energy_change,
+    "ff_carbon_capture": ff_carbon_capture,
     "PerComIndEnergyUse": PerComIndEnergyUse,
     "PerEVMT": PerEVMT,
     "PerForestCoverage": PerForestCoverage,
@@ -953,7 +915,7 @@ def calc_res_ghg(
     grid_ng,
     grid_oil,
     grid_other_ff,
-    PerCapResEnergyUse,
+    res_energy_change,
     pop_factor,
     rural_per_res_electrification,
     suburban_per_res_electrification,
@@ -981,19 +943,19 @@ def calc_res_ghg(
     def calc_elec_BTU(
         PerChangedFossilFuelUsed,
         ElecSpaceHeatingBTUUsed,
-        PerEnergyToUseResElecSpaceHeating,
+        RES_ELEC_SPACE_USEFUL,
         ElecWaterHeatingBTUUsed,
-        PerEnergyToUseResElecWaterHeating,
+        RES_ELEC_WATER_USEFUL,
         ElecOtherBTUUsed,
-        PerEnergyToUseResElecOther,
+        RES_ELEC_OTHER_USEFUL,
         NGSpaceHeatingToElecBTUUsed,
         FOKerSpaceHeatingToElecBTUUsed,
         LPGSpaceHeatingToElecBTUUsed,
-        PerEnergyToUseResElecSpaceHeatingSwitch,
+        RES_ELEC_WATER_USEFUL_REPLACE_FF,
         NGWaterHeatingToElecBTUUsed,
         FOKerWaterHeatingToElecBTUUsed,
         LPGWaterHeatingToElecBTUUsed,
-        PerEnergyToUseResElecWaterHeatingSwitch,
+        RES_ELEC_OTHER_USEFUL_REPLACE_FF,
         NGOtherToElecBTUUsed,
         FOKerOtherToElecBTUUsed,
         LPGOtherToElecBTUUsed,
@@ -1006,16 +968,16 @@ def calc_res_ghg(
     ):
         if PerChangedFossilFuelUsed >= 0:
             return (
-                (ElecSpaceHeatingBTUUsed / (PerEnergyToUseResElecSpaceHeating / 100))
-                + (ElecWaterHeatingBTUUsed / (PerEnergyToUseResElecWaterHeating / 100))
-                + (ElecOtherBTUUsed / (PerEnergyToUseResElecOther / 100))
+                (ElecSpaceHeatingBTUUsed / RES_ELEC_SPACE_USEFUL)
+                + (ElecWaterHeatingBTUUsed / RES_ELEC_WATER_USEFUL)
+                + (ElecOtherBTUUsed / RES_ELEC_OTHER_USEFUL)
                 + (
                     (
                         NGSpaceHeatingToElecBTUUsed
                         + FOKerSpaceHeatingToElecBTUUsed
                         + LPGSpaceHeatingToElecBTUUsed
                     )
-                    / (PerEnergyToUseResElecSpaceHeatingSwitch / 100)
+                    / RES_ELEC_WATER_USEFUL_REPLACE_FF
                 )
                 + (
                     (
@@ -1023,15 +985,15 @@ def calc_res_ghg(
                         + FOKerWaterHeatingToElecBTUUsed
                         + LPGWaterHeatingToElecBTUUsed
                     )
-                    / (PerEnergyToUseResElecWaterHeatingSwitch / 100)
+                    / RES_ELEC_OTHER_USEFUL_REPLACE_FF
                 )
                 + (
                     (NGOtherToElecBTUUsed + FOKerOtherToElecBTUUsed + LPGOtherToElecBTUUsed)
-                    / (PerEnergyToUseResElecOther / 100)
+                    / RES_ELEC_OTHER_USEFUL
                 )
             )
         return (
-            (ElecOtherBTUUsed / (PerEnergyToUseResElecOther / 100))
+            (ElecOtherBTUUsed / RES_ELEC_OTHER_USEFUL)
             + (
                 (
                     ElecSpaceHeatingBTUUsed
@@ -1041,7 +1003,7 @@ def calc_res_ghg(
                         + ElecToLPGSpaceHeatingBTUUsed
                     )
                 )
-                / (PerEnergyToUseResElecSpaceHeating / 100)
+                / RES_ELEC_SPACE_USEFUL
             )
             + (
                 (
@@ -1052,7 +1014,7 @@ def calc_res_ghg(
                         + ElecToLPGWaterHeatingBTUUsed
                     )
                 )
-                / (PerEnergyToUseResElecWaterHeating / 100)
+                / RES_ELEC_WATER_USEFUL
             )
         )
 
@@ -1060,121 +1022,85 @@ def calc_res_ghg(
         PerChangedFossilFuelUsed,
         NGSpaceHeatingBTUUsed,
         NGSpaceHeatingToElecBTUUsed,
-        PerEnergyToUseResNGSpaceHeating,
+        RES_NG_SPACE_USEFUL,
         NGWaterHeatingBTUUsed,
         NGWaterHeatingToElecBTUUsed,
-        PerEnergyToUseResNGWaterHeating,
+        RES_NG_WATER_USEFUL,
         NGOtherBTUUsed,
         NGOtherToElecBTUUsed,
-        PerEnergyToUseResNGOther,
+        RES_NG_OTHER_USEFUL,
         ElecToNGSpaceHeatingBTUUsed,
         ElecToNGWaterHeatingBTUUsed,
     ):
         if PerChangedFossilFuelUsed >= 0:
             return (
-                (
-                    (NGSpaceHeatingBTUUsed - NGSpaceHeatingToElecBTUUsed)
-                    / (PerEnergyToUseResNGSpaceHeating / 100)
-                )
-                + (
-                    (NGWaterHeatingBTUUsed - NGWaterHeatingToElecBTUUsed)
-                    / (PerEnergyToUseResNGWaterHeating / 100)
-                )
-                + ((NGOtherBTUUsed - NGOtherToElecBTUUsed) / (PerEnergyToUseResNGOther / 100))
+                ((NGSpaceHeatingBTUUsed - NGSpaceHeatingToElecBTUUsed) / RES_NG_SPACE_USEFUL)
+                + ((NGWaterHeatingBTUUsed - NGWaterHeatingToElecBTUUsed) / RES_NG_WATER_USEFUL)
+                + ((NGOtherBTUUsed - NGOtherToElecBTUUsed) / RES_NG_OTHER_USEFUL)
             )
         return (
-            (NGOtherBTUUsed / (PerEnergyToUseResNGOther / 100))
-            + (
-                (NGSpaceHeatingBTUUsed + ElecToNGSpaceHeatingBTUUsed)
-                / (PerEnergyToUseResNGSpaceHeating / 100)
-            )
-            + (
-                (NGWaterHeatingBTUUsed + ElecToNGWaterHeatingBTUUsed)
-                / (PerEnergyToUseResNGWaterHeating / 100)
-            )
+            (NGOtherBTUUsed / RES_NG_OTHER_USEFUL)
+            + ((NGSpaceHeatingBTUUsed + ElecToNGSpaceHeatingBTUUsed) / RES_NG_SPACE_USEFUL)
+            + ((NGWaterHeatingBTUUsed + ElecToNGWaterHeatingBTUUsed) / RES_NG_WATER_USEFUL)
         )
 
     def calc_fok_btu(
         PerChangedFossilFuelUsed,
         FOKerSpaceHeatingBTUUsed,
         FOKerSpaceHeatingToElecBTUUsed,
-        PerEnergyToUseResFOKerSpaceHeating,
+        RES_FOK_SPACE_USEFUL,
         FOKerWaterHeatingBTUUsed,
         FOKerWaterHeatingToElecBTUUsed,
-        PerEnergyToUseResFOKerWaterHeating,
+        RES_FOK_WATER_USEFUL,
         FOKerOtherBTUUsed,
         FOKerOtherToElecBTUUsed,
-        PerEnergyToUseResFOKerOther,
+        RES_FOK_OTHER_USEFUL,
         ElecToFOKerSpaceHeatingBTUUsed,
         ElecToFOKerWaterHeatingBTUUsed,
     ):
         if PerChangedFossilFuelUsed >= 0:
             return (
-                (
-                    (FOKerSpaceHeatingBTUUsed - FOKerSpaceHeatingToElecBTUUsed)
-                    / (PerEnergyToUseResFOKerSpaceHeating / 100)
-                )
+                ((FOKerSpaceHeatingBTUUsed - FOKerSpaceHeatingToElecBTUUsed) / RES_FOK_SPACE_USEFUL)
                 + (
                     (FOKerWaterHeatingBTUUsed - FOKerWaterHeatingToElecBTUUsed)
-                    / (PerEnergyToUseResFOKerWaterHeating / 100)
+                    / RES_FOK_WATER_USEFUL
                 )
-                + (
-                    (FOKerOtherBTUUsed - FOKerOtherToElecBTUUsed)
-                    / (PerEnergyToUseResFOKerOther / 100)
-                )
+                + ((FOKerOtherBTUUsed - FOKerOtherToElecBTUUsed) / RES_FOK_OTHER_USEFUL)
             )
         return (
-            (FOKerOtherBTUUsed / (PerEnergyToUseResFOKerOther / 100))
-            + (
-                (FOKerSpaceHeatingBTUUsed + ElecToFOKerSpaceHeatingBTUUsed)
-                / (PerEnergyToUseResFOKerSpaceHeating / 100)
-            )
-            + (
-                (FOKerWaterHeatingBTUUsed + ElecToFOKerWaterHeatingBTUUsed)
-                / (PerEnergyToUseResFOKerWaterHeating / 100)
-            )
+            (FOKerOtherBTUUsed / RES_FOK_OTHER_USEFUL)
+            + ((FOKerSpaceHeatingBTUUsed + ElecToFOKerSpaceHeatingBTUUsed) / RES_FOK_SPACE_USEFUL)
+            + ((FOKerWaterHeatingBTUUsed + ElecToFOKerWaterHeatingBTUUsed) / RES_FOK_WATER_USEFUL)
         )
 
     def calc_lpg_btu(
         PerChangedFossilFuelUsed,
         LPGSpaceHeatingBTUUsed,
         LPGSpaceHeatingToElecBTUUsed,
-        PerEnergyToUseResLPGSpaceHeating,
+        RES_LPG_SPACE_USEFUL,
         LPGWaterHeatingBTUUsed,
         LPGWaterHeatingToElecBTUUsed,
-        PerEnergyToUseResLPGWaterHeating,
+        RES_LPG_WATER_USEFUL,
         LPGOtherBTUUsed,
         LPGOtherToElecBTUUsed,
-        PerEnergyToUseResLPGOther,
+        RES_LPG_OTHER_USEFUL,
         ElecToLPGSpaceHeatingBTUUsed,
         ElecToLPGWaterHeatingBTUUsed,
     ):
         if PerChangedFossilFuelUsed >= 0:
             return (
-                (
-                    (LPGSpaceHeatingBTUUsed - LPGSpaceHeatingToElecBTUUsed)
-                    / (PerEnergyToUseResLPGSpaceHeating / 100)
-                )
-                + (
-                    (LPGWaterHeatingBTUUsed - LPGWaterHeatingToElecBTUUsed)
-                    / (PerEnergyToUseResLPGWaterHeating / 100)
-                )
-                + ((LPGOtherBTUUsed - LPGOtherToElecBTUUsed) / (PerEnergyToUseResLPGOther / 100))
+                ((LPGSpaceHeatingBTUUsed - LPGSpaceHeatingToElecBTUUsed) / RES_LPG_SPACE_USEFUL)
+                + ((LPGWaterHeatingBTUUsed - LPGWaterHeatingToElecBTUUsed) / RES_LPG_WATER_USEFUL)
+                + ((LPGOtherBTUUsed - LPGOtherToElecBTUUsed) / RES_LPG_OTHER_USEFUL)
             )
         return (
-            (LPGOtherBTUUsed / (PerEnergyToUseResLPGOther / 100))
-            + (
-                (LPGSpaceHeatingBTUUsed + ElecToLPGSpaceHeatingBTUUsed)
-                / (PerEnergyToUseResLPGSpaceHeating / 100)
-            )
-            + (
-                (LPGWaterHeatingBTUUsed + ElecToLPGWaterHeatingBTUUsed)
-                / (PerEnergyToUseResLPGWaterHeating / 100)
-            )
+            (LPGOtherBTUUsed / RES_LPG_OTHER_USEFUL)
+            + ((LPGSpaceHeatingBTUUsed + ElecToLPGSpaceHeatingBTUUsed) / RES_LPG_SPACE_USEFUL)
+            + ((LPGWaterHeatingBTUUsed + ElecToLPGWaterHeatingBTUUsed) / RES_LPG_WATER_USEFUL)
         )
 
     urban_res_btu_used = btu_used(
-        POP, pop_factor, urban_pop_percent, UrbanBTUPerCapUsed, PerCapResEnergyUse
+        POP, pop_factor, urban_pop_percent, UrbanBTUPerCapUsed, res_energy_change
     )
 
     UrbanPerChangedFossilFuelUsed = urban_per_res_electrification - urban_per_res_elec_used
@@ -1317,19 +1243,19 @@ def calc_res_ghg(
     urban_elec_btu = calc_elec_BTU(
         UrbanPerChangedFossilFuelUsed,
         UrbanResElecSpaceHeatingBTUUsed,
-        PerEnergyToUseResElecSpaceHeating,
+        RES_ELEC_SPACE_USEFUL,
         UrbanResElecWaterHeatingBTUUsed,
-        PerEnergyToUseResElecWaterHeating,
+        RES_ELEC_WATER_USEFUL,
         UrbanResElecOtherBTUUsed,
-        PerEnergyToUseResElecOther,
+        RES_ELEC_OTHER_USEFUL,
         UrbanResNGSpaceHeatingToElecBTUUsed,
         UrbanResFOKerSpaceHeatingToElecBTUUsed,
         UrbanResLPGSpaceHeatingToElecBTUUsed,
-        PerEnergyToUseResElecSpaceHeatingSwitch,
+        RES_ELEC_WATER_USEFUL_REPLACE_FF,
         UrbanResNGWaterHeatingToElecBTUUsed,
         UrbanResFOKerWaterHeatingToElecBTUUsed,
         UrbanResLPGWaterHeatingToElecBTUUsed,
-        PerEnergyToUseResElecWaterHeatingSwitch,
+        RES_ELEC_OTHER_USEFUL_REPLACE_FF,
         UrbanResNGOtherToElecBTUUsed,
         UrbanResFOKerOtherToElecBTUUsed,
         UrbanResLPGOtherToElecBTUUsed,
@@ -1344,13 +1270,13 @@ def calc_res_ghg(
         UrbanPerChangedFossilFuelUsed,
         UrbanResNGSpaceHeatingBTUUsed,
         UrbanResNGSpaceHeatingToElecBTUUsed,
-        PerEnergyToUseResNGSpaceHeating,
+        RES_NG_SPACE_USEFUL,
         UrbanResNGWaterHeatingBTUUsed,
         UrbanResNGWaterHeatingToElecBTUUsed,
-        PerEnergyToUseResNGWaterHeating,
+        RES_NG_WATER_USEFUL,
         UrbanResNGOtherBTUUsed,
         UrbanResNGOtherToElecBTUUsed,
-        PerEnergyToUseResNGOther,
+        RES_NG_OTHER_USEFUL,
         UrbanResElecToNGSpaceHeatingBTUUsed,
         UrbanResElecToNGWaterHeatingBTUUsed,
     )
@@ -1358,13 +1284,13 @@ def calc_res_ghg(
         UrbanPerChangedFossilFuelUsed,
         UrbanResFOKerSpaceHeatingBTUUsed,
         UrbanResFOKerSpaceHeatingToElecBTUUsed,
-        PerEnergyToUseResFOKerSpaceHeating,
+        RES_FOK_SPACE_USEFUL,
         UrbanResFOKerWaterHeatingBTUUsed,
         UrbanResFOKerWaterHeatingToElecBTUUsed,
-        PerEnergyToUseResFOKerWaterHeating,
+        RES_FOK_WATER_USEFUL,
         UrbanResFOKerOtherBTUUsed,
         UrbanResFOKerOtherToElecBTUUsed,
-        PerEnergyToUseResFOKerOther,
+        RES_FOK_OTHER_USEFUL,
         UrbanResElecToFOKerSpaceHeatingBTUUsed,
         UrbanResElecToFOKerWaterHeatingBTUUsed,
     )
@@ -1373,19 +1299,19 @@ def calc_res_ghg(
         UrbanPerChangedFossilFuelUsed,
         UrbanResLPGSpaceHeatingBTUUsed,
         UrbanResLPGSpaceHeatingToElecBTUUsed,
-        PerEnergyToUseResLPGSpaceHeating,
+        RES_LPG_SPACE_USEFUL,
         UrbanResLPGWaterHeatingBTUUsed,
         UrbanResLPGWaterHeatingToElecBTUUsed,
-        PerEnergyToUseResLPGWaterHeating,
+        RES_LPG_WATER_USEFUL,
         UrbanResLPGOtherBTUUsed,
         UrbanResLPGOtherToElecBTUUsed,
-        PerEnergyToUseResLPGOther,
+        RES_LPG_OTHER_USEFUL,
         UrbanResElecToLPGSpaceHeatingBTUUsed,
         UrbanResElecToLPGWaterHeatingBTUUsed,
     )
 
     suburban_res_btu_used = btu_used(
-        POP, pop_factor, suburban_pop_percent, SuburbanBTUPerCapUsed, PerCapResEnergyUse
+        POP, pop_factor, suburban_pop_percent, SuburbanBTUPerCapUsed, res_energy_change
     )
 
     SuburbanPerChangedFossilFuelUsed = suburban_per_res_electrification - suburban_per_res_elec_used
@@ -1535,19 +1461,19 @@ def calc_res_ghg(
     suburban_elec_btu = calc_elec_BTU(
         SuburbanPerChangedFossilFuelUsed,
         SuburbanResElecSpaceHeatingBTUUsed,
-        PerEnergyToUseResElecSpaceHeating,
+        RES_ELEC_SPACE_USEFUL,
         SuburbanResElecWaterHeatingBTUUsed,
-        PerEnergyToUseResElecWaterHeating,
+        RES_ELEC_WATER_USEFUL,
         SuburbanResElecOtherBTUUsed,
-        PerEnergyToUseResElecOther,
+        RES_ELEC_OTHER_USEFUL,
         SuburbanResNGSpaceHeatingToElecBTUUsed,
         SuburbanResFOKerSpaceHeatingToElecBTUUsed,
         SuburbanResLPGSpaceHeatingToElecBTUUsed,
-        PerEnergyToUseResElecSpaceHeatingSwitch,
+        RES_ELEC_WATER_USEFUL_REPLACE_FF,
         SuburbanResNGWaterHeatingToElecBTUUsed,
         SuburbanResFOKerWaterHeatingToElecBTUUsed,
         SuburbanResLPGWaterHeatingToElecBTUUsed,
-        PerEnergyToUseResElecWaterHeatingSwitch,
+        RES_ELEC_OTHER_USEFUL_REPLACE_FF,
         SuburbanResNGOtherToElecBTUUsed,
         SuburbanResFOKerOtherToElecBTUUsed,
         SuburbanResLPGOtherToElecBTUUsed,
@@ -1562,13 +1488,13 @@ def calc_res_ghg(
         SuburbanPerChangedFossilFuelUsed,
         SuburbanResNGSpaceHeatingBTUUsed,
         SuburbanResNGSpaceHeatingToElecBTUUsed,
-        PerEnergyToUseResNGSpaceHeating,
+        RES_NG_SPACE_USEFUL,
         SuburbanResNGWaterHeatingBTUUsed,
         SuburbanResNGWaterHeatingToElecBTUUsed,
-        PerEnergyToUseResNGWaterHeating,
+        RES_NG_WATER_USEFUL,
         SuburbanResNGOtherBTUUsed,
         SuburbanResNGOtherToElecBTUUsed,
-        PerEnergyToUseResNGOther,
+        RES_NG_OTHER_USEFUL,
         SuburbanResElecToNGSpaceHeatingBTUUsed,
         SuburbanResElecToNGWaterHeatingBTUUsed,
     )
@@ -1576,13 +1502,13 @@ def calc_res_ghg(
         SuburbanPerChangedFossilFuelUsed,
         SuburbanResFOKerSpaceHeatingBTUUsed,
         SuburbanResFOKerSpaceHeatingToElecBTUUsed,
-        PerEnergyToUseResFOKerSpaceHeating,
+        RES_FOK_SPACE_USEFUL,
         SuburbanResFOKerWaterHeatingBTUUsed,
         SuburbanResFOKerWaterHeatingToElecBTUUsed,
-        PerEnergyToUseResFOKerWaterHeating,
+        RES_FOK_WATER_USEFUL,
         SuburbanResFOKerOtherBTUUsed,
         SuburbanResFOKerOtherToElecBTUUsed,
-        PerEnergyToUseResFOKerOther,
+        RES_FOK_OTHER_USEFUL,
         SuburbanResElecToFOKerSpaceHeatingBTUUsed,
         SuburbanResElecToFOKerWaterHeatingBTUUsed,
     )
@@ -1591,19 +1517,19 @@ def calc_res_ghg(
         SuburbanPerChangedFossilFuelUsed,
         SuburbanResLPGSpaceHeatingBTUUsed,
         SuburbanResLPGSpaceHeatingToElecBTUUsed,
-        PerEnergyToUseResLPGSpaceHeating,
+        RES_LPG_SPACE_USEFUL,
         SuburbanResLPGWaterHeatingBTUUsed,
         SuburbanResLPGWaterHeatingToElecBTUUsed,
-        PerEnergyToUseResLPGWaterHeating,
+        RES_LPG_WATER_USEFUL,
         SuburbanResLPGOtherBTUUsed,
         SuburbanResLPGOtherToElecBTUUsed,
-        PerEnergyToUseResLPGOther,
+        RES_LPG_OTHER_USEFUL,
         SuburbanResElecToLPGSpaceHeatingBTUUsed,
         SuburbanResElecToLPGWaterHeatingBTUUsed,
     )
 
     rural_res_btu_used = btu_used(
-        POP, pop_factor, rural_pop_percent, RuralBTUPerCapUsed, PerCapResEnergyUse
+        POP, pop_factor, rural_pop_percent, RuralBTUPerCapUsed, res_energy_change
     )
     RuralPerChangedFossilFuelUsed = rural_per_res_electrification - rural_per_res_elec_used
     rural_per_res_elec_used_to_FF_heating = rural_per_res_elec_used - rural_per_res_electrification
@@ -1745,19 +1671,19 @@ def calc_res_ghg(
     rural_elec_btu = calc_elec_BTU(
         RuralPerChangedFossilFuelUsed,
         RuralResElecSpaceHeatingBTUUsed,
-        PerEnergyToUseResElecSpaceHeating,
+        RES_ELEC_SPACE_USEFUL,
         RuralResElecWaterHeatingBTUUsed,
-        PerEnergyToUseResElecWaterHeating,
+        RES_ELEC_WATER_USEFUL,
         RuralResElecOtherBTUUsed,
-        PerEnergyToUseResElecOther,
+        RES_ELEC_OTHER_USEFUL,
         RuralResNGSpaceHeatingToElecBTUUsed,
         RuralResFOKerSpaceHeatingToElecBTUUsed,
         RuralResLPGSpaceHeatingToElecBTUUsed,
-        PerEnergyToUseResElecSpaceHeatingSwitch,
+        RES_ELEC_WATER_USEFUL_REPLACE_FF,
         RuralResNGWaterHeatingToElecBTUUsed,
         RuralResFOKerWaterHeatingToElecBTUUsed,
         RuralResLPGWaterHeatingToElecBTUUsed,
-        PerEnergyToUseResElecWaterHeatingSwitch,
+        RES_ELEC_OTHER_USEFUL_REPLACE_FF,
         RuralResNGOtherToElecBTUUsed,
         RuralResFOKerOtherToElecBTUUsed,
         RuralResLPGOtherToElecBTUUsed,
@@ -1772,13 +1698,13 @@ def calc_res_ghg(
         RuralPerChangedFossilFuelUsed,
         RuralResNGSpaceHeatingBTUUsed,
         RuralResNGSpaceHeatingToElecBTUUsed,
-        PerEnergyToUseResNGSpaceHeating,
+        RES_NG_SPACE_USEFUL,
         RuralResNGWaterHeatingBTUUsed,
         RuralResNGWaterHeatingToElecBTUUsed,
-        PerEnergyToUseResNGWaterHeating,
+        RES_NG_WATER_USEFUL,
         RuralResNGOtherBTUUsed,
         RuralResNGOtherToElecBTUUsed,
-        PerEnergyToUseResNGOther,
+        RES_NG_OTHER_USEFUL,
         RuralResElecToNGSpaceHeatingBTUUsed,
         RuralResElecToNGWaterHeatingBTUUsed,
     )
@@ -1786,13 +1712,13 @@ def calc_res_ghg(
         RuralPerChangedFossilFuelUsed,
         RuralResFOKerSpaceHeatingBTUUsed,
         RuralResFOKerSpaceHeatingToElecBTUUsed,
-        PerEnergyToUseResFOKerSpaceHeating,
+        RES_FOK_SPACE_USEFUL,
         RuralResFOKerWaterHeatingBTUUsed,
         RuralResFOKerWaterHeatingToElecBTUUsed,
-        PerEnergyToUseResFOKerWaterHeating,
+        RES_FOK_WATER_USEFUL,
         RuralResFOKerOtherBTUUsed,
         RuralResFOKerOtherToElecBTUUsed,
-        PerEnergyToUseResFOKerOther,
+        RES_FOK_OTHER_USEFUL,
         RuralResElecToFOKerSpaceHeatingBTUUsed,
         RuralResElecToFOKerWaterHeatingBTUUsed,
     )
@@ -1801,13 +1727,13 @@ def calc_res_ghg(
         RuralPerChangedFossilFuelUsed,
         RuralResLPGSpaceHeatingBTUUsed,
         RuralResLPGSpaceHeatingToElecBTUUsed,
-        PerEnergyToUseResLPGSpaceHeating,
+        RES_LPG_SPACE_USEFUL,
         RuralResLPGWaterHeatingBTUUsed,
         RuralResLPGWaterHeatingToElecBTUUsed,
-        PerEnergyToUseResLPGWaterHeating,
+        RES_LPG_WATER_USEFUL,
         RuralResLPGOtherBTUUsed,
         RuralResLPGOtherToElecBTUUsed,
-        PerEnergyToUseResLPGOther,
+        RES_LPG_OTHER_USEFUL,
         RuralResElecToLPGSpaceHeatingBTUUsed,
         RuralResElecToLPGWaterHeatingBTUUsed,
     )
@@ -1826,29 +1752,29 @@ def calc_res_ghg(
             )
             * MMT_LB
         )
-        * (1 - PerCombCapture / 100)
+        * (1 - ff_carbon_capture / 100)
     )
 
     res_ng_btu = urban_ng_btu + suburban_ng_btu + rural_ng_btu
     res_ng_ghg = (
         res_ng_btu
         * (1 / BTU_CCF_AVG)
-        * (1 + PerCapResEnergyUse / 100)
-        * MCFperCCF
+        * (1 + res_energy_change / 100)
+        * 0.1
         * CO2_LB_KCF_NG
         * MMT_LB
     )
     res_fok_ghg = (
         (urban_fok_btu + suburban_fok_btu + rural_fok_btu)
         * (1 / BTU_GAL_FOK)
-        * (1 + PerCapResEnergyUse / 100)
+        * (1 + res_energy_change / 100)
         * (CO2_MMT_KB_FOK * KB_G)
     )
 
     res_lpg_ghg = (
         (urban_lpg_btu + suburban_lpg_btu + rural_lpg_btu)
         * (1 / BTU_GAL_LPG)
-        * (1 + PerCapResEnergyUse / 100)
+        * (1 + res_energy_change / 100)
         * (CO2_MMT_KB_LPG * KB_G)
     )
 
@@ -1863,7 +1789,7 @@ def calc_ci_ghg(
     grid_ng,
     grid_oil,
     grid_other_ff,
-    PerCombCapture,
+    ff_carbon_capture,
     PerComIndEnergyUse,
 ):
     ComIndPerFossilFuelUsed = 100 - ComIndPerElectrification
@@ -1888,7 +1814,7 @@ def calc_ci_ghg(
             )
             * MMT_LB
         )
-        * (1 - PerCombCapture / 100)
+        * (1 - ff_carbon_capture / 100)
     )
 
     ComIndNGGHG = (
@@ -2021,7 +1947,7 @@ def calc_highway_ghg(
     grid_ng,
     grid_oil,
     grid_other_ff,
-    PerCombCapture,
+    ff_carbon_capture,
     PerEVMT,
     pop_factor,
     RegionalFleetMPG,
@@ -2050,7 +1976,7 @@ def calc_highway_ghg(
             + (grid_other_ff / 100 * CO2_LB_MWH_OTHER_FF)
         )
         * MMT_LB
-    ) * (1 - PerCombCapture / 100)
+    ) * (1 - ff_carbon_capture / 100)
 
     return highway_ghg
 
@@ -2064,7 +1990,7 @@ def calc_transit_ghg(
     grid_ng,
     grid_oil,
     grid_other_ff,
-    PerCombCapture,
+    ff_carbon_capture,
     PerTransRailRidership,
     pop_factor,
     rural_pop_percent,
@@ -2116,7 +2042,7 @@ def calc_transit_ghg(
             )
             * MMT_LB
         )
-        * (1 - PerCombCapture / 100)
+        * (1 - ff_carbon_capture / 100)
     )
 
     MobTransitDieselGHG = (
@@ -2162,7 +2088,7 @@ def calc_other_mobile_ghg(
     grid_other_ff,
     InterCityRailPerElecMotion,
     MarinePortPerElectrification,
-    PerCombCapture,
+    ff_carbon_capture,
     PerFreightRail,
     PerInterCityRail,
     PerMarinePort,
@@ -2191,7 +2117,7 @@ def calc_other_mobile_ghg(
             )
             * MMT_LB
         )
-        * (1 - PerCombCapture / 100)
+        * (1 - ff_carbon_capture / 100)
     )
 
     FreightRailDieselGHG = (
@@ -2221,7 +2147,7 @@ def calc_other_mobile_ghg(
             )
             * MMT_LB
         )
-        * (1 - PerCombCapture / 100)
+        * (1 - ff_carbon_capture / 100)
     )
 
     InterCityRailDieselGHG = (
@@ -2257,7 +2183,7 @@ def calc_other_mobile_ghg(
             )
             * MMT_LB
         )
-        * (1 - PerCombCapture / 100)
+        * (1 - ff_carbon_capture / 100)
     )
 
     MarinePortRFOGHG = (
@@ -2305,7 +2231,7 @@ def calc_other_mobile_ghg(
             )
             * MMT_LB
         )
-        * (1 - PerCombCapture / 100)
+        * (1 - ff_carbon_capture / 100)
     )
 
     OffroadMotGasGHG = (
@@ -2352,7 +2278,7 @@ def calc_non_energy_ghg(
     grid_oil,
     grid_other_ff,
     PerAg,
-    PerCapResEnergyUse,
+    res_energy_change,
     PerComIndEnergyUse,
     PerForestCoverage,
     PerIP,
@@ -2375,7 +2301,7 @@ def calc_non_energy_ghg(
         grid_ng,
         grid_oil,
         grid_other_ff,
-        PerCapResEnergyUse,
+        res_energy_change,
         pop_factor,
         rural_per_res_electrification,
         suburban_per_res_electrification,
@@ -2404,7 +2330,7 @@ def calc_non_energy_ghg(
         (ResNGConsumption + ComIndNGConsumption)
         * (1 / BTU_CCF_AVG)
         * 100
-        * MillionCFperCF
+        * 0.000001
         * (MMTCO2ePerMillionCFNG_CH4 + MMTCO2ePerMillionCFNG_CO2)
     )
 
@@ -2433,7 +2359,7 @@ def wrangle_data_for_bar_chart(user_inputs):
                 user_inputs["grid_ng"],
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
-                user_inputs["PerCapResEnergyUse"],
+                user_inputs["res_energy_change"],
                 user_inputs["pop_factor"],
                 user_inputs["rural_per_res_electrification"],
                 user_inputs["suburban_per_res_electrification"],
@@ -2448,7 +2374,7 @@ def wrangle_data_for_bar_chart(user_inputs):
                 user_inputs["grid_ng"],
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
-                user_inputs["PerCombCapture"],
+                user_inputs["ff_carbon_capture"],
                 user_inputs["PerComIndEnergyUse"],
             ),
             calc_highway_ghg(
@@ -2456,7 +2382,7 @@ def wrangle_data_for_bar_chart(user_inputs):
                 user_inputs["grid_ng"],
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
-                user_inputs["PerCombCapture"],
+                user_inputs["ff_carbon_capture"],
                 user_inputs["PerEVMT"],
                 user_inputs["pop_factor"],
                 user_inputs["RegionalFleetMPG"],
@@ -2470,7 +2396,7 @@ def wrangle_data_for_bar_chart(user_inputs):
                 user_inputs["grid_ng"],
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
-                user_inputs["PerCombCapture"],
+                user_inputs["ff_carbon_capture"],
                 user_inputs["PerTransRailRidership"],
                 user_inputs["pop_factor"],
                 user_inputs["rural_pop_percent"],
@@ -2489,7 +2415,7 @@ def wrangle_data_for_bar_chart(user_inputs):
                 user_inputs["grid_other_ff"],
                 user_inputs["InterCityRailPerElecMotion"],
                 user_inputs["MarinePortPerElectrification"],
-                user_inputs["PerCombCapture"],
+                user_inputs["ff_carbon_capture"],
                 user_inputs["PerFreightRail"],
                 user_inputs["PerInterCityRail"],
                 user_inputs["PerMarinePort"],
@@ -2503,7 +2429,7 @@ def wrangle_data_for_bar_chart(user_inputs):
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
                 user_inputs["PerAg"],
-                user_inputs["PerCapResEnergyUse"],
+                user_inputs["res_energy_change"],
                 user_inputs["PerComIndEnergyUse"],
                 user_inputs["PerForestCoverage"],
                 user_inputs["PerIP"],
@@ -2532,7 +2458,7 @@ def wrangle_data_for_stacked_chart(user_inputs):
                 user_inputs["grid_ng"],
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
-                user_inputs["PerCapResEnergyUse"],
+                user_inputs["res_energy_change"],
                 user_inputs["pop_factor"],
                 user_inputs["rural_per_res_electrification"],
                 user_inputs["suburban_per_res_electrification"],
@@ -2550,7 +2476,7 @@ def wrangle_data_for_stacked_chart(user_inputs):
                 user_inputs["grid_ng"],
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
-                user_inputs["PerCombCapture"],
+                user_inputs["ff_carbon_capture"],
                 user_inputs["PerComIndEnergyUse"],
             ),
         ],
@@ -2561,7 +2487,7 @@ def wrangle_data_for_stacked_chart(user_inputs):
                 user_inputs["grid_ng"],
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
-                user_inputs["PerCombCapture"],
+                user_inputs["ff_carbon_capture"],
                 user_inputs["PerEVMT"],
                 user_inputs["pop_factor"],
                 user_inputs["RegionalFleetMPG"],
@@ -2578,7 +2504,7 @@ def wrangle_data_for_stacked_chart(user_inputs):
                 user_inputs["grid_ng"],
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
-                user_inputs["PerCombCapture"],
+                user_inputs["ff_carbon_capture"],
                 user_inputs["PerTransRailRidership"],
                 user_inputs["pop_factor"],
                 user_inputs["rural_pop_percent"],
@@ -2600,7 +2526,7 @@ def wrangle_data_for_stacked_chart(user_inputs):
                 user_inputs["grid_other_ff"],
                 user_inputs["InterCityRailPerElecMotion"],
                 user_inputs["MarinePortPerElectrification"],
-                user_inputs["PerCombCapture"],
+                user_inputs["ff_carbon_capture"],
                 user_inputs["PerFreightRail"],
                 user_inputs["PerInterCityRail"],
                 user_inputs["PerMarinePort"],
@@ -2617,7 +2543,7 @@ def wrangle_data_for_stacked_chart(user_inputs):
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
                 user_inputs["PerAg"],
-                user_inputs["PerCapResEnergyUse"],
+                user_inputs["res_energy_change"],
                 user_inputs["PerComIndEnergyUse"],
                 user_inputs["PerForestCoverage"],
                 user_inputs["PerIP"],
@@ -2705,7 +2631,7 @@ def callback(attr, old, new):
         "urban_pop_percent": float(urban_pop_percentTextInput.value),
         "suburban_pop_percent": float(suburban_pop_percentTextInput.value),
         "rural_pop_percent": float(rural_pop_percentTextInput.value),
-        "PerCapResEnergyUse": PerCapResEnergyUseSlider.value,
+        "res_energy_change": res_energy_change_slider.value,
         "urban_per_res_electrification": urban_per_res_electrification_slider.value,
         "suburban_per_res_electrification": suburban_per_res_electrification_slider.value,
         "rural_per_res_electrification": rural_per_res_electrification_slider.value,
@@ -2733,7 +2659,7 @@ def callback(attr, old, new):
         "PerIP": PerIPSlider.value,
         "PerUrbanTreeCoverage": PerUrbanTreeCoverageSlider.value,
         "PerForestCoverage": PerForestCoverageSlider.value,
-        "PerCombCapture": PerCombCaptureSlider.value,
+        "ff_carbon_capture": ff_carbon_capture_slider.value,
         "AirCapture": AirCaptureSlider.value,  # TK, possibly
     }
 
@@ -2893,10 +2819,10 @@ rural_pop_percentTextInput = TextInput(
 rural_pop_percentTextInput.on_change("value", callback)
 
 # residential
-PerCapResEnergyUseSlider = Slider(
+res_energy_change_slider = Slider(
     start=-100, end=100, value=0, step=10, title="% Change in Per Capita Residential Energy Usage",
 )
-PerCapResEnergyUseSlider.on_change("value", callback)
+res_energy_change_slider.on_change("value", callback)
 urban_per_res_electrification_slider = Slider(
     start=UrbanMinPerResElectrification,
     end=100,
@@ -3088,14 +3014,14 @@ PerForestCoverageSlider = Slider(
 PerForestCoverageSlider.on_change("value", callback)
 
 # carbon capture
-PerCombCaptureSlider = Slider(
+ff_carbon_capture_slider = Slider(
     start=0,
     end=100,
     value=0,
     step=1,
     title="% Carbon Captured at Combustion Site for Electricity Generation",
 )
-PerCombCaptureSlider.on_change("value", callback)
+ff_carbon_capture_slider.on_change("value", callback)
 
 AirCaptureSlider = Slider(start=0, end=100, value=0, step=1, title="MMTCO2e Captured from the Air")
 AirCaptureSlider.on_change("value", callback)
@@ -3124,7 +3050,7 @@ grid_inputs = Column(
     grid_other_ffTextInput,
 )
 res_inputs = Column(
-    PerCapResEnergyUseSlider,
+    res_energy_change_slider,
     urban_per_res_electrification_slider,
     suburban_per_res_electrification_slider,
     rural_per_res_electrification_slider,
@@ -3156,7 +3082,7 @@ non_energy_inputs = Column(
     PerUrbanTreeCoverageSlider,
     PerForestCoverageSlider,
 )
-carbon_capture_inputs = Column(PerCombCaptureSlider, AirCaptureSlider)
+carbon_capture_inputs = Column(ff_carbon_capture_slider, AirCaptureSlider)
 
 all_inputs = [
     population_inputs,
