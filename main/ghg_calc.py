@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 from bokeh.layouts import row, column
-from bokeh.models import Slider, Column, ColumnDataSource, TextInput, Paragraph
+from bokeh.models import Slider, Column, ColumnDataSource, TextInput, Paragraph, LabelSet
 from bokeh.palettes import Viridis7, Spectral10
 from bokeh.plotting import figure, curdoc
 from bokeh.transform import dodge, cumsum
@@ -867,7 +867,7 @@ def calc_res_ghg(
     urban_res_btu_used = btu_used(
         POP, pop_factor, urban_pop_percent, URB_ENERGY_BTU, res_energy_change
     )
-
+    print(urban_per_res_electrification)
     UrbanPerChangedFossilFuelUsed = urban_per_res_electrification - URB_ENERGY_ELEC
     urban_res_elec_used_to_FF_heating = URB_ENERGY_ELEC - urban_per_res_electrification
 
@@ -2396,6 +2396,7 @@ def callback(attr, old, new):
 ###############
 # Create charts
 
+
 bar_chart_data = wrangle_data_for_bar_chart(user_inputs)
 bar_chart_source = ColumnDataSource(data=bar_chart_data)
 bar_chart = figure(
@@ -2425,6 +2426,31 @@ bar_chart.vbar(
 )
 bar_chart.xaxis.major_label_orientation = np.pi / 4
 bar_chart.x_range.range_padding = 0.1
+
+# temporary data labels
+labels_scenario = LabelSet(
+    x=dodge("Category", 0.15, range=bar_chart.x_range),
+    y="Scenario",
+    x_offset=-8,
+    y_offset=3,
+    text="Scenario",
+    text_font_size="9px",
+    level="glyph",
+    source=bar_chart_source,
+)
+labels_2015 = LabelSet(
+    x=dodge("Category", 0.15, range=bar_chart.x_range),
+    y="2015",
+    x_offset=-30,
+    y_offset=15,
+    text="2015",
+    text_font_size="9px",
+    level="glyph",
+    source=bar_chart_source,
+)
+bar_chart.add_layout(labels_scenario)
+bar_chart.add_layout(labels_2015)
+
 
 stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
 stacked_chart_source = ColumnDataSource(data=stacked_chart_data)
