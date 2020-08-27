@@ -21,14 +21,15 @@ def test_calc_res_ghg():
         g.grid_other_ff,
         g.res_energy_change,
         g.pop_factor,
-        g.rural_per_res_electrification,
-        g.suburban_per_res_electrification,
-        g.urban_per_res_electrification,
+        g.RUR_ENERGY_ELEC,
+        g.SUB_ENERGY_ELEC,
+        g.URB_ENERGY_ELEC,
         g.rural_pop_percent,
         g.suburban_pop_percent,
         g.urban_pop_percent,
     )
-    assert res_ghg == 15.030605191538607
+    # this had been 15.030605191538607
+    assert res_ghg == 15.201897046514375
 
 
 def test_calc_ci_ghg():
@@ -125,10 +126,10 @@ def test_calc_non_energy_ghg():
         g.PerWaste,
         g.PerWasteWater,
         g.pop_factor,
-        g.rural_per_res_electrification,
-        g.suburban_per_res_electrification,
-        g.urban_per_res_electrification,
+        g.RUR_ENERGY_ELEC,
+        g.SUB_ENERGY_ELEC,
+        g.URB_ENERGY_ELEC,
         g.urban_pop_percent,
     )
-
-    assert ghg == 7.114884838160576
+    # this had been 7.114884838160576
+    assert ghg == 7.10780219120066
