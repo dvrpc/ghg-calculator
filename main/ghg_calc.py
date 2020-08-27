@@ -342,6 +342,7 @@ PerUrbanElecBTUPerCapUsedWaterHeating = (
     UrbanBTUPerCapElecWaterHeatingUsed / UrbanBTUPerCapElecUsed * 100
 )
 PerUrbanElecBTUPerCapUsedOther = UrbanBTUPerCapElecOtherUsed / UrbanBTUPerCapElecUsed * 100
+
 PerSuburbanElecBTUPerCapUsedSpaceHeating = (
     SuburbanBTUPerCapElecSpaceHeatingUsed / SuburbanBTUPerCapElecUsed * 100
 )
@@ -474,10 +475,9 @@ RuralBTUPerCapUsed = (
     RuralBTUPerCapElecUsed + RuralBTUPerCapNGUsed + RuralBTUPerCapFOKerUsed + RuralBTUPerCapLPGUsed
 )  # BTU/Person
 
-
-def per_res_elec_used(btu_per_cap_elec_used, btu_per_cap_used):
-    return btu_per_cap_elec_used / btu_per_cap_used * 100
-
+urban_per_res_elec_used = UrbanBTUPerCapElecUsed / UrbanBTUPerCapUsed * 100
+suburban_per_res_elec_used = SuburbanBTUPerCapElecUsed / SuburbanBTUPerCapUsed * 100
+rural_per_res_elec_used = RuralBTUPerCapElecUsed / RuralBTUPerCapUsed * 100
 
 UrbanPerResNGUsed = UrbanBTUPerCapNGUsed / UrbanBTUPerCapUsed * 100
 SuburbanPerResNGUsed = SuburbanBTUPerCapNGUsed / SuburbanBTUPerCapUsed * 100
@@ -491,11 +491,7 @@ UrbanPerResLPGUsed = UrbanBTUPerCapLPGUsed / UrbanBTUPerCapUsed * 100
 SuburbanPerResLPGUsed = SuburbanBTUPerCapLPGUsed / SuburbanBTUPerCapUsed * 100
 RuralPerResLPGUsed = RuralBTUPerCapLPGUsed / RuralBTUPerCapUsed * 100
 
-
-def min_per_res_electrification(btu_per_cap_elec_other_used, btu_per_cap_used):
-    return btu_per_cap_elec_other_used / btu_per_cap_used * 100
-
-
+UrbanMinPerResElectrification = UrbanBTUPerCapElecOtherUsed / UrbanBTUPerCapUsed * 100
 UrbanPerResFossilFuelUsed2015 = UrbanPerResNGUsed + UrbanPerResFOKerUsed + UrbanPerResLPGUsed
 UrbanPerResFFNGUsed = UrbanPerResNGUsed / UrbanPerResFossilFuelUsed2015 * 100
 UrbanPerResFFFOKerUsed = UrbanPerResFOKerUsed / UrbanPerResFossilFuelUsed2015 * 100
@@ -541,7 +537,7 @@ UrbanPerResFFWaterHeatingLPGUsed = (
     UrbanBTUPerCapLPGWaterHeatingUsed / UrbanBTUPerCapFFWaterHeatingUsed * 100
 )
 
-
+SuburbanMinPerResElectrification = SuburbanBTUPerCapElecOtherUsed / SuburbanBTUPerCapUsed * 100
 SuburbanPerResFossilFuelUsed2015 = (
     SuburbanPerResNGUsed + SuburbanPerResFOKerUsed + SuburbanPerResLPGUsed
 )
@@ -589,6 +585,7 @@ SuburbanPerResFFWaterHeatingLPGUsed = (
     SuburbanBTUPerCapLPGWaterHeatingUsed / SuburbanBTUPerCapFFWaterHeatingUsed * 100
 )
 
+RuralMinPerResElectrification = RuralBTUPerCapElecOtherUsed / RuralBTUPerCapUsed * 100
 RuralPerResFossilFuelUsed2015 = RuralPerResNGUsed + RuralPerResFOKerUsed + RuralPerResLPGUsed
 RuralPerResFFNGUsed = RuralPerResNGUsed / RuralPerResFossilFuelUsed2015 * 100
 RuralPerResFFFOKerUsed = RuralPerResFOKerUsed / RuralPerResFossilFuelUsed2015 * 100
@@ -633,15 +630,10 @@ RuralPerResFFWaterHeatingFOKerUsed = (
 RuralPerResFFWaterHeatingLPGUsed = (
     RuralBTUPerCapLPGWaterHeatingUsed / RuralBTUPerCapFFWaterHeatingUsed * 100
 )
-urban_per_res_electrification = min_per_res_electrification(
-    UrbanBTUPerCapElecOtherUsed, UrbanBTUPerCapUsed
-)
-suburban_per_res_electrification = min_per_res_electrification(
-    SuburbanBTUPerCapElecOtherUsed, SuburbanBTUPerCapUsed
-)
-rural_per_res_electrification = min_per_res_electrification(
-    RuralBTUPerCapElecOtherUsed, RuralBTUPerCapUsed
-)
+
+urban_per_res_electrification = UrbanMinPerResElectrification
+suburban_per_res_electrification = SuburbanMinPerResElectrification
+rural_per_res_electrification = RuralMinPerResElectrification
 
 # Commercial/Industrial Stationary Energy from 2015 Inventory
 PerEnergyToUseComIndElec = 100
@@ -1185,7 +1177,6 @@ def calc_res_ghg(
         POP, pop_factor, urban_pop_percent, UrbanBTUPerCapUsed, PerCapResEnergyUse
     )
 
-    urban_per_res_elec_used = per_res_elec_used(UrbanBTUPerCapElecUsed, UrbanBTUPerCapUsed)
     UrbanPerChangedFossilFuelUsed = urban_per_res_electrification - urban_per_res_elec_used
     urban_res_elec_used_to_FF_heating = urban_per_res_elec_used - urban_per_res_electrification
 
@@ -1397,7 +1388,6 @@ def calc_res_ghg(
         POP, pop_factor, suburban_pop_percent, SuburbanBTUPerCapUsed, PerCapResEnergyUse
     )
 
-    suburban_per_res_elec_used = per_res_elec_used(SuburbanBTUPerCapElecUsed, SuburbanBTUPerCapUsed)
     SuburbanPerChangedFossilFuelUsed = suburban_per_res_electrification - suburban_per_res_elec_used
     suburban_per_res_elec_used_to_FF_heating = (
         suburban_per_res_elec_used - suburban_per_res_electrification
@@ -1615,7 +1605,6 @@ def calc_res_ghg(
     rural_res_btu_used = btu_used(
         POP, pop_factor, rural_pop_percent, RuralBTUPerCapUsed, PerCapResEnergyUse
     )
-    rural_per_res_elec_used = per_res_elec_used(RuralBTUPerCapElecUsed, RuralBTUPerCapUsed)
     RuralPerChangedFossilFuelUsed = rural_per_res_electrification - rural_per_res_elec_used
     rural_per_res_elec_used_to_FF_heating = rural_per_res_elec_used - rural_per_res_electrification
 
@@ -2909,27 +2898,27 @@ PerCapResEnergyUseSlider = Slider(
 )
 PerCapResEnergyUseSlider.on_change("value", callback)
 urban_per_res_electrification_slider = Slider(
-    start=min_per_res_electrification(UrbanBTUPerCapElecOtherUsed, UrbanBTUPerCapUsed),
+    start=UrbanMinPerResElectrification,
     end=100,
-    value=per_res_elec_used(UrbanBTUPerCapElecUsed, UrbanBTUPerCapUsed),
+    value=urban_per_res_elec_used,
     step=1,
     title="% Electrification of Residential End Uses in Urban Areas",
 )
 urban_per_res_electrification_slider.on_change("value", callback)
 
 suburban_per_res_electrification_slider = Slider(
-    start=min_per_res_electrification(SuburbanBTUPerCapElecOtherUsed, SuburbanBTUPerCapUsed),
+    start=SuburbanMinPerResElectrification,
     end=100,
-    value=per_res_elec_used(SuburbanBTUPerCapElecUsed, SuburbanBTUPerCapUsed),
+    value=suburban_per_res_elec_used,
     step=1,
     title="% Electrification of Residential End Uses in Suburban Areas",
 )
 suburban_per_res_electrification_slider.on_change("value", callback)
 
 rural_per_res_electrification_slider = Slider(
-    start=min_per_res_electrification(RuralBTUPerCapElecOtherUsed, RuralBTUPerCapUsed),
+    start=RuralMinPerResElectrification,
     end=100,
-    value=per_res_elec_used(RuralBTUPerCapElecUsed, RuralBTUPerCapUsed),
+    value=rural_per_res_elec_used,
     step=1,
     title="% Electrification of Residential End Uses in Rural Areas",
 )
