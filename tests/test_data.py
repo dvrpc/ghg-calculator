@@ -28,7 +28,7 @@ def test_calc_res_ghg():
         g.suburban_pop_percent,
         g.urban_pop_percent,
     )
-    assert res_ghg == 15.030605191538609
+    assert res_ghg == 15.030605191538607
 
 
 def test_calc_ci_ghg():
