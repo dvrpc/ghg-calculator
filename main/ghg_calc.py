@@ -677,612 +677,277 @@ def calc_res_ghg(
     ghg emissions.
     """
 
-    def btu_used(subsector_pop_percent, subsector_energy_btu):
-        return (
+    # calculate BTUs of residential energy use from urban areas
+    def calc_btu_by_res_sector(
+        pop_percent,
+        energy_btu,
+        energy_elec,
+        new_energy_elec,
+        energy_ng,
+        energy_fok,
+        energy_lpg,
+        elec_space,
+        elec_water,
+        elec_other,
+        ng_space,
+        ng_water,
+        ng_other,
+        fok_space,
+        fok_water,
+        fok_other,
+        lpg_space,
+        lpg_water,
+        lpg_other,
+        ff_ng,
+        ff_fok,
+        ff_lpg,
+        elec_heat_space,
+        elec_heat_water,
+        ff_space_ng,
+        ff_water_ng,
+        ff_space_fok,
+        ff_water_fok,
+        ff_space_lpg,
+        ff_water_lpg,
+    ):
+        """Calculate BTUs by residential sub-sector."""
+
+        # change in BTU/per from change in sub-sector pop & change in amt of energy consumption
+        btu = (
             POP
             * (1 + pop_factor / 100)
-            * (subsector_pop_percent / 100)
-            * subsector_energy_btu
+            * (pop_percent / 100)
+            * energy_btu
             * (1 + res_energy_change / 100)
         )
 
-    # TODO: rename variables below - I think it can be some form of "base" and "additional"
+        # calculate the base amounts, which will be adjusted below depending on change in %
+        # of energy use that is electric
+        base_elec_btu = btu * (energy_elec / 100)
+        base_elec_space_btu = base_elec_btu * elec_space
+        base_elec_water_btu = base_elec_btu * elec_water
+        base_elec_other_btu = base_elec_btu * elec_other
 
-    # calculate BTUs of residential energy use from urban areas
-    # change URB_ENERGY_BTU based on urban_pop_percent
+        base_ng_btu = btu * (energy_ng / 100)
+        base_ng_space_btu = base_ng_btu * ng_space
+        base_ng_water_btu = base_ng_btu * ng_water
+        base_ng_other_btu = base_ng_btu * ng_other
 
-    # change in BTU/person from change in urban population and change in amount of energy consumption
-    urban_btu = btu_used(urban_pop_percent, URB_ENERGY_BTU)
+        base_fok_btu = btu * (energy_fok / 100)
+        base_fok_space_btu = base_fok_btu * fok_space
+        base_fok_water_btu = base_fok_btu * fok_water
+        base_fok_other_btu = base_fok_btu * fok_other
 
-    # these are the base amounts, will be added to/subtracted below, depending on change in %
-    # of energy use that is electric
-    base_urb_elec_btu = urban_btu * (URB_ENERGY_ELEC / 100)
-    base_urb_elec_space_btu = base_urb_elec_btu * URB_ELEC_SPACE
-    base_urb_elec_water_btu = base_urb_elec_btu * URB_ELEC_WATER
-    base_urb_elec_other_btu = base_urb_elec_btu * URB_ELEC_OTHER
+        base_lpg_btu = btu * (energy_lpg / 100)
+        base_lpg_space_btu = base_lpg_btu * lpg_space
+        base_lpg_water_btu = base_lpg_btu * lpg_water
+        base_lpg_other_btu = base_lpg_btu * lpg_other
 
-    base_urb_ng_btu = urban_btu * (URB_ENERGY_NG / 100)
-    base_urb_ng_space_btu = base_urb_ng_btu * URB_NG_SPACE
-    base_urb_ng_water_btu = base_urb_ng_btu * URB_NG_WATER
-    base_urb_ng_other_btu = base_urb_ng_btu * URB_NG_OTHER
+        #######
+        # BTU/per change resulting from change in % subsector energy use that is electric
+        # switch fossil fuels (and all uses) to electricity or electricity heating uses to ff
 
-    base_urb_fok_btu = urban_btu * (URB_ENERGY_FOK / 100)
-    base_urb_fok_space_btu = base_urb_fok_btu * URB_FOK_SPACE
-    base_urb_fok_water_btu = base_urb_fok_btu * URB_FOK_WATER
-    base_urb_fok_other_btu = base_urb_fok_btu * URB_FOK_OTHER
+        change_elec_use = new_energy_elec - energy_elec
 
-    base_urb_lpg_btu = urban_btu * (URB_ENERGY_LPG / 100)
-    base_urb_lpg_space_btu = base_urb_lpg_btu * URB_LPG_SPACE
-    base_urb_lpg_water_btu = base_urb_lpg_btu * URB_LPG_WATER
-    base_urb_lpg_other_btu = base_urb_lpg_btu * URB_LPG_OTHER
+        if change_elec_use >= 0:  # more energy is electric, therefore less FF used
+            ng_space_btu_to_elec = btu * (change_elec_use / 100) * ff_ng * ng_space
+            ng_water_btu_to_elec = btu * (change_elec_use / 100) * ff_ng * ng_water
+            ng_other_btu_to_elec = btu * (change_elec_use / 100) * ff_ng * ng_other
+            fok_space_btu_to_elec = btu * (change_elec_use / 100) * ff_fok * fok_space
+            fok_water_btu_to_elec = btu * (change_elec_use / 100) * ff_fok * fok_water
+            fok_other_btu_to_elec = btu * (change_elec_use / 100) * ff_fok * fok_other
+            lpg_space_btu_to_elec = btu * (change_elec_use / 100) * ff_lpg * lpg_space
+            lpg_water_btu_to_elec = btu * (change_elec_use / 100) * ff_lpg * lpg_water
+            lpg_other_btu_to_elec = btu * (change_elec_use / 100) * ff_lpg * lpg_other
 
-    #########
-    # BTU change resulting from change in % subsector energy use that is electric
-
-    change_elec_use = urb_energy_elec - URB_ENERGY_ELEC
-
-    # Determine whether fossil fuels (and all uses) are switched to electricity or if electricity
-    # heating uses are switched to fossil fuel heating uses
-    if change_elec_use >= 0:  # less FF used
-
-        # Fuel Switch to Electric
-        urb_ng_space_btu_to_elec = urban_btu * (change_elec_use / 100) * URB_FF_NG * URB_NG_SPACE
-        urb_ng_water_btu_to_elec = urban_btu * (change_elec_use / 100) * URB_FF_NG * URB_NG_WATER
-        urb_ng_other_btu_to_elec = urban_btu * (change_elec_use / 100) * URB_FF_NG * URB_NG_OTHER
-        urb_fok_space_btu_to_elec = urban_btu * (change_elec_use / 100) * URB_FF_FOK * URB_FOK_SPACE
-        urb_fok_water_btu_to_elec = urban_btu * (change_elec_use / 100) * URB_FF_FOK * URB_FOK_WATER
-        urb_fok_other_btu_to_elec = urban_btu * (change_elec_use / 100) * URB_FF_FOK * URB_FOK_OTHER
-        urb_lpg_space_btu_to_elec = urban_btu * (change_elec_use / 100) * URB_FF_LPG * URB_LPG_SPACE
-        urb_lpg_water_btu_to_elec = urban_btu * (change_elec_use / 100) * URB_FF_LPG * URB_LPG_WATER
-        urb_lpg_other_btu_to_elec = urban_btu * (change_elec_use / 100) * URB_FF_LPG * URB_LPG_OTHER
-
-        urban_elec_btu = (
-            (base_urb_elec_space_btu / RES_ELEC_SPACE_USEFUL)
-            + (base_urb_elec_water_btu / RES_ELEC_WATER_USEFUL)
-            + (base_urb_elec_other_btu / RES_ELEC_OTHER_USEFUL)
-            + (
-                (urb_ng_space_btu_to_elec + urb_fok_space_btu_to_elec + urb_lpg_space_btu_to_elec)
-                / RES_ELEC_WATER_USEFUL_REPLACE_FF
+            elec_btu = (
+                (base_elec_space_btu / RES_ELEC_SPACE_USEFUL)
+                + (base_elec_water_btu / RES_ELEC_WATER_USEFUL)
+                + (base_elec_other_btu / RES_ELEC_OTHER_USEFUL)
+                + (
+                    (ng_space_btu_to_elec + fok_space_btu_to_elec + lpg_space_btu_to_elec)
+                    / RES_ELEC_WATER_USEFUL_REPLACE_FF
+                )
+                + (
+                    (ng_water_btu_to_elec + fok_water_btu_to_elec + lpg_water_btu_to_elec)
+                    / RES_ELEC_OTHER_USEFUL_REPLACE_FF
+                )
+                + (
+                    (ng_other_btu_to_elec + fok_other_btu_to_elec + lpg_other_btu_to_elec)
+                    / RES_ELEC_OTHER_USEFUL
+                )
             )
-            + (
-                (urb_ng_water_btu_to_elec + urb_fok_water_btu_to_elec + urb_lpg_water_btu_to_elec)
-                / RES_ELEC_OTHER_USEFUL_REPLACE_FF
+            ng_btu = (
+                ((base_ng_space_btu - ng_space_btu_to_elec) / RES_NG_SPACE_USEFUL)
+                + ((base_ng_water_btu - ng_water_btu_to_elec) / RES_NG_WATER_USEFUL)
+                + ((base_ng_other_btu - ng_other_btu_to_elec) / RES_NG_OTHER_USEFUL)
             )
-            + (
-                (urb_ng_other_btu_to_elec + urb_fok_other_btu_to_elec + urb_lpg_other_btu_to_elec)
-                / RES_ELEC_OTHER_USEFUL
+            fok_btu = (
+                ((base_fok_space_btu - fok_space_btu_to_elec) / RES_FOK_SPACE_USEFUL)
+                + ((base_fok_water_btu - fok_water_btu_to_elec) / RES_FOK_WATER_USEFUL)
+                + ((base_fok_other_btu - fok_other_btu_to_elec) / RES_FOK_OTHER_USEFUL)
             )
-        )
-        urban_ng_btu = (
-            ((base_urb_ng_space_btu - urb_ng_space_btu_to_elec) / RES_NG_SPACE_USEFUL)
-            + ((base_urb_ng_water_btu - urb_ng_water_btu_to_elec) / RES_NG_WATER_USEFUL)
-            + ((base_urb_ng_other_btu - urb_ng_other_btu_to_elec) / RES_NG_OTHER_USEFUL)
-        )
-        urban_fok_btu = (
-            ((base_urb_fok_space_btu - urb_fok_space_btu_to_elec) / RES_FOK_SPACE_USEFUL)
-            + ((base_urb_fok_water_btu - urb_fok_water_btu_to_elec) / RES_FOK_WATER_USEFUL)
-            + ((base_urb_fok_other_btu - urb_fok_other_btu_to_elec) / RES_FOK_OTHER_USEFUL)
-        )
-        urban_lpg_btu = (
-            ((base_urb_lpg_space_btu - urb_lpg_space_btu_to_elec) / RES_LPG_SPACE_USEFUL)
-            + ((base_urb_lpg_water_btu - urb_lpg_water_btu_to_elec) / RES_LPG_WATER_USEFUL)
-            + ((base_urb_lpg_other_btu - urb_lpg_other_btu_to_elec) / RES_LPG_OTHER_USEFUL)
-        )
-    else:  # more FF used
-        # Fuel Switch to Fossil Fuels heating uses
-        urb_elec_space_btu_to_ng = (
-            base_urb_elec_btu * (-(change_elec_use) / 100) * URB_ELEC_HEAT_SPACE * URB_FF_SPACE_NG
-        )
+            lpg_btu = (
+                ((base_lpg_space_btu - lpg_space_btu_to_elec) / RES_LPG_SPACE_USEFUL)
+                + ((base_lpg_water_btu - lpg_water_btu_to_elec) / RES_LPG_WATER_USEFUL)
+                + ((base_lpg_other_btu - lpg_other_btu_to_elec) / RES_LPG_OTHER_USEFUL)
+            )
+        else:  # less energy is electric, therefore more FF used
+            elec_space_btu_to_ng = (
+                base_elec_btu * (-(change_elec_use) / 100) * elec_heat_space * ff_space_ng
+            )
 
-        urb_elec_water_btu_to_ng = (
-            base_urb_elec_btu * (-(change_elec_use) / 100) * URB_ELEC_HEAT_WATER * URB_FF_WATER_NG
-        )
+            elec_water_btu_to_ng = (
+                base_elec_btu * (-(change_elec_use) / 100) * elec_heat_water * ff_water_ng
+            )
 
-        urb_elec_space_btu_to_fok = (
-            base_urb_elec_btu * (-(change_elec_use) / 100) * URB_ELEC_HEAT_SPACE * URB_FF_SPACE_FOK
-        )
+            elec_space_btu_to_fok = (
+                base_elec_btu * (-(change_elec_use) / 100) * elec_heat_space * ff_space_fok
+            )
 
-        urb_elec_water_btu_to_fok = (
-            base_urb_elec_btu * (-(change_elec_use) / 100) * URB_ELEC_HEAT_WATER * URB_FF_WATER_FOK
-        )
+            elec_water_btu_to_fok = (
+                base_elec_btu * (-(change_elec_use) / 100) * elec_heat_water * ff_water_fok
+            )
 
-        urb_elec_space_btu_to_lpg = (
-            base_urb_elec_btu * (-(change_elec_use) / 100) * URB_ELEC_HEAT_SPACE * URB_FF_SPACE_LPG
-        )
+            elec_space_btu_to_lpg = (
+                base_elec_btu * (-(change_elec_use) / 100) * elec_heat_space * ff_space_lpg
+            )
 
-        urb_elec_water_btu_to_lpg = (
-            base_urb_elec_btu * (-(change_elec_use) / 100) * URB_ELEC_HEAT_WATER * URB_FF_WATER_LPG
-        )
+            elec_water_btu_to_lpg = (
+                base_elec_btu * (-(change_elec_use) / 100) * elec_heat_water * ff_water_lpg
+            )
 
-        urban_elec_btu = (
-            (base_urb_elec_other_btu / RES_ELEC_OTHER_USEFUL)
-            + (
-                (
-                    base_urb_elec_space_btu
-                    - (
-                        urb_elec_space_btu_to_ng
-                        + urb_elec_space_btu_to_fok
-                        + urb_elec_space_btu_to_lpg
+            elec_btu = (
+                (base_elec_other_btu / RES_ELEC_OTHER_USEFUL)
+                + (
+                    (
+                        base_elec_space_btu
+                        - (elec_space_btu_to_ng + elec_space_btu_to_fok + elec_space_btu_to_lpg)
                     )
+                    / RES_ELEC_SPACE_USEFUL
                 )
-                / RES_ELEC_SPACE_USEFUL
-            )
-            + (
-                (
-                    base_urb_elec_water_btu
-                    - (
-                        urb_elec_water_btu_to_ng
-                        + urb_elec_water_btu_to_fok
-                        + urb_elec_water_btu_to_lpg
+                + (
+                    (
+                        base_elec_water_btu
+                        - (elec_water_btu_to_ng + elec_water_btu_to_fok + elec_water_btu_to_lpg)
                     )
+                    / RES_ELEC_WATER_USEFUL
                 )
-                / RES_ELEC_WATER_USEFUL
             )
-        )
-        urban_ng_btu = (
-            (base_urb_ng_other_btu / RES_NG_OTHER_USEFUL)
-            + ((base_urb_ng_space_btu + urb_elec_space_btu_to_ng) / RES_NG_SPACE_USEFUL)
-            + ((base_urb_ng_water_btu + urb_elec_water_btu_to_ng) / RES_NG_WATER_USEFUL)
-        )
-        urban_fok_btu = (
-            (base_urb_fok_other_btu / RES_FOK_OTHER_USEFUL)
-            + ((base_urb_fok_space_btu + urb_elec_space_btu_to_fok) / RES_FOK_SPACE_USEFUL)
-            + ((base_urb_fok_water_btu + urb_elec_water_btu_to_fok) / RES_FOK_WATER_USEFUL)
-        )
-        urban_lpg_btu = (
-            (base_urb_lpg_other_btu / RES_LPG_OTHER_USEFUL)
-            + ((base_urb_lpg_space_btu + urb_elec_space_btu_to_lpg) / RES_LPG_SPACE_USEFUL)
-            + ((base_urb_lpg_water_btu + urb_elec_water_btu_to_lpg) / RES_LPG_WATER_USEFUL)
-        )
+            ng_btu = (
+                (base_ng_other_btu / RES_NG_OTHER_USEFUL)
+                + ((base_ng_space_btu + elec_space_btu_to_ng) / RES_NG_SPACE_USEFUL)
+                + ((base_ng_water_btu + elec_water_btu_to_ng) / RES_NG_WATER_USEFUL)
+            )
+            fok_btu = (
+                (base_fok_other_btu / RES_FOK_OTHER_USEFUL)
+                + ((base_fok_space_btu + elec_space_btu_to_fok) / RES_FOK_SPACE_USEFUL)
+                + ((base_fok_water_btu + elec_water_btu_to_fok) / RES_FOK_WATER_USEFUL)
+            )
+            lpg_btu = (
+                (base_lpg_other_btu / RES_LPG_OTHER_USEFUL)
+                + ((base_lpg_space_btu + elec_space_btu_to_lpg) / RES_LPG_SPACE_USEFUL)
+                + ((base_lpg_water_btu + elec_water_btu_to_lpg) / RES_LPG_WATER_USEFUL)
+            )
+        return elec_btu, ng_btu, fok_btu, lpg_btu
 
-    sub_btu = btu_used(suburban_pop_percent, SUB_ENERGY_BTU)
-
-    SuburbanPerChangedFossilFuelUsed = sub_energy_elec - SUB_ENERGY_ELEC
-    suburban_per_res_elec_used_to_FF_heating = SUB_ENERGY_ELEC - sub_energy_elec
-
-    SuburbanResElecBTUUsed = sub_btu * (SUB_ENERGY_ELEC / 100)
-    SuburbanResElecSpaceHeatingBTUUsed = SuburbanResElecBTUUsed * SUB_ELEC_SPACE
-    SuburbanResElecWaterHeatingBTUUsed = SuburbanResElecBTUUsed * SUB_ELEC_WATER
-    SuburbanResElecOtherBTUUsed = SuburbanResElecBTUUsed * SUB_ELEC_OTHER
-
-    SuburbanResNGBTUUsed = sub_btu * (SUB_ENERGY_NG / 100)
-    SuburbanResNGSpaceHeatingBTUUsed = SuburbanResNGBTUUsed * SUB_NG_SPACE
-    SuburbanResNGWaterHeatingBTUUsed = SuburbanResNGBTUUsed * SUB_NG_WATER
-    SuburbanResNGOtherBTUUsed = SuburbanResNGBTUUsed * SUB_NG_OTHER
-
-    SuburbanResFOKerBTUUsed = sub_btu * (SUB_ENERGY_FOK / 100)
-    SuburbanResFOKerSpaceHeatingBTUUsed = SuburbanResFOKerBTUUsed * SUB_FOK_SPACE
-    SuburbanResFOKerWaterHeatingBTUUsed = SuburbanResFOKerBTUUsed * SUB_FOK_WATER
-    SuburbanResFOKerOtherBTUUsed = SuburbanResFOKerBTUUsed * SUB_FOK_OTHER
-
-    SuburbanResLPGBTUUsed = sub_btu * (SUB_ENERGY_LPG / 100)
-    SuburbanResLPGSpaceHeatingBTUUsed = SuburbanResLPGBTUUsed * SUB_LPG_SPACE
-    SuburbanResLPGWaterHeatingBTUUsed = SuburbanResLPGBTUUsed * SUB_LPG_WATER
-    SuburbanResLPGOtherBTUUsed = SuburbanResLPGBTUUsed * SUB_LPG_OTHER
-
-    # Fuel Switch to Electric
-    SuburbanResNGSpaceHeatingToElecBTUUsed = (
-        sub_btu * (SuburbanPerChangedFossilFuelUsed / 100) * SUB_FF_NG * SUB_NG_SPACE
-    )
-    SuburbanResNGWaterHeatingToElecBTUUsed = (
-        sub_btu * (SuburbanPerChangedFossilFuelUsed / 100) * SUB_FF_NG * SUB_NG_WATER
-    )
-    SuburbanResNGOtherToElecBTUUsed = (
-        sub_btu * (SuburbanPerChangedFossilFuelUsed / 100) * SUB_FF_NG * SUB_NG_OTHER
-    )
-    SuburbanResFOKerSpaceHeatingToElecBTUUsed = (
-        sub_btu * (SuburbanPerChangedFossilFuelUsed / 100) * SUB_FF_FOK * SUB_FOK_SPACE
-    )
-    SuburbanResFOKerWaterHeatingToElecBTUUsed = (
-        sub_btu * (SuburbanPerChangedFossilFuelUsed / 100) * SUB_FF_FOK * SUB_FOK_WATER
-    )
-    SuburbanResFOKerOtherToElecBTUUsed = (
-        sub_btu * (SuburbanPerChangedFossilFuelUsed / 100) * SUB_FF_FOK * SUB_FOK_OTHER
-    )
-    SuburbanResLPGSpaceHeatingToElecBTUUsed = (
-        sub_btu * (SuburbanPerChangedFossilFuelUsed / 100) * SUB_FF_LPG * SUB_LPG_SPACE
-    )
-    SuburbanResLPGWaterHeatingToElecBTUUsed = (
-        sub_btu * (SuburbanPerChangedFossilFuelUsed / 100) * SUB_FF_LPG * SUB_LPG_WATER
-    )
-    SuburbanResLPGOtherToElecBTUUsed = (
-        sub_btu * (SuburbanPerChangedFossilFuelUsed / 100) * SUB_FF_LPG * SUB_LPG_OTHER
+    urban_elec_btu, urban_ng_btu, urban_fok_btu, urban_lpg_btu = calc_btu_by_res_sector(
+        urban_pop_percent,
+        URB_ENERGY_BTU,
+        URB_ENERGY_ELEC,
+        urb_energy_elec,
+        URB_ENERGY_NG,
+        URB_ENERGY_FOK,
+        URB_ENERGY_LPG,
+        URB_ELEC_SPACE,
+        URB_ELEC_WATER,
+        URB_ELEC_OTHER,
+        URB_NG_SPACE,
+        URB_NG_WATER,
+        URB_NG_OTHER,
+        URB_FOK_SPACE,
+        URB_FOK_WATER,
+        URB_FOK_OTHER,
+        URB_LPG_SPACE,
+        URB_LPG_WATER,
+        URB_LPG_OTHER,
+        URB_FF_NG,
+        URB_FF_FOK,
+        URB_FF_LPG,
+        URB_ELEC_HEAT_SPACE,
+        URB_ELEC_HEAT_WATER,
+        URB_FF_SPACE_NG,
+        URB_FF_WATER_NG,
+        URB_FF_SPACE_FOK,
+        URB_FF_WATER_FOK,
+        URB_FF_SPACE_LPG,
+        URB_FF_WATER_LPG,
     )
 
-    # Fuel Switch to Fossil Fuels heating uses
-    SuburbanResElecToNGSpaceHeatingBTUUsed = (
-        SuburbanResElecBTUUsed
-        * (suburban_per_res_elec_used_to_FF_heating / 100)
-        * SUB_ELEC_HEAT_SPACE
-        * SUB_FF_SPACE_NG
+    suburban_elec_btu, suburban_ng_btu, suburban_fok_btu, suburban_lpg_btu = calc_btu_by_res_sector(
+        suburban_pop_percent,
+        SUB_ENERGY_BTU,
+        SUB_ENERGY_ELEC,
+        sub_energy_elec,
+        SUB_ENERGY_NG,
+        SUB_ENERGY_FOK,
+        SUB_ENERGY_LPG,
+        SUB_ELEC_SPACE,
+        SUB_ELEC_WATER,
+        SUB_ELEC_OTHER,
+        SUB_NG_SPACE,
+        SUB_NG_WATER,
+        SUB_NG_OTHER,
+        SUB_FOK_SPACE,
+        SUB_FOK_WATER,
+        SUB_FOK_OTHER,
+        SUB_LPG_SPACE,
+        SUB_LPG_WATER,
+        SUB_LPG_OTHER,
+        SUB_FF_NG,
+        SUB_FF_FOK,
+        SUB_FF_LPG,
+        SUB_ELEC_HEAT_SPACE,
+        SUB_ELEC_HEAT_WATER,
+        SUB_FF_SPACE_NG,
+        SUB_FF_WATER_NG,
+        SUB_FF_SPACE_FOK,
+        SUB_FF_WATER_FOK,
+        SUB_FF_SPACE_LPG,
+        SUB_FF_WATER_LPG,
     )
-
-    SuburbanResElecToNGWaterHeatingBTUUsed = (
-        SuburbanResElecBTUUsed
-        * (suburban_per_res_elec_used_to_FF_heating / 100)
-        * SUB_ELEC_HEAT_WATER
-        * SUB_FF_WATER_NG
+    rural_elec_btu, rural_ng_btu, rural_fok_btu, rural_lpg_btu = calc_btu_by_res_sector(
+        rural_pop_percent,
+        RUR_ENERGY_BTU,
+        RUR_ENERGY_ELEC,
+        rur_energy_elec,
+        RUR_ENERGY_NG,
+        RUR_ENERGY_FOK,
+        RUR_ENERGY_LPG,
+        RUR_ELEC_SPACE,
+        RUR_ELEC_WATER,
+        RUR_ELEC_OTHER,
+        RUR_NG_SPACE,
+        RUR_NG_WATER,
+        RUR_NG_OTHER,
+        RUR_FOK_SPACE,
+        RUR_FOK_WATER,
+        RUR_FOK_OTHER,
+        RUR_LPG_SPACE,
+        RUR_LPG_WATER,
+        RUR_LPG_OTHER,
+        RUR_FF_NG,
+        RUR_FF_FOK,
+        RUR_FF_LPG,
+        RUR_ELEC_HEAT_SPACE,
+        RUR_ELEC_HEAT_WATER,
+        RUR_FF_SPACE_NG,
+        RUR_FF_WATER_NG,
+        RUR_FF_SPACE_FOK,
+        RUR_FF_WATER_FOK,
+        RUR_FF_SPACE_LPG,
+        RUR_FF_WATER_LPG,
     )
-
-    SuburbanResElecToFOKerSpaceHeatingBTUUsed = (
-        SuburbanResElecBTUUsed
-        * (suburban_per_res_elec_used_to_FF_heating / 100)
-        * SUB_ELEC_HEAT_SPACE
-        * SUB_FF_SPACE_FOK
-    )
-
-    SuburbanResElecToFOKerWaterHeatingBTUUsed = (
-        SuburbanResElecBTUUsed
-        * (suburban_per_res_elec_used_to_FF_heating / 100)
-        * SUB_ELEC_HEAT_WATER
-        * SUB_FF_WATER_FOK
-    )
-
-    SuburbanResElecToLPGSpaceHeatingBTUUsed = (
-        SuburbanResElecBTUUsed
-        * (suburban_per_res_elec_used_to_FF_heating / 100)
-        * SUB_ELEC_HEAT_SPACE
-        * SUB_FF_SPACE_LPG
-    )
-
-    SuburbanResElecToLPGWaterHeatingBTUUsed = (
-        SuburbanResElecBTUUsed
-        * (suburban_per_res_elec_used_to_FF_heating / 100)
-        * SUB_ELEC_HEAT_WATER
-        * SUB_FF_WATER_LPG
-    )
-
-    # Determine whether fossil fuels (and all uses) are switched to electricity or if electricity
-    # heating uses are switched to fossil fuel heating uses
-    if SuburbanPerChangedFossilFuelUsed >= 0:
-        suburban_elec_btu = (
-            (SuburbanResElecSpaceHeatingBTUUsed / RES_ELEC_SPACE_USEFUL)
-            + (SuburbanResElecWaterHeatingBTUUsed / RES_ELEC_WATER_USEFUL)
-            + (SuburbanResElecOtherBTUUsed / RES_ELEC_OTHER_USEFUL)
-            + (
-                (
-                    SuburbanResNGSpaceHeatingToElecBTUUsed
-                    + SuburbanResFOKerSpaceHeatingToElecBTUUsed
-                    + SuburbanResLPGSpaceHeatingToElecBTUUsed
-                )
-                / RES_ELEC_WATER_USEFUL_REPLACE_FF
-            )
-            + (
-                (
-                    SuburbanResNGWaterHeatingToElecBTUUsed
-                    + SuburbanResFOKerWaterHeatingToElecBTUUsed
-                    + SuburbanResLPGWaterHeatingToElecBTUUsed
-                )
-                / RES_ELEC_OTHER_USEFUL_REPLACE_FF
-            )
-            + (
-                (
-                    SuburbanResNGOtherToElecBTUUsed
-                    + SuburbanResFOKerOtherToElecBTUUsed
-                    + SuburbanResLPGOtherToElecBTUUsed
-                )
-                / RES_ELEC_OTHER_USEFUL
-            )
-        )
-        suburban_ng_btu = (
-            (
-                (SuburbanResNGSpaceHeatingBTUUsed - SuburbanResNGSpaceHeatingToElecBTUUsed)
-                / RES_NG_SPACE_USEFUL
-            )
-            + (
-                (SuburbanResNGWaterHeatingBTUUsed - SuburbanResNGWaterHeatingToElecBTUUsed)
-                / RES_NG_WATER_USEFUL
-            )
-            + ((SuburbanResNGOtherBTUUsed - SuburbanResNGOtherToElecBTUUsed) / RES_NG_OTHER_USEFUL)
-        )
-        suburban_fok_btu = (
-            (
-                (SuburbanResFOKerSpaceHeatingBTUUsed - SuburbanResFOKerSpaceHeatingToElecBTUUsed)
-                / RES_FOK_SPACE_USEFUL
-            )
-            + (
-                (SuburbanResFOKerWaterHeatingBTUUsed - SuburbanResFOKerWaterHeatingToElecBTUUsed)
-                / RES_FOK_WATER_USEFUL
-            )
-            + (
-                (SuburbanResFOKerOtherBTUUsed - SuburbanResFOKerOtherToElecBTUUsed)
-                / RES_FOK_OTHER_USEFUL
-            )
-        )
-        suburban_lpg_btu = (
-            (
-                (SuburbanResLPGSpaceHeatingBTUUsed - SuburbanResLPGSpaceHeatingToElecBTUUsed)
-                / RES_LPG_SPACE_USEFUL
-            )
-            + (
-                (SuburbanResLPGWaterHeatingBTUUsed - SuburbanResLPGWaterHeatingToElecBTUUsed)
-                / RES_LPG_WATER_USEFUL
-            )
-            + (
-                (SuburbanResLPGOtherBTUUsed - SuburbanResLPGOtherToElecBTUUsed)
-                / RES_LPG_OTHER_USEFUL
-            )
-        )
-    else:
-        suburban_elec_btu = (
-            (SuburbanResElecOtherBTUUsed / RES_ELEC_OTHER_USEFUL)
-            + (
-                (
-                    SuburbanResElecSpaceHeatingBTUUsed
-                    - (
-                        SuburbanResElecToNGSpaceHeatingBTUUsed
-                        + SuburbanResElecToFOKerSpaceHeatingBTUUsed
-                        + SuburbanResElecToLPGSpaceHeatingBTUUsed
-                    )
-                )
-                / RES_ELEC_SPACE_USEFUL
-            )
-            + (
-                (
-                    SuburbanResElecWaterHeatingBTUUsed
-                    - (
-                        SuburbanResElecToNGWaterHeatingBTUUsed
-                        + SuburbanResElecToFOKerWaterHeatingBTUUsed
-                        + SuburbanResElecToLPGWaterHeatingBTUUsed
-                    )
-                )
-                / RES_ELEC_WATER_USEFUL
-            )
-        )
-        suburban_ng_btu = (
-            (SuburbanResNGOtherBTUUsed / RES_NG_OTHER_USEFUL)
-            + (
-                (SuburbanResNGSpaceHeatingBTUUsed + SuburbanResElecToNGSpaceHeatingBTUUsed)
-                / RES_NG_SPACE_USEFUL
-            )
-            + (
-                (SuburbanResNGWaterHeatingBTUUsed + SuburbanResElecToNGWaterHeatingBTUUsed)
-                / RES_NG_WATER_USEFUL
-            )
-        )
-        suburban_fok_btu = (
-            (SuburbanResFOKerOtherBTUUsed / RES_FOK_OTHER_USEFUL)
-            + (
-                (SuburbanResFOKerSpaceHeatingBTUUsed + SuburbanResElecToFOKerSpaceHeatingBTUUsed)
-                / RES_FOK_SPACE_USEFUL
-            )
-            + (
-                (SuburbanResFOKerWaterHeatingBTUUsed + SuburbanResElecToFOKerWaterHeatingBTUUsed)
-                / RES_FOK_WATER_USEFUL
-            )
-        )
-        suburban_lpg_btu = (
-            (SuburbanResLPGOtherBTUUsed / RES_LPG_OTHER_USEFUL)
-            + (
-                (SuburbanResLPGSpaceHeatingBTUUsed + SuburbanResElecToLPGSpaceHeatingBTUUsed)
-                / RES_LPG_SPACE_USEFUL
-            )
-            + (
-                (SuburbanResLPGWaterHeatingBTUUsed + SuburbanResElecToLPGWaterHeatingBTUUsed)
-                / RES_LPG_WATER_USEFUL
-            )
-        )
-
-    rur_btu = btu_used(rural_pop_percent, RUR_ENERGY_BTU)
-    RuralPerChangedFossilFuelUsed = rur_energy_elec - RUR_ENERGY_ELEC
-    rural_per_res_elec_used_to_FF_heating = RUR_ENERGY_ELEC - rur_energy_elec
-
-    RuralResElecBTUUsed = rur_btu * (RUR_ENERGY_ELEC / 100)
-    RuralResElecSpaceHeatingBTUUsed = RuralResElecBTUUsed * RUR_ELEC_SPACE
-    RuralResElecWaterHeatingBTUUsed = RuralResElecBTUUsed * RUR_ELEC_WATER
-    RuralResElecOtherBTUUsed = RuralResElecBTUUsed * RUR_ELEC_OTHER
-
-    RuralResNGBTUUsed = rur_btu * (RUR_ENERGY_NG / 100)
-    RuralResNGSpaceHeatingBTUUsed = RuralResNGBTUUsed * RUR_NG_SPACE
-    RuralResNGWaterHeatingBTUUsed = RuralResNGBTUUsed * RUR_NG_WATER
-    RuralResNGOtherBTUUsed = RuralResNGBTUUsed * RUR_NG_OTHER
-
-    RuralResFOKerBTUUsed = rur_btu * (RUR_ENERGY_FOK / 100)
-    RuralResFOKerSpaceHeatingBTUUsed = RuralResFOKerBTUUsed * RUR_FOK_SPACE
-    RuralResFOKerWaterHeatingBTUUsed = RuralResFOKerBTUUsed * RUR_FOK_WATER
-    RuralResFOKerOtherBTUUsed = RuralResFOKerBTUUsed * RUR_FOK_OTHER
-
-    RuralResLPGBTUUsed = rur_btu * (RUR_ENERGY_LPG / 100)
-    RuralResLPGSpaceHeatingBTUUsed = RuralResLPGBTUUsed * RUR_LPG_SPACE
-    RuralResLPGWaterHeatingBTUUsed = RuralResLPGBTUUsed * RUR_LPG_WATER
-    RuralResLPGOtherBTUUsed = RuralResLPGBTUUsed * RUR_LPG_OTHER
-
-    # Fuel Switch to Electric
-    RuralResNGSpaceHeatingToElecBTUUsed = (
-        rur_btu * (RuralPerChangedFossilFuelUsed / 100) * RUR_FF_NG * RUR_NG_SPACE
-    )
-    RuralResNGWaterHeatingToElecBTUUsed = (
-        rur_btu * (RuralPerChangedFossilFuelUsed / 100) * RUR_FF_NG * RUR_NG_WATER
-    )
-    RuralResNGOtherToElecBTUUsed = (
-        rur_btu * (RuralPerChangedFossilFuelUsed / 100) * RUR_FF_NG * RUR_NG_OTHER
-    )
-    RuralResFOKerSpaceHeatingToElecBTUUsed = (
-        rur_btu * (RuralPerChangedFossilFuelUsed / 100) * RUR_FF_FOK * RUR_FOK_SPACE
-    )
-    RuralResFOKerWaterHeatingToElecBTUUsed = (
-        rur_btu * (RuralPerChangedFossilFuelUsed / 100) * RUR_FF_FOK * RUR_FOK_WATER
-    )
-    RuralResFOKerOtherToElecBTUUsed = (
-        rur_btu * (RuralPerChangedFossilFuelUsed / 100) * RUR_FF_FOK * RUR_FOK_OTHER
-    )
-    RuralResLPGSpaceHeatingToElecBTUUsed = (
-        rur_btu * (RuralPerChangedFossilFuelUsed / 100) * RUR_FF_LPG * RUR_LPG_SPACE
-    )
-    RuralResLPGWaterHeatingToElecBTUUsed = (
-        rur_btu * (RuralPerChangedFossilFuelUsed / 100) * RUR_FF_LPG * RUR_LPG_WATER
-    )
-    RuralResLPGOtherToElecBTUUsed = (
-        rur_btu * (RuralPerChangedFossilFuelUsed / 100) * RUR_FF_LPG * RUR_LPG_OTHER
-    )
-
-    # Fuel Switch to Fossil Fuels heating uses
-    RuralResElecToNGSpaceHeatingBTUUsed = (
-        RuralResElecBTUUsed
-        * (rural_per_res_elec_used_to_FF_heating / 100)
-        * RUR_ELEC_HEAT_SPACE
-        * RUR_FF_SPACE_NG
-    )
-
-    RuralResElecToNGWaterHeatingBTUUsed = (
-        RuralResElecBTUUsed
-        * (rural_per_res_elec_used_to_FF_heating / 100)
-        * RUR_ELEC_HEAT_WATER
-        * RUR_FF_WATER_NG
-    )
-
-    RuralResElecToFOKerSpaceHeatingBTUUsed = (
-        RuralResElecBTUUsed
-        * (rural_per_res_elec_used_to_FF_heating / 100)
-        * RUR_ELEC_HEAT_SPACE
-        * RUR_FF_SPACE_FOK
-    )
-
-    RuralResElecToFOKerWaterHeatingBTUUsed = (
-        RuralResElecBTUUsed
-        * (rural_per_res_elec_used_to_FF_heating / 100)
-        * RUR_ELEC_HEAT_WATER
-        * RUR_FF_WATER_FOK
-    )
-
-    RuralResElecToLPGSpaceHeatingBTUUsed = (
-        RuralResElecBTUUsed
-        * (rural_per_res_elec_used_to_FF_heating / 100)
-        * RUR_ELEC_HEAT_SPACE
-        * RUR_FF_SPACE_LPG
-    )
-
-    RuralResElecToLPGWaterHeatingBTUUsed = (
-        RuralResElecBTUUsed
-        * (rural_per_res_elec_used_to_FF_heating / 100)
-        * RUR_ELEC_HEAT_WATER
-        * RUR_FF_WATER_LPG
-    )
-
-    # Determine whether fossil fuels (and all uses) are switched to electricity or if electricity
-    # heating uses are switched to fossil fuel heating uses
-    if RuralPerChangedFossilFuelUsed >= 0:
-        rural_elec_btu = (
-            (RuralResElecSpaceHeatingBTUUsed / RES_ELEC_SPACE_USEFUL)
-            + (RuralResElecWaterHeatingBTUUsed / RES_ELEC_WATER_USEFUL)
-            + (RuralResElecOtherBTUUsed / RES_ELEC_OTHER_USEFUL)
-            + (
-                (
-                    RuralResNGSpaceHeatingToElecBTUUsed
-                    + RuralResFOKerSpaceHeatingToElecBTUUsed
-                    + RuralResLPGSpaceHeatingToElecBTUUsed
-                )
-                / RES_ELEC_WATER_USEFUL_REPLACE_FF
-            )
-            + (
-                (
-                    RuralResNGWaterHeatingToElecBTUUsed
-                    + RuralResFOKerWaterHeatingToElecBTUUsed
-                    + RuralResLPGWaterHeatingToElecBTUUsed
-                )
-                / RES_ELEC_OTHER_USEFUL_REPLACE_FF
-            )
-            + (
-                (
-                    RuralResNGOtherToElecBTUUsed
-                    + RuralResFOKerOtherToElecBTUUsed
-                    + RuralResLPGOtherToElecBTUUsed
-                )
-                / RES_ELEC_OTHER_USEFUL
-            )
-        )
-        rural_ng_btu = (
-            (
-                (RuralResNGSpaceHeatingBTUUsed - RuralResNGSpaceHeatingToElecBTUUsed)
-                / RES_NG_SPACE_USEFUL
-            )
-            + (
-                (RuralResNGWaterHeatingBTUUsed - RuralResNGWaterHeatingToElecBTUUsed)
-                / RES_NG_WATER_USEFUL
-            )
-            + ((RuralResNGOtherBTUUsed - RuralResNGOtherToElecBTUUsed) / RES_NG_OTHER_USEFUL)
-        )
-        rural_fok_btu = (
-            (
-                (RuralResFOKerSpaceHeatingBTUUsed - RuralResFOKerSpaceHeatingToElecBTUUsed)
-                / RES_FOK_SPACE_USEFUL
-            )
-            + (
-                (RuralResFOKerWaterHeatingBTUUsed - RuralResFOKerWaterHeatingToElecBTUUsed)
-                / RES_FOK_WATER_USEFUL
-            )
-            + ((RuralResFOKerOtherBTUUsed - RuralResFOKerOtherToElecBTUUsed) / RES_FOK_OTHER_USEFUL)
-        )
-        rural_lpg_btu = (
-            (
-                (RuralResLPGSpaceHeatingBTUUsed - RuralResLPGSpaceHeatingToElecBTUUsed)
-                / RES_LPG_SPACE_USEFUL
-            )
-            + (
-                (RuralResLPGWaterHeatingBTUUsed - RuralResLPGWaterHeatingToElecBTUUsed)
-                / RES_LPG_WATER_USEFUL
-            )
-            + ((RuralResLPGOtherBTUUsed - RuralResLPGOtherToElecBTUUsed) / RES_LPG_OTHER_USEFUL)
-        )
-    else:
-        rural_elec_btu = (
-            (RuralResElecOtherBTUUsed / RES_ELEC_OTHER_USEFUL)
-            + (
-                (
-                    RuralResElecSpaceHeatingBTUUsed
-                    - (
-                        RuralResElecToNGSpaceHeatingBTUUsed
-                        + RuralResElecToFOKerSpaceHeatingBTUUsed
-                        + RuralResElecToLPGSpaceHeatingBTUUsed
-                    )
-                )
-                / RES_ELEC_SPACE_USEFUL
-            )
-            + (
-                (
-                    RuralResElecWaterHeatingBTUUsed
-                    - (
-                        RuralResElecToNGWaterHeatingBTUUsed
-                        + RuralResElecToFOKerWaterHeatingBTUUsed
-                        + RuralResElecToLPGWaterHeatingBTUUsed
-                    )
-                )
-                / RES_ELEC_WATER_USEFUL
-            )
-        )
-        rural_ng_btu = (
-            (RuralResNGOtherBTUUsed / RES_NG_OTHER_USEFUL)
-            + (
-                (RuralResNGSpaceHeatingBTUUsed + RuralResElecToNGSpaceHeatingBTUUsed)
-                / RES_NG_SPACE_USEFUL
-            )
-            + (
-                (RuralResNGWaterHeatingBTUUsed + RuralResElecToNGWaterHeatingBTUUsed)
-                / RES_NG_WATER_USEFUL
-            )
-        )
-        rural_fok_btu = (
-            (RuralResFOKerOtherBTUUsed / RES_FOK_OTHER_USEFUL)
-            + (
-                (RuralResFOKerSpaceHeatingBTUUsed + RuralResElecToFOKerSpaceHeatingBTUUsed)
-                / RES_FOK_SPACE_USEFUL
-            )
-            + (
-                (RuralResFOKerWaterHeatingBTUUsed + RuralResElecToFOKerWaterHeatingBTUUsed)
-                / RES_FOK_WATER_USEFUL
-            )
-        )
-        rural_lpg_btu = (
-            (RuralResLPGOtherBTUUsed / RES_LPG_OTHER_USEFUL)
-            + (
-                (RuralResLPGSpaceHeatingBTUUsed + RuralResElecToLPGSpaceHeatingBTUUsed)
-                / RES_LPG_SPACE_USEFUL
-            )
-            + (
-                (RuralResLPGWaterHeatingBTUUsed + RuralResElecToLPGWaterHeatingBTUUsed)
-                / RES_LPG_WATER_USEFUL
-            )
-        )
 
     # Calculate GHG emissions
     res_elec_ghg = (
