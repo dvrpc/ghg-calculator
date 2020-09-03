@@ -21,15 +21,17 @@ def test_calc_res_ghg():
         g.grid_other_ff,
         g.res_energy_change,
         g.pop_factor,
-        g.RUR_ENERGY_ELEC,
-        g.SUB_ENERGY_ELEC,
-        g.URB_ENERGY_ELEC,
+        g.RUR_ENERGY_ELEC * 100,
+        g.SUB_ENERGY_ELEC * 100,
+        g.URB_ENERGY_ELEC * 100,
         g.rural_pop_percent,
         g.suburban_pop_percent,
         g.urban_pop_percent,
     )
     # this had been 15.030605191538607
-    assert res_ghg == 15.201897046514375
+    # and then assert res_ghg == 15.201897046514375 (difference with new number due to removing
+    # conversion back and forth from %)
+    assert res_ghg == 15.201897046514373
 
 
 def test_calc_ci_ghg():
@@ -126,9 +128,9 @@ def test_calc_non_energy_ghg():
         g.PerWaste,
         g.PerWasteWater,
         g.pop_factor,
-        g.RUR_ENERGY_ELEC,
-        g.SUB_ENERGY_ELEC,
-        g.URB_ENERGY_ELEC,
+        g.RUR_ENERGY_ELEC * 100,
+        g.SUB_ENERGY_ELEC * 100,
+        g.URB_ENERGY_ELEC * 100,
         g.urban_pop_percent,
     )
     # this had been 7.114884838160576

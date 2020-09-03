@@ -290,20 +290,19 @@ RUR_LPG_SPACE = RUR_LPG_SPACE_BTU / RUR_LPG_BTU
 RUR_LPG_WATER = RUR_LPG_WATER_BTU / RUR_LPG_BTU
 RUR_LPG_OTHER = RUR_LPG_OTHER_BTU / RUR_LPG_BTU
 
-# TODO: change these from percent to shares
-# percent of total energy/sector by energy type
-URB_ENERGY_ELEC = URB_ELEC_BTU / URB_ENERGY_BTU * 100
-URB_ENERGY_NG = URB_NG_BTU / URB_ENERGY_BTU * 100
-URB_ENERGY_FOK = URB_FOK_BTU / URB_ENERGY_BTU * 100
-URB_ENERGY_LPG = URB_LPG_BTU / URB_ENERGY_BTU * 100
-SUB_ENERGY_ELEC = SUB_ELEC_BTU / SUB_ENERGY_BTU * 100
-SUB_ENERGY_NG = SUB_NG_BTU / SUB_ENERGY_BTU * 100
-SUB_ENERGY_FOK = SUB_FOK_BTU / SUB_ENERGY_BTU * 100
-SUB_ENERGY_LPG = SUB_LPG_BTU / SUB_ENERGY_BTU * 100
-RUR_ENERGY_ELEC = RUR_ELEC_BTU / RUR_ENERGY_BTU * 100
-RUR_ENERGY_NG = RUR_NB_BTU / RUR_ENERGY_BTU * 100
-RUR_ENERGY_FOK = RUR_FOK_BTU / RUR_ENERGY_BTU * 100
-RUR_ENERGY_LPG = RUR_LPG_BTU / RUR_ENERGY_BTU * 100
+# share of total energy/sector by energy type
+URB_ENERGY_ELEC = URB_ELEC_BTU / URB_ENERGY_BTU
+URB_ENERGY_NG = URB_NG_BTU / URB_ENERGY_BTU
+URB_ENERGY_FOK = URB_FOK_BTU / URB_ENERGY_BTU
+URB_ENERGY_LPG = URB_LPG_BTU / URB_ENERGY_BTU
+SUB_ENERGY_ELEC = SUB_ELEC_BTU / SUB_ENERGY_BTU
+SUB_ENERGY_NG = SUB_NG_BTU / SUB_ENERGY_BTU
+SUB_ENERGY_FOK = SUB_FOK_BTU / SUB_ENERGY_BTU
+SUB_ENERGY_LPG = SUB_LPG_BTU / SUB_ENERGY_BTU
+RUR_ENERGY_ELEC = RUR_ELEC_BTU / RUR_ENERGY_BTU
+RUR_ENERGY_NG = RUR_NB_BTU / RUR_ENERGY_BTU
+RUR_ENERGY_FOK = RUR_FOK_BTU / RUR_ENERGY_BTU
+RUR_ENERGY_LPG = RUR_LPG_BTU / RUR_ENERGY_BTU
 
 # share of total electric heating/sector by heating type
 URB_ELEC_HEAT_SPACE = URB_ELEC_SPACE_BTU / URB_ELEC_HEAT_BTU
@@ -645,14 +644,14 @@ user_inputs = {
     "PerWasteWater": PerWasteWater,
     "pop_factor": pop_factor,
     "RegionalFleetMPG": RegionalFleetMPG,
-    "rur_energy_elec": RUR_ENERGY_ELEC,
+    "rur_energy_elec": RUR_ENERGY_ELEC * 100,  # convert to % b/c func will take user % later
     "rural_pop_percent": rural_pop_percent,
-    "sub_energy_elec": SUB_ENERGY_ELEC,
+    "sub_energy_elec": SUB_ENERGY_ELEC * 100,  # convert to % b/c func will take user % later
     "suburban_pop_percent": suburban_pop_percent,
     "TransRailRuralPerElecMotion": TransRailRuralPerElecMotion,
     "TransRailSuburbanPerElecMotion": TransRailSuburbanPerElecMotion,
     "TransRailUrbanPerElecMotion": TransRailUrbanPerElecMotion,
-    "urb_energy_elec": URB_ENERGY_ELEC,
+    "urb_energy_elec": URB_ENERGY_ELEC * 100,  # convert to % b/c func will take user % later
     "urban_pop_percent": urban_pop_percent,
     "VMTperCap": VMTperCap,
 }
@@ -677,7 +676,6 @@ def calc_res_ghg(
     ghg emissions.
     """
 
-    # calculate BTUs of residential energy use from urban areas
     def calc_btu_by_res_sector(
         pop_percent,
         energy_btu,
@@ -723,22 +721,22 @@ def calc_res_ghg(
 
         # calculate the base amounts, which will be adjusted below depending on change in %
         # of energy use that is electric
-        base_elec_btu = btu * (energy_elec / 100)
+        base_elec_btu = btu * energy_elec
         base_elec_space_btu = base_elec_btu * elec_space
         base_elec_water_btu = base_elec_btu * elec_water
         base_elec_other_btu = base_elec_btu * elec_other
 
-        base_ng_btu = btu * (energy_ng / 100)
+        base_ng_btu = btu * energy_ng
         base_ng_space_btu = base_ng_btu * ng_space
         base_ng_water_btu = base_ng_btu * ng_water
         base_ng_other_btu = base_ng_btu * ng_other
 
-        base_fok_btu = btu * (energy_fok / 100)
+        base_fok_btu = btu * energy_fok
         base_fok_space_btu = base_fok_btu * fok_space
         base_fok_water_btu = base_fok_btu * fok_water
         base_fok_other_btu = base_fok_btu * fok_other
 
-        base_lpg_btu = btu * (energy_lpg / 100)
+        base_lpg_btu = btu * energy_lpg
         base_lpg_space_btu = base_lpg_btu * lpg_space
         base_lpg_water_btu = base_lpg_btu * lpg_water
         base_lpg_other_btu = base_lpg_btu * lpg_other
@@ -747,18 +745,18 @@ def calc_res_ghg(
         # BTU/per change resulting from change in % subsector energy use that is electric
         # switch fossil fuels (and all uses) to electricity or electricity heating uses to ff
 
-        change_elec_use = new_energy_elec - energy_elec
+        change_elec_use = (new_energy_elec / 100) - energy_elec
 
         if change_elec_use >= 0:  # more energy is electric, therefore less FF used
-            ng_space_btu_to_elec = btu * (change_elec_use / 100) * ff_ng * ng_space
-            ng_water_btu_to_elec = btu * (change_elec_use / 100) * ff_ng * ng_water
-            ng_other_btu_to_elec = btu * (change_elec_use / 100) * ff_ng * ng_other
-            fok_space_btu_to_elec = btu * (change_elec_use / 100) * ff_fok * fok_space
-            fok_water_btu_to_elec = btu * (change_elec_use / 100) * ff_fok * fok_water
-            fok_other_btu_to_elec = btu * (change_elec_use / 100) * ff_fok * fok_other
-            lpg_space_btu_to_elec = btu * (change_elec_use / 100) * ff_lpg * lpg_space
-            lpg_water_btu_to_elec = btu * (change_elec_use / 100) * ff_lpg * lpg_water
-            lpg_other_btu_to_elec = btu * (change_elec_use / 100) * ff_lpg * lpg_other
+            ng_space_btu_to_elec = btu * change_elec_use * ff_ng * ng_space
+            ng_water_btu_to_elec = btu * change_elec_use * ff_ng * ng_water
+            ng_other_btu_to_elec = btu * change_elec_use * ff_ng * ng_other
+            fok_space_btu_to_elec = btu * change_elec_use * ff_fok * fok_space
+            fok_water_btu_to_elec = btu * change_elec_use * ff_fok * fok_water
+            fok_other_btu_to_elec = btu * change_elec_use * ff_fok * fok_other
+            lpg_space_btu_to_elec = btu * change_elec_use * ff_lpg * lpg_space
+            lpg_water_btu_to_elec = btu * change_elec_use * ff_lpg * lpg_water
+            lpg_other_btu_to_elec = btu * change_elec_use * ff_lpg * lpg_other
 
             elec_btu = (
                 (base_elec_space_btu / RES_ELEC_SPACE_USEFUL)
@@ -793,28 +791,24 @@ def calc_res_ghg(
                 + ((base_lpg_other_btu - lpg_other_btu_to_elec) / RES_LPG_OTHER_USEFUL)
             )
         else:  # less energy is electric, therefore more FF used
-            elec_space_btu_to_ng = (
-                base_elec_btu * (-(change_elec_use) / 100) * elec_heat_space * ff_space_ng
-            )
+            elec_space_btu_to_ng = base_elec_btu * -change_elec_use * elec_heat_space * ff_space_ng
 
-            elec_water_btu_to_ng = (
-                base_elec_btu * (-(change_elec_use) / 100) * elec_heat_water * ff_water_ng
-            )
+            elec_water_btu_to_ng = base_elec_btu * -change_elec_use * elec_heat_water * ff_water_ng
 
             elec_space_btu_to_fok = (
-                base_elec_btu * (-(change_elec_use) / 100) * elec_heat_space * ff_space_fok
+                base_elec_btu * -change_elec_use * elec_heat_space * ff_space_fok
             )
 
             elec_water_btu_to_fok = (
-                base_elec_btu * (-(change_elec_use) / 100) * elec_heat_water * ff_water_fok
+                base_elec_btu * -change_elec_use * elec_heat_water * ff_water_fok
             )
 
             elec_space_btu_to_lpg = (
-                base_elec_btu * (-(change_elec_use) / 100) * elec_heat_space * ff_space_lpg
+                base_elec_btu * -change_elec_use * elec_heat_space * ff_space_lpg
             )
 
             elec_water_btu_to_lpg = (
-                base_elec_btu * (-(change_elec_use) / 100) * elec_heat_water * ff_water_lpg
+                base_elec_btu * -change_elec_use * elec_heat_water * ff_water_lpg
             )
 
             elec_btu = (
@@ -965,7 +959,6 @@ def calc_res_ghg(
         )
         * (1 - ff_carbon_capture / 100)
     )
-
     res_ng_btu = urban_ng_btu + suburban_ng_btu + rural_ng_btu
     res_ng_ghg = (
         res_ng_btu
@@ -981,7 +974,6 @@ def calc_res_ghg(
         * (1 + res_energy_change / 100)
         * (CO2_MMT_KB_FOK * KB_G)
     )
-
     res_lpg_ghg = (
         (urban_lpg_btu + suburban_lpg_btu + rural_lpg_btu)
         * (1 / BTU_GAL_LPG)
@@ -2065,7 +2057,7 @@ res_energy_change_slider.on_change("value", callback)
 urb_energy_elec_slider = Slider(
     start=URB_ELEC_OTHER_BTU / URB_ENERGY_BTU * 100,
     end=100,
-    value=URB_ENERGY_ELEC,
+    value=URB_ENERGY_ELEC * 100,
     step=1,
     title="% Electrification of Residential End Uses in Urban Areas",
 )
@@ -2074,7 +2066,7 @@ urb_energy_elec_slider.on_change("value", callback)
 sub_energy_elec_slider = Slider(
     start=SUB_ELEC_OTHER_BTU / SUB_ENERGY_BTU * 100,
     end=100,
-    value=SUB_ENERGY_ELEC,
+    value=SUB_ENERGY_ELEC * 100,
     step=1,
     title="% Electrification of Residential End Uses in Suburban Areas",
 )
@@ -2083,7 +2075,7 @@ sub_energy_elec_slider.on_change("value", callback)
 rur_energy_elec_slider = Slider(
     start=RUR_ELEC_OTHER_BTU / RUR_ENERGY_BTU * 100,
     end=100,
-    value=RUR_ENERGY_ELEC,
+    value=RUR_ENERGY_ELEC * 100,
     step=1,
     title="% Electrification of Residential End Uses in Rural Areas",
 )
