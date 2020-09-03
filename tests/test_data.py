@@ -15,18 +15,18 @@ print("Non-Energy = ", NonEnergyGHG)
 
 def test_calc_res_ghg():
     res_ghg, res_ngbtu = g.calc_res_ghg(
-        g.grid_coal,
-        g.grid_ng,
-        g.grid_oil,
-        g.grid_other_ff,
-        g.res_energy_change,
-        g.pop_factor,
+        g.GRID_COAL,
+        g.GRID_NG,
+        g.GRID_OIL,
+        g.GRID_OTHER_FF,
+        0,  # residential energy change
+        0,  # change in population
         g.RUR_ENERGY_ELEC * 100,
         g.SUB_ENERGY_ELEC * 100,
         g.URB_ENERGY_ELEC * 100,
-        g.rural_pop_percent,
-        g.suburban_pop_percent,
-        g.urban_pop_percent,
+        g.RURAL_POP_PERCENT,
+        g.SUBURBAN_POP_PERCENT,
+        g.URBAN_POP_PERCENT,
     )
     # this had been 15.030605191538607
     # and then assert res_ghg == 15.201897046514375 (difference with new number due to removing
@@ -36,13 +36,13 @@ def test_calc_res_ghg():
 
 def test_calc_ci_ghg():
     ci_ghg = g.calc_ci_ghg(
-        g.ComIndPerElectrification,
-        g.grid_coal,
-        g.grid_ng,
-        g.grid_oil,
-        g.grid_other_ff,
+        g.CI_ENERGY_ELEC,
+        g.GRID_COAL,
+        g.GRID_NG,
+        g.GRID_OIL,
+        g.GRID_OTHER_FF,
         g.ff_carbon_capture,
-        g.PerComIndEnergyUse,
+        0,  # change in CI energy usage
     )
 
     assert ci_ghg == 27.47829273576916
@@ -50,44 +50,44 @@ def test_calc_ci_ghg():
 
 def test_calc_mob_highway_GHG():
     ghg = g.calc_highway_ghg(
-        g.grid_coal,
-        g.grid_ng,
-        g.grid_oil,
-        g.grid_other_ff,
+        g.GRID_COAL,
+        g.GRID_NG,
+        g.GRID_OIL,
+        g.GRID_OTHER_FF,
         g.ff_carbon_capture,
-        g.PerEVMT,
-        g.pop_factor,
-        g.RegionalFleetMPG,
-        g.rural_pop_percent,
-        g.suburban_pop_percent,
-        g.urban_pop_percent,
-        g.VMTperCap,
+        0,  # percent vehicles miles that are electric
+        0,  # change in population
+        g.REG_FLEET_MPG,
+        g.RURAL_POP_PERCENT,
+        g.SUBURBAN_POP_PERCENT,
+        g.URBAN_POP_PERCENT,
+        0,  # change in vehicle miles per person
     )
 
     assert ghg == 17.937509502305318
 
 
 def test_calc_mob_aviation_ghg():
-    ghg = g.calc_aviation_ghg(g.pop_factor, g.PerAviation)
+    ghg = g.calc_aviation_ghg(0, 0)
 
     assert ghg == 3.9
 
 
 def test_calc_mob_transit_ghg():
     ghg = g.calc_transit_ghg(
-        g.grid_coal,
-        g.grid_ng,
-        g.grid_oil,
-        g.grid_other_ff,
+        g.GRID_COAL,
+        g.GRID_NG,
+        g.GRID_OIL,
+        g.GRID_OTHER_FF,
         g.ff_carbon_capture,
         g.PerTransRailRidership,
-        g.pop_factor,
-        g.rural_pop_percent,
-        g.suburban_pop_percent,
+        0,  # change in population
+        g.RURAL_POP_PERCENT,
+        g.SUBURBAN_POP_PERCENT,
         g.TransRailUrbanPerElecMotion,
         g.TransRailSuburbanPerElecMotion,
         g.TransRailRuralPerElecMotion,
-        g.urban_pop_percent,
+        g.URBAN_POP_PERCENT,
     )
 
     assert ghg == 0.17340094875122483
@@ -96,10 +96,10 @@ def test_calc_mob_transit_ghg():
 def test_calc_other_mobile_ghg():
     ghg = g.calc_other_mobile_ghg(
         g.FreightRailPerElecMotion,
-        g.grid_coal,
-        g.grid_ng,
-        g.grid_oil,
-        g.grid_other_ff,
+        g.GRID_COAL,
+        g.GRID_NG,
+        g.GRID_OIL,
+        g.GRID_OTHER_FF,
         g.InterCityRailPerElecMotion,
         g.MarinePortPerElectrification,
         g.ff_carbon_capture,
@@ -114,24 +114,24 @@ def test_calc_other_mobile_ghg():
 
 def test_calc_non_energy_ghg():
     ghg = g.calc_non_energy_ghg(
-        g.ComIndPerElectrification,
-        g.grid_coal,
-        g.grid_ng,
-        g.grid_oil,
-        g.grid_other_ff,
-        g.PerAg,
-        g.res_energy_change,
-        g.PerComIndEnergyUse,
-        g.PerForestCoverage,
-        g.PerIP,
-        g.PerUrbanTreeCoverage,
-        g.PerWaste,
-        g.PerWasteWater,
-        g.pop_factor,
+        g.CI_ENERGY_ELEC,
+        g.GRID_COAL,
+        g.GRID_NG,
+        g.GRID_OIL,
+        g.GRID_OTHER_FF,
+        0,  # change in ag
+        0,  # change in residential energy usage
+        0,  # change in CI energy usage
+        0,  # change in forest coverage
+        0,  # change in energy use for industrial processes
+        0,  # change in urban tree coverage
+        0,  # change in solid waste
+        0,  # change in wastewater
+        0,  # change in population
         g.RUR_ENERGY_ELEC * 100,
         g.SUB_ENERGY_ELEC * 100,
         g.URB_ENERGY_ELEC * 100,
-        g.urban_pop_percent,
+        g.URBAN_POP_PERCENT,
     )
     # this had been 7.114884838160576
     assert ghg == 7.10780219120066

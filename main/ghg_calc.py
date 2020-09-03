@@ -4,14 +4,14 @@ from statistics import mean
 import numpy as np
 import pandas as pd
 
-from bokeh.layouts import row, column
+from bokeh.layouts import column
 from bokeh.models import Slider, Column, ColumnDataSource, TextInput, Paragraph, LabelSet
 from bokeh.palettes import Viridis7, Spectral10
 from bokeh.plotting import figure, curdoc
 from bokeh.transform import dodge, cumsum
 
 
-sectors = [
+SECTORS = [
     "Residential",
     "Commercial/Industrial",
     "Mobile-Highway",
@@ -35,10 +35,10 @@ GHG_OTHER_MOBILE = 1.12  # includes freight & intercity rail, marine & port-rela
 GHG_AG = 0.41  # agriculture
 GHG_SOLID_WASTE = 2.01  # landfills
 GHG_WASTEWATER = 0.49
-GHG_IP = 5.52  # Includes Hydrogen production, iron & steel production, industrial wastewater treatment, ODS substitutes, and petroleum refining
+GHG_IP = 5.52  # industrial processes; includes Hydrogen production, iron & steel production, industrial wastewater treatment, ODS substitutes, and petroleum refining
 GHG_URBAN_TREES = -1.025
 GHG_FORESTS = -1.109
-GHG_FOREST_CHANGE = 0.380
+GHG_FOREST_CHANGE = 0.380  # TODO: why is this not 0?
 RES_NG = 115884601.50 / 1000  # NG Consumpton 2015 (million CF)
 CI_NG = 139139475 / 1000  # NG Consumpton 2015 (million CF)
 GHG_NON_ENERGY = (
@@ -58,10 +58,9 @@ SUBURBAN_POP = 3693658
 RURAL_POP = 332445
 POP = URBAN_POP + SUBURBAN_POP + RURAL_POP
 
-pop_factor = 0
-urban_pop_percent = URBAN_POP / POP * 100
-suburban_pop_percent = SUBURBAN_POP / POP * 100
-rural_pop_percent = RURAL_POP / POP * 100
+URBAN_POP_PERCENT = URBAN_POP / POP * 100
+SUBURBAN_POP_PERCENT = SUBURBAN_POP / POP * 100
+RURAL_POP_PERCENT = RURAL_POP / POP * 100
 
 # Average Emissions pr MWh of fossil fuels from eGRID 2014/2016 for RFCE
 # NOTE: Future reference - should we pull plant-level data for this?)
@@ -74,16 +73,16 @@ CO2_LB_MWH_OTHER_FF = (1488.036692 + 1334.201) / 2
 ff_carbon_capture = 0
 
 # Electricity Mix from 2015 inventory
-grid_coal = 20.47
-grid_oil = 0.47
-grid_ng = 34.38
-grid_other_ff = 0.46
-grid_bio = 1.59
-grid_hydro = 1.06
-grid_nuclear = 40.10
-grid_wind = 1.16
-grid_solar = 0.30
-grid_geo = 0.00
+GRID_COAL = 20.47
+GRID_OIL = 0.47
+GRID_NG = 34.38
+GRID_OTHER_FF = 0.46
+GRID_BIO = 1.59
+GRID_HYDRO = 1.06
+GRID_NUCLEAR = 40.10
+GRID_WIND = 1.16
+GRID_SOLAR = 0.30
+GRID_GEO = 0.00
 GRID_LOSS = 0.047287092
 
 CO2_MMT_KB_FOK = 0.000428929
@@ -119,8 +118,6 @@ CO2_MMT_BBTU_NAPHTHAS = 72.62
 
 ###############################
 # Residential Stationary Energy
-
-res_energy_change = 0
 
 URBAN_ELEC_MWH_CAP = 2.41  # MWh/person
 SUBURBAN_ELEC_MWH_CAP = 3.17
@@ -354,104 +351,81 @@ RUR_FF_WATER_LPG = RUR_LPG_WATER_BTU / RUR_FF_WATER_BTU
 # Commercial/Industrial Stationary Energy from 2015 Inventory
 # Also: https://www.iea-etsap.org/E-TechDS/PDF/I01-ind_boilers-GS-AD-gct.pdf
 
-PerEnergyToUseComIndElec = 100
-PerEnergyToUseComIndNG = 75
-PerEnergyToUseComIndCoal = 85
-PerEnergyToUseComIndDFO = 80
-PerEnergyToUseComIndKer = 80
-PerEnergyToUseComIndLPG = 80
-PerEnergyToUseComIndMotGas = 80
-PerEnergyToUseComIndRFO = 80
-PerEnergyToUseComIndPetCoke = 80
-PerEnergyToUseComIndStillGas = 80
-PerEnergyToUseComIndSpecialNaphthas = 80
-PerComIndEnergyUse = 0
+# share of fuel that is converted to useful energy
+CI_ELEC_USEFUL = 1
+CI_NG_USEFUL = 0.75
+CI_COAL_USEFUL = 0.85
+CI_DFO_USEFUL = 0.80
+CI_K_USEFUL = 0.80
+CI_LPG_USEFUL = 0.80
+CI_MOTOR_GAS_USEFUL = 0.80
+CI_RFO_USEFUL = 0.80
+CI_PET_COKE_USEFUL = 0.80
+CI_STILL_GAS_USEFUL = 0.80
+CI_NAPHTHAS_USEFUL = 0.80
 
-ComIndElecBBtu = 119120.51
-ComIndNGBBtu = 145987.03
-ComIndCoalBBtu = 6581.08
-ComIndDFOBBtu = 24342.05
-ComIndKerBBtu = 41.91
-ComIndLPGBBtu = 2581.22
-ComIndMotGasBBtu = 12584.78
-ComIndRFOBBtu = 261.42
-ComIndPetCokeBBtu = 15067.33
-ComIndStillGasBBtu = 25628.52
-ComIndSpecialNaphthasBBtu = 73.71
+# useful BTUs consumed
+CI_ELEC_BTU = 119120.51 * CI_ELEC_USEFUL
+CI_NG_BTU = 145987.03 * CI_NG_USEFUL
+CI_COAL_BTU = 6581.08 * CI_COAL_USEFUL
+CI_DFO_BTU = 24342.05 * CI_DFO_USEFUL
+CI_K_BTU = 41.91 * CI_K_USEFUL
+CI_LPG_BTU = 2581.22 * CI_LPG_USEFUL
+CI_MOTOR_GAS_BTU = 12584.78 * CI_MOTOR_GAS_USEFUL
+CI_RFO_BTU = 261.42 * CI_RFO_USEFUL
+CI_PET_COKE_BTU = 15067.33 * CI_PET_COKE_USEFUL
+CI_STILL_GAS_BTU = 25628.52 * CI_STILL_GAS_USEFUL
+CI_NAPHTHAS_BTU = 73.71 * CI_NAPHTHAS_USEFUL
 
-ComIndElecBBtuUsed = ComIndElecBBtu * PerEnergyToUseComIndElec / 100
-ComIndNGBBtuUsed = ComIndNGBBtu * PerEnergyToUseComIndNG / 100
-ComIndCoalBBtuUsed = ComIndCoalBBtu * PerEnergyToUseComIndCoal / 100
-ComIndDFOBBtuUsed = ComIndDFOBBtu * PerEnergyToUseComIndDFO / 100
-ComIndKerBBtuUsed = ComIndKerBBtu * PerEnergyToUseComIndKer / 100
-ComIndLPGBBtuUsed = ComIndLPGBBtu * PerEnergyToUseComIndLPG / 100
-ComIndMotGasBBtuUsed = ComIndMotGasBBtu * PerEnergyToUseComIndMotGas / 100
-ComIndRFOBBtuUsed = ComIndRFOBBtu * PerEnergyToUseComIndRFO / 100
-ComIndPetCokeBBtuUsed = ComIndPetCokeBBtu * PerEnergyToUseComIndPetCoke / 100
-ComIndStillGasBBtuUsed = ComIndStillGasBBtu * PerEnergyToUseComIndStillGas / 100
-ComIndSpecialNaphthasBBtuUsed = (
-    ComIndSpecialNaphthasBBtu * PerEnergyToUseComIndSpecialNaphthas / 100
+CI_ENERGY_BTU = (
+    CI_ELEC_BTU
+    + CI_NG_BTU
+    + CI_COAL_BTU
+    + CI_DFO_BTU
+    + CI_K_BTU
+    + CI_LPG_BTU
+    + CI_MOTOR_GAS_BTU
+    + CI_RFO_BTU
+    + CI_PET_COKE_BTU
+    + CI_STILL_GAS_BTU
+    + CI_NAPHTHAS_BTU
 )
 
-ComIndBBtuUsed = (
-    ComIndElecBBtuUsed
-    + ComIndNGBBtuUsed
-    + ComIndCoalBBtuUsed
-    + ComIndDFOBBtuUsed
-    + ComIndKerBBtuUsed
-    + ComIndLPGBBtuUsed
-    + ComIndMotGasBBtuUsed
-    + ComIndRFOBBtuUsed
-    + ComIndPetCokeBBtuUsed
-    + ComIndStillGasBBtuUsed
-    + ComIndSpecialNaphthasBBtuUsed
-)
+# percent of energy by fuel type
+CI_ENERGY_ELEC = CI_ELEC_BTU / CI_ENERGY_BTU * 100
+CI_ENERGY_NG = CI_NG_BTU / CI_ENERGY_BTU * 100
+CI_ENERGY_COAL = CI_COAL_BTU / CI_ENERGY_BTU * 100
+CI_ENERGY_DFO = CI_DFO_BTU / CI_ENERGY_BTU * 100
+CI_ENERGY_K = CI_K_BTU / CI_ENERGY_BTU * 100
+CI_ENERGY_LPG = CI_LPG_BTU / CI_ENERGY_BTU * 100
+CI_ENERGY_MOTOR_GAS = CI_MOTOR_GAS_BTU / CI_ENERGY_BTU * 100
+CI_ENERGY_RFO = CI_RFO_BTU / CI_ENERGY_BTU * 100
+CI_ENERGY_PET_COKE = CI_PET_COKE_BTU / CI_ENERGY_BTU * 100
+CI_ENERGY_STILL_GAS = CI_STILL_GAS_BTU / CI_ENERGY_BTU * 100
+CI_ENERGY_NAPHTHAS = CI_NAPHTHAS_BTU / CI_ENERGY_BTU * 100
 
-ComIndPerElecUsed = ComIndElecBBtuUsed / ComIndBBtuUsed * 100
-ComIndPerNGUsed = ComIndNGBBtuUsed / ComIndBBtuUsed * 100
-ComIndPerCoalUsed = ComIndCoalBBtuUsed / ComIndBBtuUsed * 100
-ComIndPerDFOUsed = ComIndDFOBBtuUsed / ComIndBBtuUsed * 100
-ComIndPerKerUsed = ComIndKerBBtuUsed / ComIndBBtuUsed * 100
-ComIndPerLPGUsed = ComIndLPGBBtuUsed / ComIndBBtuUsed * 100
-ComIndPerMotGasUsed = ComIndMotGasBBtuUsed / ComIndBBtuUsed * 100
-ComIndPerRFOUsed = ComIndRFOBBtuUsed / ComIndBBtuUsed * 100
-ComIndPerPetCokeUsed = ComIndPetCokeBBtuUsed / ComIndBBtuUsed * 100
-ComIndPerStillGasUsed = ComIndStillGasBBtuUsed / ComIndBBtuUsed * 100
-ComIndPerSpecialNaphthasUsed = ComIndSpecialNaphthasBBtuUsed / ComIndBBtuUsed * 100
-
-ComIndPerFossilFuelUsed2015 = 100 - ComIndPerElecUsed
-ComIndPerFFNGUsed = ComIndPerNGUsed / ComIndPerFossilFuelUsed2015 * 100
-ComIndPerFFCoalUsed = ComIndPerCoalUsed / ComIndPerFossilFuelUsed2015 * 100
-ComIndPerFFDFOUsed = ComIndPerDFOUsed / ComIndPerFossilFuelUsed2015 * 100
-ComIndPerFFKerUsed = ComIndPerKerUsed / ComIndPerFossilFuelUsed2015 * 100
-ComIndPerFFLPGUsed = ComIndPerLPGUsed / ComIndPerFossilFuelUsed2015 * 100
-ComIndPerFFMotGasUsed = ComIndPerMotGasUsed / ComIndPerFossilFuelUsed2015 * 100
-ComIndPerFFRFOUsed = ComIndPerRFOUsed / ComIndPerFossilFuelUsed2015 * 100
-ComIndPerFFPetCokeUsed = ComIndPerPetCokeUsed / ComIndPerFossilFuelUsed2015 * 100
-ComIndPerFFStillGasUsed = ComIndPerStillGasUsed / ComIndPerFossilFuelUsed2015 * 100
-ComIndPerFFSpecialNaphthasUsed = ComIndPerSpecialNaphthasUsed / ComIndPerFossilFuelUsed2015 * 100
-
-ComIndMinPerElectrification = ComIndPerElecUsed
-ComIndPerElectrification = ComIndMinPerElectrification
+# share of FF energy by individual FF
+CI_ENERGY_FF = 100 - CI_ENERGY_ELEC
+CI_ENERGY_FF_NG = CI_ENERGY_NG / CI_ENERGY_FF
+CI_ENERGY_FF_COAL = CI_ENERGY_COAL / CI_ENERGY_FF
+CI_ENERGY_FF_DFO = CI_ENERGY_DFO / CI_ENERGY_FF
+CI_ENERGY_FF_K = CI_ENERGY_K / CI_ENERGY_FF
+CI_ENERGY_FF_LPG = CI_ENERGY_LPG / CI_ENERGY_FF
+CI_ENERGY_FF_MOTOR_GAS = CI_ENERGY_MOTOR_GAS / CI_ENERGY_FF
+CI_ENERGY_FF_RFO = CI_ENERGY_RFO / CI_ENERGY_FF
+CI_ENERGY_FF_PET_COKE = CI_ENERGY_PET_COKE / CI_ENERGY_FF
+CI_ENERGY_FF_STILL_GAS = CI_ENERGY_STILL_GAS / CI_ENERGY_FF
+CI_ENERGY_FF_NAPHTHAS = CI_ENERGY_NAPHTHAS / CI_ENERGY_FF
 
 ############################
 # Mobile-Highway GHG Factors
 
-UrbanVMTperPop = 5041.95
-SuburbanVMTperPop = 7405.38
-RuralVMTperPop = 6591.47
-VMTperCap = 0
-
-PerEVMT = 0  # % VMT from PEVs
-EVEff = 0.3  # kWh/mile
-
-RegionalFleetMPG = 19.744607425  # mpg imputed from 2015 inventory
-CO2eperGallonGasoline = (
-    20.50758459351  # lbs co2e per gallon of gasoline (imputed from 2015 inventory)
-)
-
-# Mobile-Aviation GHG Factors
-PerAviation = 0
+URB_VEH_MILES = 5041.95
+SUB_VEH_MILES = 7405.38
+RUR_VEH_MILES = 6591.47
+ELEC_VEH_EFFICIENCY = 0.3  # kWh/mile
+REG_FLEET_MPG = 19.744607425  # mpg imputed from 2015 inventory
+CO2_LB_GAL_GAS = 20.50758459351  # lbs co2e per gallon of gasoline (imputed from 2015 inventory)
 
 #################################
 # Mobile-Rail Transit GHG Factors
@@ -520,7 +494,6 @@ TransRailRuralPerElecMotion = (
     TransRailRuralBTUPerCapElecMotion / TransRailRuralBTUPerCapMotion * 100
 )
 
-TransRailRuralPerElecMotion = TransRailRuralPerElecMotion
 
 ##########################
 # Mobile-Other GHG Factors
@@ -543,7 +516,6 @@ InterCityRailElecBBtuMotion = InterCityRailElecBBtu * PerEnergyToMotionRailElec 
 InterCityRailDieselBBtuMotion = InterCityRailDieselBBtu * PerEnergyToMotionRailDiesel / 100
 InterCityRailBBtuMotion = InterCityRailElecBBtuMotion + InterCityRailDieselBBtuMotion
 InterCityRailPerElecMotion = InterCityRailElecBBtuMotion / InterCityRailBBtuMotion * 100
-InterCityRailPerElectrification = InterCityRailPerElecMotion
 InterCityRailMTCO2ePerBBtuDiesel = 73.978
 
 # Marine and Port
@@ -601,59 +573,52 @@ OffroadPerFFLPGMotion = OffroadPerLPGMotion / OffroadPerFossilFuelMotion2015 * 1
 OffroadMinPerElectrification = OffroadPerElecMotion
 OffroadPerElectrification = OffroadMinPerElectrification
 
-# Initial Non-Energy GHG Factors
-PerAg = 0
-PerWaste = 0
-PerWasteWater = 0
-PerIP = 0
-PerUrbanTreeCoverage = 0
-PerForestCoverage = 0
-
-# create dictionary of all variables that user can change, to pass to functions that create charts
+# create dictionary (and set initial values) of all variables that user can change
+# will be passed to functions that create charts
 user_inputs = {
-    "ComIndPerElectrification": ComIndPerElectrification,
+    "ci_energy_elec": CI_ENERGY_ELEC,
     "FreightRailPerElecMotion": FreightRailPerElecMotion,
-    "grid_coal": grid_coal,
-    "grid_oil": grid_oil,
-    "grid_ng": grid_ng,
-    "grid_nuclear": grid_nuclear,
-    "grid_solar": grid_solar,
-    "grid_wind": grid_wind,
-    "grid_bio": grid_bio,
-    "grid_hydro": grid_hydro,
-    "grid_geo": grid_geo,
-    "grid_other_ff": grid_other_ff,
+    "grid_coal": GRID_COAL,
+    "grid_oil": GRID_OIL,
+    "grid_ng": GRID_NG,
+    "grid_nuclear": GRID_NUCLEAR,
+    "grid_solar": GRID_SOLAR,
+    "grid_wind": GRID_WIND,
+    "grid_bio": GRID_BIO,
+    "grid_hydro": GRID_HYDRO,
+    "grid_geo": GRID_GEO,
+    "grid_other_ff": GRID_OTHER_FF,
     "InterCityRailPerElecMotion": InterCityRailPerElecMotion,
     "MarinePortPerElectrification": MarinePortPerElectrification,
     "OffroadPerElectrification": OffroadPerElectrification,
-    "PerAg": PerAg,
-    "PerAviation": PerAviation,
-    "res_energy_change": res_energy_change,
+    "change_ag": 0,
+    "change_air_travel": 0,
+    "res_energy_change": 0,
     "ff_carbon_capture": ff_carbon_capture,
-    "PerComIndEnergyUse": PerComIndEnergyUse,
-    "PerEVMT": PerEVMT,
-    "PerForestCoverage": PerForestCoverage,
+    "ci_energy_change": 0,
+    "veh_miles_elec": 0,
+    "change_forest": 0,
     "PerFreightRail": PerFreightRail,
     "PerInterCityRail": PerInterCityRail,
-    "PerIP": PerIP,
+    "change_industrial_processes": 0,
     "PerMarinePort": PerMarinePort,
     "PerOffroad": PerOffroad,
     "PerTransRailRidership": PerTransRailRidership,
-    "PerUrbanTreeCoverage": PerUrbanTreeCoverage,
-    "PerWaste": PerWaste,
-    "PerWasteWater": PerWasteWater,
-    "pop_factor": pop_factor,
-    "RegionalFleetMPG": RegionalFleetMPG,
+    "change_urban_trees": 0,
+    "change_solid_waste": 0,
+    "change_wastewater": 0,
+    "change_pop": 0,
+    "reg_fleet_mpg": REG_FLEET_MPG,
     "rur_energy_elec": RUR_ENERGY_ELEC * 100,  # convert to % b/c func will take user % later
-    "rural_pop_percent": rural_pop_percent,
+    "rural_pop_percent": RURAL_POP_PERCENT,
     "sub_energy_elec": SUB_ENERGY_ELEC * 100,  # convert to % b/c func will take user % later
-    "suburban_pop_percent": suburban_pop_percent,
+    "suburban_pop_percent": SUBURBAN_POP_PERCENT,
     "TransRailRuralPerElecMotion": TransRailRuralPerElecMotion,
     "TransRailSuburbanPerElecMotion": TransRailSuburbanPerElecMotion,
     "TransRailUrbanPerElecMotion": TransRailUrbanPerElecMotion,
     "urb_energy_elec": URB_ENERGY_ELEC * 100,  # convert to % b/c func will take user % later
-    "urban_pop_percent": urban_pop_percent,
-    "VMTperCap": VMTperCap,
+    "urban_pop_percent": URBAN_POP_PERCENT,
+    "change_veh_miles": 0,
 }
 
 
@@ -663,7 +628,7 @@ def calc_res_ghg(
     grid_oil,
     grid_other_ff,
     res_energy_change,
-    pop_factor,
+    change_pop,
     rur_energy_elec,
     sub_energy_elec,
     urb_energy_elec,
@@ -713,7 +678,7 @@ def calc_res_ghg(
         # change in BTU/per from change in sub-sector pop & change in amt of energy consumption
         btu = (
             POP
-            * (1 + pop_factor / 100)
+            * (1 + change_pop / 100)
             * (pop_percent / 100)
             * energy_btu
             * (1 + res_energy_change / 100)
@@ -987,24 +952,22 @@ def calc_res_ghg(
 
 
 def calc_ci_ghg(
-    ComIndPerElectrification,
+    ci_energy_elec,
     grid_coal,
     grid_ng,
     grid_oil,
     grid_other_ff,
     ff_carbon_capture,
-    PerComIndEnergyUse,
+    ci_energy_change,
 ):
-    ComIndPerFossilFuelUsed = 100 - ComIndPerElectrification
-    PerChangedFossilFuelUsed = (
-        ComIndPerFossilFuelUsed - ComIndPerFossilFuelUsed2015
-    ) / ComIndPerFossilFuelUsed2015
+    ci_ff = 100 - ci_energy_elec
+    change_ff = (ci_ff - CI_ENERGY_FF) / CI_ENERGY_FF
 
-    ComIndElecGHG = (
-        ComIndBBtuUsed
-        * (1 + PerComIndEnergyUse / 100)
-        * (ComIndPerElectrification / 100)
-        / (PerEnergyToUseComIndElec / 100)
+    ci_elec_ghg = (
+        CI_ENERGY_BTU
+        * (1 + ci_energy_change / 100)
+        * (ci_energy_elec / 100)
+        / CI_ELEC_USEFUL
         * 1000000000
         * (1 / BTU_MWH)
         / (1 - GRID_LOSS)
@@ -1020,128 +983,128 @@ def calc_ci_ghg(
         * (1 - ff_carbon_capture / 100)
     )
 
-    ComIndNGGHG = (
-        ComIndBBtuUsed
-        * (1 + PerComIndEnergyUse / 100)
-        * (ComIndPerFossilFuelUsed / 100)
-        * (1 + PerChangedFossilFuelUsed)
-        * (ComIndPerFFNGUsed / 100)
-        / (PerEnergyToUseComIndNG / 100)
+    ci_ng_ghg = (
+        CI_ENERGY_BTU
+        * (1 + ci_energy_change / 100)
+        * (ci_ff / 100)
+        * (1 + change_ff)
+        * CI_ENERGY_FF_NG
+        / CI_NG_USEFUL
         * CO2_MMT_BBTU_NG
         * MT_TO_MMT
     )
 
-    ComIndCoalGHG = (
-        ComIndBBtuUsed
-        * (1 + PerComIndEnergyUse / 100)
-        * (ComIndPerFossilFuelUsed / 100)
-        * (1 + PerChangedFossilFuelUsed)
-        * (ComIndPerFFCoalUsed / 100)
-        / (PerEnergyToUseComIndCoal / 100)
+    ci_coal_ghg = (
+        CI_ENERGY_BTU
+        * (1 + ci_energy_change / 100)
+        * (ci_ff / 100)
+        * (1 + change_ff)
+        * CI_ENERGY_FF_COAL
+        / CI_COAL_USEFUL
         * CO2_MMT_BBTU_COAL
         * MT_TO_MMT
     )
 
-    ComIndDFOGHG = (
-        ComIndBBtuUsed
-        * (1 + PerComIndEnergyUse / 100)
-        * (ComIndPerFossilFuelUsed / 100)
-        * (1 + PerChangedFossilFuelUsed)
-        * (ComIndPerFFDFOUsed / 100)
-        / (PerEnergyToUseComIndDFO / 100)
+    ci_dfo_ghg = (
+        CI_ENERGY_BTU
+        * (1 + ci_energy_change / 100)
+        * (ci_ff / 100)
+        * (1 + change_ff)
+        * CI_ENERGY_FF_DFO
+        / CI_DFO_USEFUL
         * CO2_MMT_BBTU_DFO
         * MT_TO_MMT
     )
 
-    ComIndKerGHG = (
-        ComIndBBtuUsed
-        * (1 + PerComIndEnergyUse / 100)
-        * (ComIndPerFossilFuelUsed / 100)
-        * (1 + PerChangedFossilFuelUsed)
-        * (ComIndPerFFKerUsed / 100)
-        / (PerEnergyToUseComIndKer / 100)
+    ci_k_ghg = (
+        CI_ENERGY_BTU
+        * (1 + ci_energy_change / 100)
+        * (ci_ff / 100)
+        * (1 + change_ff)
+        * CI_ENERGY_FF_K
+        / CI_K_USEFUL
         * CO2_MMT_BBTU_KER
         * MT_TO_MMT
     )
 
-    ComIndLPGGHG = (
-        ComIndBBtuUsed
-        * (1 + PerComIndEnergyUse / 100)
-        * (ComIndPerFossilFuelUsed / 100)
-        * (1 + PerChangedFossilFuelUsed)
-        * (ComIndPerFFLPGUsed / 100)
-        / (PerEnergyToUseComIndLPG / 100)
+    ci_lpg_ghg = (
+        CI_ENERGY_BTU
+        * (1 + ci_energy_change / 100)
+        * (ci_ff / 100)
+        * (1 + change_ff)
+        * CI_ENERGY_FF_LPG
+        / CI_LPG_USEFUL
         * CO2_MMT_BBTU_LPG
         * MT_TO_MMT
     )
 
-    ComIndMotGasGHG = (
-        ComIndBBtuUsed
-        * (1 + PerComIndEnergyUse / 100)
-        * (ComIndPerFossilFuelUsed / 100)
-        * (1 + PerChangedFossilFuelUsed)
-        * (ComIndPerFFMotGasUsed / 100)
-        / (PerEnergyToUseComIndMotGas / 100)
+    ci_motor_gas_ghg = (
+        CI_ENERGY_BTU
+        * (1 + ci_energy_change / 100)
+        * (ci_ff / 100)
+        * (1 + change_ff)
+        * CI_ENERGY_FF_MOTOR_GAS
+        / CI_MOTOR_GAS_USEFUL
         * CO2_MMT_BBTU_MOTOR_GAS
         * MT_TO_MMT
     )
 
-    ComIndRFOGHG = (
-        ComIndBBtuUsed
-        * (1 + PerComIndEnergyUse / 100)
-        * (ComIndPerFossilFuelUsed / 100)
-        * (1 + PerChangedFossilFuelUsed)
-        * (ComIndPerFFRFOUsed / 100)
-        / (PerEnergyToUseComIndRFO / 100)
+    ci_rfo_ghg = (
+        CI_ENERGY_BTU
+        * (1 + ci_energy_change / 100)
+        * (ci_ff / 100)
+        * (1 + change_ff)
+        * CI_ENERGY_FF_RFO
+        / CI_RFO_USEFUL
         * CO2_MMT_BBTU_RFO
         * MT_TO_MMT
     )
 
-    ComIndPetCokeGHG = (
-        ComIndBBtuUsed
-        * (1 + PerComIndEnergyUse / 100)
-        * (ComIndPerFossilFuelUsed / 100)
-        * (1 + PerChangedFossilFuelUsed)
-        * (ComIndPerFFPetCokeUsed / 100)
-        / (PerEnergyToUseComIndPetCoke / 100)
+    ci_pet_coke_ghg = (
+        CI_ENERGY_BTU
+        * (1 + ci_energy_change / 100)
+        * (ci_ff / 100)
+        * (1 + change_ff)
+        * CI_ENERGY_FF_PET_COKE
+        / CI_PET_COKE_USEFUL
         * CO2_MMT_BBTU_PETCOKE
         * MT_TO_MMT
     )
 
-    ComIndStillGasGHG = (
-        ComIndBBtuUsed
-        * (1 + PerComIndEnergyUse / 100)
-        * (ComIndPerFossilFuelUsed / 100)
-        * (1 + PerChangedFossilFuelUsed)
-        * (ComIndPerFFStillGasUsed / 100)
-        / (PerEnergyToUseComIndStillGas / 100)
+    ci_still_gas_ghg = (
+        CI_ENERGY_BTU
+        * (1 + ci_energy_change / 100)
+        * (ci_ff / 100)
+        * (1 + change_ff)
+        * CI_ENERGY_FF_STILL_GAS
+        / CI_STILL_GAS_USEFUL
         * CO2_MMT_BBTU_STILL_GAS
         * MT_TO_MMT
     )
 
-    ComIndSpecialNaphthasGHG = (
-        ComIndBBtuUsed
-        * (1 + PerComIndEnergyUse / 100)
-        * (ComIndPerFossilFuelUsed / 100)
-        * (1 + PerChangedFossilFuelUsed)
-        * (ComIndPerFFSpecialNaphthasUsed / 100)
-        / (PerEnergyToUseComIndSpecialNaphthas / 100)
+    ci_naphthas_ghg = (
+        CI_ENERGY_BTU
+        * (1 + ci_energy_change / 100)
+        * (ci_ff / 100)
+        * (1 + change_ff)
+        * CI_ENERGY_FF_NAPHTHAS
+        / CI_NAPHTHAS_USEFUL
         * CO2_MMT_BBTU_NAPHTHAS
         * MT_TO_MMT
     )
 
     return (
-        ComIndElecGHG
-        + ComIndNGGHG
-        + ComIndCoalGHG
-        + ComIndDFOGHG
-        + ComIndKerGHG
-        + ComIndLPGGHG
-        + ComIndMotGasGHG
-        + ComIndRFOGHG
-        + ComIndPetCokeGHG
-        + ComIndStillGasGHG
-        + ComIndSpecialNaphthasGHG
+        ci_elec_ghg
+        + ci_ng_ghg
+        + ci_coal_ghg
+        + ci_dfo_ghg
+        + ci_k_ghg
+        + ci_lpg_ghg
+        + ci_motor_gas_ghg
+        + ci_rfo_ghg
+        + ci_pet_coke_ghg
+        + ci_still_gas_ghg
+        + ci_naphthas_ghg
     )
 
 
@@ -1151,25 +1114,27 @@ def calc_highway_ghg(
     grid_oil,
     grid_other_ff,
     ff_carbon_capture,
-    PerEVMT,
-    pop_factor,
-    RegionalFleetMPG,
+    veh_miles_elec,
+    change_pop,
+    reg_fleet_mpg,
     rural_pop_percent,
     suburban_pop_percent,
     urban_pop_percent,
-    VMTperCap,
+    change_veh_miles,
 ):
-    VMT = (
-        (POP * urban_pop_percent / 100 * (1 + pop_factor / 100) * UrbanVMTperPop)
-        + (POP * suburban_pop_percent / 100 * (1 + pop_factor / 100) * SuburbanVMTperPop)
-        + (POP * rural_pop_percent / 100 * (1 + pop_factor / 100) * RuralVMTperPop)
-    ) * (1 + VMTperCap / 100)
+    veh_miles_traveled = (
+        (POP * urban_pop_percent / 100 * (1 + change_pop / 100) * URB_VEH_MILES)
+        + (POP * suburban_pop_percent / 100 * (1 + change_pop / 100) * SUB_VEH_MILES)
+        + (POP * rural_pop_percent / 100 * (1 + change_pop / 100) * RUR_VEH_MILES)
+    ) * (1 + change_veh_miles / 100)
 
-    EVMT = VMT * PerEVMT / 100
+    elec_miles_percent = veh_miles_traveled * veh_miles_elec / 100
 
-    highway_ghg = (VMT - EVMT) / RegionalFleetMPG * CO2eperGallonGasoline * MMT_LB + (
-        EVMT
-        * EVEff
+    highway_ghg = (
+        veh_miles_traveled - elec_miles_percent
+    ) / reg_fleet_mpg * CO2_LB_GAL_GAS * MMT_LB + (
+        elec_miles_percent
+        * ELEC_VEH_EFFICIENCY
         * 0.001
         / (1 - GRID_LOSS)
         * (
@@ -1179,13 +1144,15 @@ def calc_highway_ghg(
             + (grid_other_ff / 100 * CO2_LB_MWH_OTHER_FF)
         )
         * MMT_LB
-    ) * (1 - ff_carbon_capture / 100)
+    ) * (
+        1 - ff_carbon_capture / 100
+    )
 
     return highway_ghg
 
 
-def calc_aviation_ghg(pop_factor, PerAviation):
-    return GHG_AVIATION * (1 + pop_factor / 100) * (1 + PerAviation / 100)
+def calc_aviation_ghg(change_pop, change_air_travel):
+    return GHG_AVIATION * (1 + change_pop / 100) * (1 + change_air_travel / 100)
 
 
 def calc_transit_ghg(
@@ -1195,7 +1162,7 @@ def calc_transit_ghg(
     grid_other_ff,
     ff_carbon_capture,
     PerTransRailRidership,
-    pop_factor,
+    change_pop,
     rural_pop_percent,
     suburban_pop_percent,
     TransRailUrbanPerElecMotion,
@@ -1209,7 +1176,7 @@ def calc_transit_ghg(
 
     MobTransitElecGHG = (
         POP
-        * (1 + pop_factor / 100)
+        * (1 + change_pop / 100)
         * (1 / BTU_MWH)
         / (1 - GRID_LOSS)
         * (
@@ -1250,7 +1217,7 @@ def calc_transit_ghg(
 
     MobTransitDieselGHG = (
         POP
-        * (1 + pop_factor / 100)
+        * (1 + change_pop / 100)
         * TransRailMTCO2ePerBBtuDiesel
         * (1 / 1000000000)
         * MT_TO_MMT
@@ -1475,29 +1442,29 @@ def calc_other_mobile_ghg(
 
 
 def calc_non_energy_ghg(
-    ComIndPerElectrification,
+    ci_energy_elec,
     grid_coal,
     grid_ng,
     grid_oil,
     grid_other_ff,
-    PerAg,
+    change_ag,
     res_energy_change,
-    PerComIndEnergyUse,
-    PerForestCoverage,
-    PerIP,
-    PerUrbanTreeCoverage,
-    PerWaste,
-    PerWasteWater,
-    pop_factor,
+    ci_energy_change,
+    change_forest,
+    change_industrial_processes,
+    change_urban_trees,
+    change_solid_waste,
+    change_wastewater,
+    change_pop,
     rur_energy_elec,
     sub_energy_elec,
     urb_energy_elec,
-    urban_pop_percent,
+    urban_pop_percent,  # TODO: why only urban_pop_percent and not sub and rural?
 ):
-    AgricultureGHG = GHG_AG * (1 + PerAg / 100)
-    SolidWasteGHG = GHG_SOLID_WASTE * (1 + PerWaste / 100) * (1 + pop_factor / 100)
-    WasteWaterGHG = GHG_WASTEWATER * (1 + PerWasteWater / 100) * (1 + pop_factor / 100)
-    IndProcGHG = GHG_IP * (1 + PerIP / 100)
+    AgricultureGHG = GHG_AG * (1 + change_ag / 100)
+    SolidWasteGHG = GHG_SOLID_WASTE * (1 + change_solid_waste / 100) * (1 + change_pop / 100)
+    WasteWaterGHG = GHG_WASTEWATER * (1 + change_wastewater / 100) * (1 + change_pop / 100)
+    IndProcGHG = GHG_IP * (1 + change_industrial_processes / 100)
 
     ResNGConsumption = calc_res_ghg(
         grid_coal,
@@ -1505,27 +1472,25 @@ def calc_non_energy_ghg(
         grid_oil,
         grid_other_ff,
         res_energy_change,
-        pop_factor,
+        change_pop,
         rur_energy_elec,
         sub_energy_elec,
         urb_energy_elec,
-        rural_pop_percent,
-        suburban_pop_percent,
+        RURAL_POP_PERCENT,
+        SUBURBAN_POP_PERCENT,
         urban_pop_percent,
     )[1]
 
-    ComIndPerFossilFuelUsed = 100 - ComIndPerElectrification
-    PerChangedFossilFuelUsed = (
-        ComIndPerFossilFuelUsed - ComIndPerFossilFuelUsed2015
-    ) / ComIndPerFossilFuelUsed2015
+    ci_ff = 100 - ci_energy_elec
+    change_ff = (ci_ff - CI_ENERGY_FF) / CI_ENERGY_FF
 
     ComIndNGConsumption = (
-        ComIndBBtuUsed
-        * (1 + PerComIndEnergyUse / 100)
-        * (ComIndPerFossilFuelUsed / 100)
-        * (1 + PerChangedFossilFuelUsed)
-        * (ComIndPerFFNGUsed / 100)
-        / (PerEnergyToUseComIndNG / 100)
+        CI_ENERGY_BTU
+        * (1 + ci_energy_change / 100)
+        * (ci_ff / 100)
+        * (1 + change_ff)
+        * CI_ENERGY_FF_NG
+        / CI_NG_USEFUL
         * 1000000000
     )
 
@@ -1537,16 +1502,16 @@ def calc_non_energy_ghg(
         * (MMTCO2ePerMillionCFNG_CH4 + MMTCO2ePerMillionCFNG_CO2)
     )
 
-    LULUCFGHG = GHG_URBAN_TREES * (1 + PerUrbanTreeCoverage / 100) + (
+    LULUCFGHG = GHG_URBAN_TREES * (1 + change_urban_trees / 100) + (
         GHG_FORESTS + GHG_FOREST_CHANGE
-    ) * (1 + PerForestCoverage / 100)
+    ) * (1 + change_forest / 100)
 
     return AgricultureGHG + SolidWasteGHG + WasteWaterGHG + IndProcGHG + NGSystemsGHG + LULUCFGHG
 
 
 def wrangle_data_for_bar_chart(user_inputs):
     data = {
-        "Category": sectors,
+        "Category": SECTORS,
         "2015": [
             GHG_RES,
             GHG_CI,
@@ -1563,7 +1528,7 @@ def wrangle_data_for_bar_chart(user_inputs):
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
                 user_inputs["res_energy_change"],
-                user_inputs["pop_factor"],
+                user_inputs["change_pop"],
                 user_inputs["rur_energy_elec"],
                 user_inputs["sub_energy_elec"],
                 user_inputs["urb_energy_elec"],
@@ -1572,13 +1537,13 @@ def wrangle_data_for_bar_chart(user_inputs):
                 user_inputs["urban_pop_percent"],
             )[0],
             calc_ci_ghg(
-                user_inputs["ComIndPerElectrification"],
+                user_inputs["ci_energy_elec"],
                 user_inputs["grid_coal"],
                 user_inputs["grid_ng"],
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
                 user_inputs["ff_carbon_capture"],
-                user_inputs["PerComIndEnergyUse"],
+                user_inputs["ci_energy_change"],
             ),
             calc_highway_ghg(
                 user_inputs["grid_coal"],
@@ -1586,13 +1551,13 @@ def wrangle_data_for_bar_chart(user_inputs):
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
                 user_inputs["ff_carbon_capture"],
-                user_inputs["PerEVMT"],
-                user_inputs["pop_factor"],
-                user_inputs["RegionalFleetMPG"],
+                user_inputs["veh_miles_elec"],
+                user_inputs["change_pop"],
+                user_inputs["reg_fleet_mpg"],
                 user_inputs["rural_pop_percent"],
                 user_inputs["suburban_pop_percent"],
                 user_inputs["urban_pop_percent"],
-                user_inputs["VMTperCap"],
+                user_inputs["change_veh_miles"],
             ),
             calc_transit_ghg(
                 user_inputs["grid_coal"],
@@ -1601,7 +1566,7 @@ def wrangle_data_for_bar_chart(user_inputs):
                 user_inputs["grid_other_ff"],
                 user_inputs["ff_carbon_capture"],
                 user_inputs["PerTransRailRidership"],
-                user_inputs["pop_factor"],
+                user_inputs["change_pop"],
                 user_inputs["rural_pop_percent"],
                 user_inputs["suburban_pop_percent"],
                 user_inputs["TransRailUrbanPerElecMotion"],
@@ -1609,7 +1574,7 @@ def wrangle_data_for_bar_chart(user_inputs):
                 user_inputs["TransRailRuralPerElecMotion"],
                 user_inputs["urban_pop_percent"],
             ),
-            calc_aviation_ghg(user_inputs["pop_factor"], user_inputs["PerAviation"]),
+            calc_aviation_ghg(user_inputs["change_pop"], user_inputs["change_air_travel"]),
             calc_other_mobile_ghg(
                 user_inputs["FreightRailPerElecMotion"],
                 user_inputs["grid_coal"],
@@ -1626,20 +1591,20 @@ def wrangle_data_for_bar_chart(user_inputs):
                 user_inputs["OffroadPerElectrification"],
             ),
             calc_non_energy_ghg(
-                user_inputs["ComIndPerElectrification"],
+                user_inputs["ci_energy_elec"],
                 user_inputs["grid_coal"],
                 user_inputs["grid_ng"],
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
-                user_inputs["PerAg"],
+                user_inputs["change_ag"],
                 user_inputs["res_energy_change"],
-                user_inputs["PerComIndEnergyUse"],
-                user_inputs["PerForestCoverage"],
-                user_inputs["PerIP"],
-                user_inputs["PerUrbanTreeCoverage"],
-                user_inputs["PerWaste"],
-                user_inputs["PerWasteWater"],
-                user_inputs["pop_factor"],
+                user_inputs["ci_energy_change"],
+                user_inputs["change_forest"],
+                user_inputs["change_industrial_processes"],
+                user_inputs["change_urban_trees"],
+                user_inputs["change_solid_waste"],
+                user_inputs["change_wastewater"],
+                user_inputs["change_pop"],
                 user_inputs["rur_energy_elec"],
                 user_inputs["sub_energy_elec"],
                 user_inputs["urb_energy_elec"],
@@ -1662,7 +1627,7 @@ def wrangle_data_for_stacked_chart(user_inputs):
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
                 user_inputs["res_energy_change"],
-                user_inputs["pop_factor"],
+                user_inputs["change_pop"],
                 user_inputs["rur_energy_elec"],
                 user_inputs["sub_energy_elec"],
                 user_inputs["urb_energy_elec"],
@@ -1674,13 +1639,13 @@ def wrangle_data_for_stacked_chart(user_inputs):
         "Commercial/Industrial": [
             GHG_CI,
             calc_ci_ghg(
-                user_inputs["ComIndPerElectrification"],
+                user_inputs["ci_energy_elec"],
                 user_inputs["grid_coal"],
                 user_inputs["grid_ng"],
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
                 user_inputs["ff_carbon_capture"],
-                user_inputs["PerComIndEnergyUse"],
+                user_inputs["ci_energy_change"],
             ),
         ],
         "Mobile-Highway": [
@@ -1691,13 +1656,13 @@ def wrangle_data_for_stacked_chart(user_inputs):
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
                 user_inputs["ff_carbon_capture"],
-                user_inputs["PerEVMT"],
-                user_inputs["pop_factor"],
-                user_inputs["RegionalFleetMPG"],
+                user_inputs["veh_miles_elec"],
+                user_inputs["change_pop"],
+                user_inputs["reg_fleet_mpg"],
                 user_inputs["rural_pop_percent"],
                 user_inputs["suburban_pop_percent"],
                 user_inputs["urban_pop_percent"],
-                user_inputs["VMTperCap"],
+                user_inputs["change_veh_miles"],
             ),
         ],
         "Mobile-Transit": [
@@ -1709,7 +1674,7 @@ def wrangle_data_for_stacked_chart(user_inputs):
                 user_inputs["grid_other_ff"],
                 user_inputs["ff_carbon_capture"],
                 user_inputs["PerTransRailRidership"],
-                user_inputs["pop_factor"],
+                user_inputs["change_pop"],
                 user_inputs["rural_pop_percent"],
                 user_inputs["suburban_pop_percent"],
                 user_inputs["TransRailUrbanPerElecMotion"],
@@ -1718,7 +1683,10 @@ def wrangle_data_for_stacked_chart(user_inputs):
                 user_inputs["urban_pop_percent"],
             ),
         ],
-        "Mobile-Aviation": [GHG_AVIATION, calc_aviation_ghg(pop_factor, PerAviation)],
+        "Mobile-Aviation": [
+            GHG_AVIATION,
+            calc_aviation_ghg(user_inputs["change_pop"], user_inputs["change_air_travel"]),
+        ],
         "Mobile-Other": [
             GHG_OTHER_MOBILE,
             calc_other_mobile_ghg(
@@ -1740,20 +1708,20 @@ def wrangle_data_for_stacked_chart(user_inputs):
         "Non-Energy": [
             GHG_NON_ENERGY,
             calc_non_energy_ghg(
-                user_inputs["ComIndPerElectrification"],
+                user_inputs["ci_energy_elec"],
                 user_inputs["grid_coal"],
                 user_inputs["grid_ng"],
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
-                user_inputs["PerAg"],
+                user_inputs["change_ag"],
                 user_inputs["res_energy_change"],
-                user_inputs["PerComIndEnergyUse"],
-                user_inputs["PerForestCoverage"],
-                user_inputs["PerIP"],
-                user_inputs["PerUrbanTreeCoverage"],
-                user_inputs["PerWaste"],
-                user_inputs["PerWasteWater"],
-                user_inputs["pop_factor"],
+                user_inputs["ci_energy_change"],
+                user_inputs["change_forest"],
+                user_inputs["change_industrial_processes"],
+                user_inputs["change_urban_trees"],
+                user_inputs["change_solid_waste"],
+                user_inputs["change_wastewater"],
+                user_inputs["change_pop"],
                 user_inputs["rur_energy_elec"],
                 user_inputs["sub_energy_elec"],
                 user_inputs["urb_energy_elec"],
@@ -1819,18 +1787,18 @@ def generate_text_and_style(user_inputs):
 def callback(attr, old, new):
     """Set variables according to user inputs."""
     user_inputs = {
-        "grid_coal": float(grid_coalTextInput.value),
-        "grid_ng": float(grid_ngTextInput.value),
-        "grid_oil": float(grid_oilTextInput.value),
-        "grid_nuclear": float(grid_nuclearTextInput.value),
-        "grid_solar": float(grid_solarTextInput.value),
-        "grid_wind": float(grid_windTextInput.value),
-        "grid_bio": float(grid_bioTextInput.value),
-        "grid_hydro": float(grid_hydroTextInput.value),
-        "grid_geo": float(grid_geoTextInput.value),
-        "grid_other_ff": float(grid_other_ffTextInput.value),
+        "grid_coal": float(grid_coal_input.value),
+        "grid_ng": float(grid_ng_input.value),
+        "grid_oil": float(grid_oil_input.value),
+        "grid_nuclear": float(grid_nuclear_input.value),
+        "grid_solar": float(grid_solar_input.value),
+        "grid_wind": float(grid_wind_input.value),
+        "grid_bio": float(grid_bio_input.value),
+        "grid_hydro": float(grid_hydro_input.value),
+        "grid_geo": float(grid_geo_input.value),
+        "grid_other_ff": float(grid_other_ff_input.value),
         "PerNetZeroCarbon": float(PerNetZeroCarbonTextInput.value),  # TK, possibly
-        "pop_factor": pop_factorSlider.value,
+        "change_pop": change_pop_slider.value,
         "urban_pop_percent": float(urban_pop_percentTextInput.value),
         "suburban_pop_percent": float(suburban_pop_percentTextInput.value),
         "rural_pop_percent": float(rural_pop_percentTextInput.value),
@@ -1838,11 +1806,11 @@ def callback(attr, old, new):
         "urb_energy_elec": urb_energy_elec_slider.value,
         "sub_energy_elec": sub_energy_elec_slider.value,
         "rur_energy_elec": rur_energy_elec_slider.value,
-        "PerComIndEnergyUse": PerComIndEnergyUseSlider.value,
-        "ComIndPerElectrification": ComIndPerElectrificationSlider.value,
-        "VMTperCap": VMTperCapSlider.value,
-        "RegionalFleetMPG": RegionalFleetMPGSlider.value,
-        "PerEVMT": PerEVMTSlider.value,
+        "ci_energy_change": ci_energy_change_slider.value,
+        "ci_energy_elec": ci_energy_elec_slider.value,
+        "change_veh_miles": change_veh_miles_slider.value,
+        "reg_fleet_mpg": reg_fleet_mpg_slider.value,
+        "veh_miles_elec": veh_miles_elec_slider.value,
         "PerTransRailRidership": PerTransRailRidershipSlider.value,
         "TransRailUrbanPerElecMotion": TransRailUrbanPerElecMotionSlider.value,
         "TransRailSuburbanPerElecMotion": TransRailSuburbanPerElecMotionSlider.value,
@@ -1855,13 +1823,13 @@ def callback(attr, old, new):
         "MarinePortPerElectrification": MarinePortPerElectrificationSlider.value,
         "PerOffroad": PerOffroadSlider.value,
         "OffroadPerElectrification": OffroadPerElectrificationSlider.value,
-        "PerAviation": PerAviationSlider.value,
-        "PerAg": PerAgSlider.value,
-        "PerWaste": PerWasteSlider.value,
-        "PerWasteWater": PerWasteWaterSlider.value,
-        "PerIP": PerIPSlider.value,
-        "PerUrbanTreeCoverage": PerUrbanTreeCoverageSlider.value,
-        "PerForestCoverage": PerForestCoverageSlider.value,
+        "change_air_travel": change_air_travel_slider.value,
+        "change_ag": change_ag_slider.value,
+        "change_solid_waste": change_solid_waste_slider.value,
+        "change_wastewater": change_wasterwater_slider.value,
+        "change_industrial_processes": change_industrial_processes_slider.value,
+        "change_urban_trees": change_urban_trees_slider.value,
+        "change_forest": change_forest_slider.value,
         "ff_carbon_capture": ff_carbon_capture_slider.value,
         "AirCapture": AirCaptureSlider.value,  # TK, possibly
     }
@@ -1877,7 +1845,6 @@ def callback(attr, old, new):
 
 ###############
 # Create charts
-
 
 bar_chart_data = wrangle_data_for_bar_chart(user_inputs)
 bar_chart_source = ColumnDataSource(data=bar_chart_data)
@@ -1935,7 +1902,6 @@ labels_2015 = LabelSet(
 bar_chart.add_layout(labels_scenario)
 bar_chart.add_layout(labels_2015)
 
-
 stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
 stacked_chart_source = ColumnDataSource(data=stacked_chart_data)
 stacked_bar_chart = figure(
@@ -1947,17 +1913,14 @@ stacked_bar_chart = figure(
     title="Greenhouse Gas Emissions in Greater Philadelphia",
 )
 stacked_bar_chart.vbar_stack(
-    sectors, x="Year", width=0.4, color=Viridis7, source=stacked_chart_source, legend_label=sectors
+    SECTORS, x="Year", width=0.4, color=Viridis7, source=stacked_chart_source, legend_label=SECTORS
 )
-stacked_bar_chart.legend[
-    0
-].items.reverse()  # Reverses legend items to match order of occurence in stack
+stacked_bar_chart.legend[0].items.reverse()  # Reverse legend items to match order  in stack
 stacked_bar_chart_legend = stacked_bar_chart.legend[0]
 stacked_bar_chart.add_layout(stacked_bar_chart_legend, "right")
 
 pie_chart_data = wrangle_data_for_pie_chart(user_inputs)
 pie_chart_source = ColumnDataSource(data=pie_chart_data)
-
 pie_chart = figure(
     title="Electricity Grid Resource Mix",
     toolbar_location=None,
@@ -1967,7 +1930,6 @@ pie_chart = figure(
     tooltips="@FuelType: @Percentage",
     x_range=(-0.5, 1.0),
 )
-
 pie_chart.wedge(
     x=0,
     y=1,
@@ -1979,7 +1941,6 @@ pie_chart.wedge(
     legend_field="FuelType",
     source=pie_chart_source,
 )
-
 pie_chart.axis.axis_label = None
 pie_chart.axis.visible = False
 pie_chart.grid.grid_line_color = None
@@ -1991,61 +1952,61 @@ pie_chart.grid.grid_line_color = None
 text, style = generate_text_and_style(user_inputs)
 grid_text = Paragraph(text=text, style=style)
 
-grid_coalTextInput = TextInput(value=str(round(grid_coal, 1)), title="% Coal in Grid Mix")
-grid_coalTextInput.on_change("value", callback)
+grid_coal_input = TextInput(value=str(round(GRID_COAL, 1)), title="% Coal in Grid Mix")
+grid_coal_input.on_change("value", callback)
 
-grid_oilTextInput = TextInput(value=str(round(grid_oil, 1)), title="% Oil in Grid Mix")
-grid_oilTextInput.on_change("value", callback)
+grid_oil_input = TextInput(value=str(round(GRID_OIL, 1)), title="% Oil in Grid Mix")
+grid_oil_input.on_change("value", callback)
 
-grid_ngTextInput = TextInput(value=str(round(grid_ng, 1)), title="% Natural Gas in Grid Mix")
-grid_ngTextInput.on_change("value", callback)
+grid_ng_input = TextInput(value=str(round(GRID_NG, 1)), title="% Natural Gas in Grid Mix")
+grid_ng_input.on_change("value", callback)
 
-grid_nuclearTextInput = TextInput(value=str(round(grid_nuclear, 1)), title="% Nuclear in Grid Mix")
-grid_nuclearTextInput.on_change("value", callback)
+grid_nuclear_input = TextInput(value=str(round(GRID_NUCLEAR, 1)), title="% Nuclear in Grid Mix")
+grid_nuclear_input.on_change("value", callback)
 
-grid_solarTextInput = TextInput(value=str(round(grid_solar, 1)), title="% Solar in Grid Mix")
-grid_solarTextInput.on_change("value", callback)
+grid_solar_input = TextInput(value=str(round(GRID_SOLAR, 1)), title="% Solar in Grid Mix")
+grid_solar_input.on_change("value", callback)
 
-grid_windTextInput = TextInput(value=str(round(grid_wind, 1)), title="% Wind in Grid Mix")
-grid_windTextInput.on_change("value", callback)
+grid_wind_input = TextInput(value=str(round(GRID_WIND, 1)), title="% Wind in Grid Mix")
+grid_wind_input.on_change("value", callback)
 
-grid_bioTextInput = TextInput(value=str(round(grid_bio, 1)), title="% Biomass in Grid Mix")
-grid_bioTextInput.on_change("value", callback)
+grid_bio_input = TextInput(value=str(round(GRID_BIO, 1)), title="% Biomass in Grid Mix")
+grid_bio_input.on_change("value", callback)
 
-grid_hydroTextInput = TextInput(value=str(round(grid_hydro, 1)), title="% Hydropower in Grid Mix")
-grid_hydroTextInput.on_change("value", callback)
+grid_hydro_input = TextInput(value=str(round(GRID_HYDRO, 1)), title="% Hydropower in Grid Mix")
+grid_hydro_input.on_change("value", callback)
 
-grid_geoTextInput = TextInput(value=str(round(grid_geo, 1)), title="% Geothermal in Grid Mix")
-grid_geoTextInput.on_change("value", callback)
+grid_geo_input = TextInput(value=str(round(GRID_GEO, 1)), title="% Geothermal in Grid Mix")
+grid_geo_input.on_change("value", callback)
 
-grid_other_ffTextInput = TextInput(
-    value=str(round(grid_other_ff, 1)), title="% Other Fossil Fuel in Grid Mix"
+grid_other_ff_input = TextInput(
+    value=str(round(GRID_OTHER_FF, 1)), title="% Other Fossil Fuel in Grid Mix"
 )
-grid_other_ffTextInput.on_change("value", callback)
+grid_other_ff_input.on_change("value", callback)
 
 PerNetZeroCarbonTextInput = TextInput(
-    value=str(round(grid_nuclear + grid_solar + grid_wind + grid_bio + grid_hydro + grid_geo)),
+    value=str(round(GRID_NUCLEAR + GRID_SOLAR + GRID_WIND + GRID_BIO + GRID_HYDRO + GRID_GEO)),
     title="% Net Zero Carbon Sources in Grid Mix",
 )
 PerNetZeroCarbonTextInput.on_change("value", callback)
 
 # population
-pop_factorSlider = Slider(start=-100, end=100, value=0, step=10, title="% Change in Population")
-pop_factorSlider.on_change("value", callback)
+change_pop_slider = Slider(start=-100, end=100, value=0, step=10, title="% Change in Population")
+change_pop_slider.on_change("value", callback)
 
 urban_pop_percentTextInput = TextInput(
-    value=str(round(urban_pop_percent, 1)), title="% of Population Living in Urban Municipalities"
+    value=str(round(URBAN_POP_PERCENT, 1)), title="% of Population Living in Urban Municipalities"
 )
 urban_pop_percentTextInput.on_change("value", callback)
 
 suburban_pop_percentTextInput = TextInput(
-    value=str(round(suburban_pop_percent, 1)),
+    value=str(round(SUBURBAN_POP_PERCENT, 1)),
     title="% of Population Living in Suburban Municipalities",
 )
 suburban_pop_percentTextInput.on_change("value", callback)
 
 rural_pop_percentTextInput = TextInput(
-    value=str(round(rural_pop_percent, 1)), title="% of Population Living in Rural Municipalities"
+    value=str(round(RURAL_POP_PERCENT, 1)), title="% of Population Living in Rural Municipalities"
 )
 rural_pop_percentTextInput.on_change("value", callback)
 
@@ -2082,39 +2043,43 @@ rur_energy_elec_slider = Slider(
 rur_energy_elec_slider.on_change("value", callback)
 
 # commercial and industrial
-PerComIndEnergyUseSlider = Slider(
+ci_energy_change_slider = Slider(
     start=-100,
     end=100,
     value=0,
     step=10,
     title="% Change in Commercial and Industrial Energy Usage",
 )
-PerComIndEnergyUseSlider.on_change("value", callback)
+ci_energy_change_slider.on_change("value", callback)
 
-ComIndPerElectrificationSlider = Slider(
-    start=ComIndMinPerElectrification,
+ci_energy_elec_slider = Slider(
+    start=CI_ENERGY_ELEC,
     end=100,
-    value=ComIndPerElecUsed,
+    value=CI_ENERGY_ELEC,
     step=1,
     title="% Electrification of Commercial and Industrial End Uses",
 )
-ComIndPerElectrificationSlider.on_change("value", callback)
+ci_energy_elec_slider.on_change("value", callback)
 
 # highway
-VMTperCapSlider = Slider(start=-100, end=100, value=0, step=1, title="% Change in VMT per Capita")
-VMTperCapSlider.on_change("value", callback)
+change_veh_miles_slider = Slider(
+    start=-100, end=100, value=0, step=1, title="% Change in Vehicle Miles Traveled per Person"
+)
+change_veh_miles_slider.on_change("value", callback)
 
-PerEVMTSlider = Slider(start=0, end=100, value=0, step=1, title="% Vehicle Miles that are Electric")
-PerEVMTSlider.on_change("value", callback)
+veh_miles_elec_slider = Slider(
+    start=0, end=100, value=0, step=1, title="% Vehicle Miles that are Electric"
+)
+veh_miles_elec_slider.on_change("value", callback)
 
-RegionalFleetMPGSlider = Slider(
+reg_fleet_mpg_slider = Slider(
     start=1,
     end=100,
-    value=RegionalFleetMPG,
+    value=REG_FLEET_MPG,
     step=1,
     title="Averge Regional Fleetwide Fuel Economy (MPG)",
 )
-RegionalFleetMPGSlider.on_change("value", callback)
+reg_fleet_mpg_slider.on_change("value", callback)
 
 # rail transit
 PerTransRailRidershipSlider = Slider(
@@ -2150,8 +2115,10 @@ TransRailRuralPerElecMotionSlider = Slider(
 TransRailRuralPerElecMotionSlider.on_change("value", callback)
 
 # aviation
-PerAviationSlider = Slider(start=-100, end=100, value=0, step=1, title="% Change in Air Travel")
-PerAviationSlider.on_change("value", callback)
+change_air_travel_slider = Slider(
+    start=-100, end=100, value=0, step=1, title="% Change in Air Travel"
+)
+change_air_travel_slider.on_change("value", callback)
 
 # freight rail
 PerFreightRailSlider = Slider(
@@ -2214,35 +2181,35 @@ OffroadPerElectrificationSlider = Slider(
 OffroadPerElectrificationSlider.on_change("value", callback)
 
 # non-energy
-PerAgSlider = Slider(
+change_ag_slider = Slider(
     start=-100, end=100, value=0, step=1, title="% Change in Emissions from Agriculture"
 )
-PerAgSlider.on_change("value", callback)
+change_ag_slider.on_change("value", callback)
 
-PerWasteSlider = Slider(
+change_solid_waste_slider = Slider(
     start=-100, end=100, value=0, step=1, title="% Change in Per Capita Landfill Waste"
 )
-PerWasteSlider.on_change("value", callback)
+change_solid_waste_slider.on_change("value", callback)
 
-PerWasteWaterSlider = Slider(
+change_wasterwater_slider = Slider(
     start=-100, end=100, value=0, step=1, title="% Change in Per Capita Wastewater"
 )
-PerWasteWaterSlider.on_change("value", callback)
+change_wasterwater_slider.on_change("value", callback)
 
-PerIPSlider = Slider(
+change_industrial_processes_slider = Slider(
     start=-100, end=100, value=0, step=1, title="% Change in Emissions from Industrial Processes",
 )
-PerIPSlider.on_change("value", callback)
+change_industrial_processes_slider.on_change("value", callback)
 
-PerUrbanTreeCoverageSlider = Slider(
+change_urban_trees_slider = Slider(
     start=-100, end=100, value=0, step=1, title="% Change in Urban Tree Coverage"
 )
-PerUrbanTreeCoverageSlider.on_change("value", callback)
+change_urban_trees_slider.on_change("value", callback)
 
-PerForestCoverageSlider = Slider(
+change_forest_slider = Slider(
     start=-100, end=100, value=0, step=1, title="% Change in Forest Coverage"
 )
-PerForestCoverageSlider.on_change("value", callback)
+change_forest_slider.on_change("value", callback)
 
 # carbon capture
 ff_carbon_capture_slider = Slider(
@@ -2261,7 +2228,7 @@ AirCaptureSlider.on_change("value", callback)
 # group the input widgets
 
 population_inputs = Column(
-    pop_factorSlider,
+    change_pop_slider,
     urban_pop_percentTextInput,
     suburban_pop_percentTextInput,
     rural_pop_percentTextInput,
@@ -2269,16 +2236,16 @@ population_inputs = Column(
 
 grid_inputs = Column(
     grid_text,
-    grid_coalTextInput,
-    grid_oilTextInput,
-    grid_ngTextInput,
-    grid_nuclearTextInput,
-    grid_solarTextInput,
-    grid_windTextInput,
-    grid_bioTextInput,
-    grid_hydroTextInput,
-    grid_geoTextInput,
-    grid_other_ffTextInput,
+    grid_coal_input,
+    grid_oil_input,
+    grid_ng_input,
+    grid_nuclear_input,
+    grid_solar_input,
+    grid_wind_input,
+    grid_bio_input,
+    grid_hydro_input,
+    grid_geo_input,
+    grid_other_ff_input,
 )
 res_inputs = Column(
     res_energy_change_slider,
@@ -2286,8 +2253,8 @@ res_inputs = Column(
     sub_energy_elec_slider,
     rur_energy_elec_slider,
 )
-ci_inputs = Column(PerComIndEnergyUseSlider, ComIndPerElectrificationSlider)
-highway_inputs = Column(VMTperCapSlider, PerEVMTSlider, RegionalFleetMPGSlider)
+ci_inputs = Column(ci_energy_change_slider, ci_energy_elec_slider)
+highway_inputs = Column(change_veh_miles_slider, veh_miles_elec_slider, reg_fleet_mpg_slider)
 transit_inputs = Column(
     PerTransRailRidershipSlider,
     TransRailUrbanPerElecMotionSlider,
@@ -2295,7 +2262,7 @@ transit_inputs = Column(
     TransRailRuralPerElecMotionSlider,
 )
 other_mobile_inputs = Column(
-    PerAviationSlider,
+    change_air_travel_slider,
     PerFreightRailSlider,
     FreightRailPerElecMotionSlider,
     PerInterCityRailSlider,
@@ -2306,12 +2273,12 @@ other_mobile_inputs = Column(
     OffroadPerElectrificationSlider,
 )
 non_energy_inputs = Column(
-    PerAgSlider,
-    PerWasteSlider,
-    PerWasteWaterSlider,
-    PerIPSlider,
-    PerUrbanTreeCoverageSlider,
-    PerForestCoverageSlider,
+    change_ag_slider,
+    change_solid_waste_slider,
+    change_wasterwater_slider,
+    change_industrial_processes_slider,
+    change_urban_trees_slider,
+    change_forest_slider,
 )
 carbon_capture_inputs = Column(ff_carbon_capture_slider, AirCaptureSlider)
 
