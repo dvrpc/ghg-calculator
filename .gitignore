@@ -1,6 +1,6 @@
 ve
 __pycache__
-
+*.swp
 
 config/settings.py
 notes.md
