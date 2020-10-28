@@ -19,18 +19,19 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 
-from bokeh.server.django import autoload, directory, document, static_extensions
+from bokeh.server.django import autoload
 
 from main import views
 
 bokeh_app_config = apps.get_app_config("bokeh.server.django")
 
 urlpatterns = [
-    path("admin", admin.site.urls),
+    # path("admin", admin.site.urls),
     path("", views.index, name="index"),
     path("population/", views.population, name="population"),
     path("stationary_energy/", views.stationary_energy),
     path("mobile_energy/", views.mobile_energy),
+    path("non_energy/", views.non_energy),
     path("grid_mix/", views.grid_mix),
 ]
 
@@ -38,6 +39,7 @@ bokeh_apps = [
     autoload("population", views.population_handler),
     autoload("stationary_energy", views.stationary_energy_handler),
     autoload("mobile_energy", views.mobile_energy_handler),
+    autoload("non_energy", views.non_energy_handler),
     autoload("grid_mix", views.grid_mix_handler),
 ]
 

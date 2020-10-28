@@ -44,7 +44,6 @@ from bokeh_apps.ghg_calc import (
     REG_FLEET_MPG,
     TransRailUrbanPerElecMotion,
     TransRailRuralPerElecMotion,
-    TransRailRuralPerElecMotion,
     FreightRailPerElecMotion,
     InterCityRailPerElecMotion,
     MarinePortPerElecMotion,
@@ -158,6 +157,7 @@ def stationary_energy_handler(doc: Document) -> None:
         user_inputs["ci_energy_change"] = ci_energy_change_slider.value
         user_inputs["ci_energy_elec"] = ci_energy_elec_slider.value
         bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
+        stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
 
     # residential
     res_energy_change_slider = Slider(
@@ -218,6 +218,10 @@ def stationary_energy_handler(doc: Document) -> None:
     bar_chart_source = ColumnDataSource(data=bar_chart_data)
     bar_chart = create_bar_chart(bar_chart_data, bar_chart_source)
 
+    stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
+    stacked_chart_source = ColumnDataSource(data=stacked_chart_data)
+    stacked_chart = create_stacked_chart(stacked_chart_data, stacked_chart_source)
+
     inputs = Column(
         res_energy_change_slider,
         urb_energy_elec_slider,
@@ -226,8 +230,8 @@ def stationary_energy_handler(doc: Document) -> None:
         ci_energy_change_slider,
         ci_energy_elec_slider,
     )
-
-    doc.add_root(layout([[inputs, bar_chart]]))
+    charts = Column(bar_chart, stacked_chart)
+    doc.add_root(layout([[inputs, charts]]))
 
 
 def stationary_energy(request: HttpRequest) -> HttpResponse:
@@ -409,6 +413,95 @@ def mobile_energy(request: HttpRequest) -> HttpResponse:
     return render(request, "main/base.html", dict(script=script))
 
 
+def non_energy_handler(doc: Document) -> None:
+    def callback(attr, old, new):
+        user_inputs["change_ag"] = change_ag_slider.value
+        user_inputs["change_solid_waste"] = change_solid_waste_slider.value
+        user_inputs["change_wastewater"] = change_wasterwater_slider.value
+        user_inputs["change_industrial_processes"] = change_industrial_processes_slider.value
+        user_inputs["change_urban_trees"] = change_urban_trees_slider.value
+        user_inputs["change_forest"] = change_forest_slider.value
+        user_inputs["ff_carbon_capture"] = ff_carbon_capture_slider.value
+        # user_inputs["AirCapture"] = air_capture_slider.value  # TK, possibly
+        bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
+        stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
+
+    change_ag_slider = Slider(
+        start=-100, end=100, value=0, step=1, title="% Change in Emissions from Agriculture"
+    )
+    change_ag_slider.on_change("value", callback)
+
+    change_solid_waste_slider = Slider(
+        start=-100, end=100, value=0, step=1, title="% Change in Per Capita Landfill Waste"
+    )
+    change_solid_waste_slider.on_change("value", callback)
+
+    change_wasterwater_slider = Slider(
+        start=-100, end=100, value=0, step=1, title="% Change in Per Capita Wastewater"
+    )
+    change_wasterwater_slider.on_change("value", callback)
+
+    change_industrial_processes_slider = Slider(
+        start=-100,
+        end=100,
+        value=0,
+        step=1,
+        title="% Change in Emissions from Industrial Processes",
+    )
+    change_industrial_processes_slider.on_change("value", callback)
+
+    change_urban_trees_slider = Slider(
+        start=-100, end=100, value=0, step=1, title="% Change in Urban Tree Coverage"
+    )
+    change_urban_trees_slider.on_change("value", callback)
+
+    change_forest_slider = Slider(
+        start=-100, end=100, value=0, step=1, title="% Change in Forest Coverage"
+    )
+    change_forest_slider.on_change("value", callback)
+
+    # carbon capture
+    ff_carbon_capture_slider = Slider(
+        start=0,
+        end=100,
+        value=0,
+        step=1,
+        title="% Carbon Captured at Combustion Site for Electricity Generation",
+    )
+    ff_carbon_capture_slider.on_change("value", callback)
+
+    air_capture_slider = Slider(
+        start=0, end=100, value=0, step=1, title="MMTCO2e Captured from the Air"
+    )
+    air_capture_slider.on_change("value", callback)
+
+    bar_chart_data = wrangle_data_for_bar_chart(user_inputs)
+    bar_chart_source = ColumnDataSource(data=bar_chart_data)
+    bar_chart = create_bar_chart(bar_chart_data, bar_chart_source)
+
+    stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
+    stacked_chart_source = ColumnDataSource(data=stacked_chart_data)
+    stacked_chart = create_stacked_chart(stacked_chart_data, stacked_chart_source)
+
+    inputs = Column(
+        change_ag_slider,
+        change_solid_waste_slider,
+        change_wasterwater_slider,
+        change_industrial_processes_slider,
+        change_urban_trees_slider,
+        change_forest_slider,
+        ff_carbon_capture_slider,
+        # air_capture_slider,
+    )
+    charts = Column(bar_chart, stacked_chart)
+    doc.add_root(layout([[inputs, charts]]))
+
+
+def non_energy(request: HttpRequest) -> HttpResponse:
+    script = server_document(request.build_absolute_uri())
+    return render(request, "main/base.html", dict(script=script))
+
+
 def grid_mix_handler(doc: Document) -> None:
     def callback(attr, old, new):
         user_inputs["grid_coal"] = float(grid_coal_input.value)
@@ -422,6 +515,8 @@ def grid_mix_handler(doc: Document) -> None:
         user_inputs["grid_geo"] = float(grid_geo_input.value)
         user_inputs["grid_other_ff"] = float(grid_other_ff_input.value)
         # user_inputs["net_zero_carbon_input"] = (float(net_zero_carbon_input.value),)  # TK, possibly
+        bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
+        stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
         pie_chart_source.data = wrangle_data_for_pie_chart(user_inputs)
         grid_text.text, grid_text.style = generate_text_and_style(user_inputs)
 
@@ -467,7 +562,7 @@ def grid_mix_handler(doc: Document) -> None:
     )
     net_zero_carbon_input.on_change("value", callback)
 
-    grid_inputs = Column(
+    inputs = Column(
         grid_text,
         grid_coal_input,
         grid_oil_input,
@@ -480,11 +575,20 @@ def grid_mix_handler(doc: Document) -> None:
         grid_geo_input,
         grid_other_ff_input,
     )
+    bar_chart_data = wrangle_data_for_bar_chart(user_inputs)
+    bar_chart_source = ColumnDataSource(data=bar_chart_data)
+    bar_chart = create_bar_chart(bar_chart_data, bar_chart_source)
+
+    stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
+    stacked_chart_source = ColumnDataSource(data=stacked_chart_data)
+    stacked_chart = create_stacked_chart(stacked_chart_data, stacked_chart_source)
+
     pie_chart_data = wrangle_data_for_pie_chart(user_inputs)
     pie_chart_source = ColumnDataSource(data=pie_chart_data)
     pie_chart = create_pie_chart(pie_chart_source)
 
-    doc.add_root(layout([[grid_inputs, pie_chart]]))
+    charts = Column(bar_chart, stacked_chart, pie_chart)
+    doc.add_root(layout([[inputs, charts]]))
 
 
 def grid_mix(request: HttpRequest) -> HttpResponse:

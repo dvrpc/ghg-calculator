@@ -1509,6 +1509,11 @@ def calc_non_energy_ghg(
     return AgricultureGHG + SolidWasteGHG + WasteWaterGHG + IndProcGHG + NGSystemsGHG + LULUCFGHG
 
 
+###########################
+# Prepare data for charts #
+###########################
+
+
 def wrangle_data_for_bar_chart(user_inputs):
     data = {
         "Category": SECTORS,
@@ -1754,86 +1759,34 @@ def wrangle_data_for_pie_chart(user_inputs):
     return data
 
 
-# def callback(attr, old, new):
-#     """Set variables according to user inputs."""
-#     user_inputs = {
-#         "grid_coal": float(grid_coal_input.value),
-#         "grid_ng": float(grid_ng_input.value),
-#         "grid_oil": float(grid_oil_input.value),
-#         "grid_nuclear": float(grid_nuclear_input.value),
-#         "grid_solar": float(grid_solar_input.value),
-#         "grid_wind": float(grid_wind_input.value),
-#         "grid_bio": float(grid_bio_input.value),
-#         "grid_hydro": float(grid_hydro_input.value),
-#         "grid_geo": float(grid_geo_input.value),
-#         "grid_other_ff": float(grid_other_ff_input.value),
-#         "PerNetZeroCarbon": float(PerNetZeroCarbonTextInput.value),  # TK, possibly
-#         "change_pop": pop_slider.value,
-#         "urban_pop_percent": float(urban_pop_percentTextInput.value),
-#         "suburban_pop_percent": float(suburban_pop_percentTextInput.value),
-#         "rural_pop_percent": float(rural_pop_percentTextInput.value),
-#         "res_energy_change": res_energy_change_slider.value,
-#         "urb_energy_elec": urb_energy_elec_slider.value,
-#         "sub_energy_elec": sub_energy_elec_slider.value,
-#         "rur_energy_elec": rur_energy_elec_slider.value,
-#         "ci_energy_change": ci_energy_change_slider.value,
-#         "ci_energy_elec": ci_energy_elec_slider.value,
-#         "change_veh_miles": change_veh_miles_slider.value,
-#         "reg_fleet_mpg": reg_fleet_mpg_slider.value,
-#         "veh_miles_elec": veh_miles_elec_slider.value,
-#         "PerTransRailRidership": PerTransRailRidershipSlider.value,
-#         "TransRailUrbanPerElecMotion": TransRailUrbanPerElecMotionSlider.value,
-#         "TransRailSuburbanPerElecMotion": TransRailSuburbanPerElecMotionSlider.value,
-#         "TransRailRuralPerElecMotion": TransRailRuralPerElecMotionSlider.value,
-#         "PerFreightRail": PerFreightRailSlider.value,
-#         "FreightRailPerElecMotion": FreightRailPerElecMotionSlider.value,
-#         "PerInterCityRail": PerInterCityRailSlider.value,
-#         "InterCityRailPerElecMotion": InterCityRailPerElecMotionSlider.value,
-#         "PerMarinePort": PerMarinePortSlider.value,
-#         "MarinePortPerElectrification": MarinePortPerElectrificationSlider.value,
-#         "PerOffroad": PerOffroadSlider.value,
-#         "OffroadPerElectrification": OffroadPerElectrificationSlider.value,
-#         "change_air_travel": change_air_travel_slider.value,
-#         "change_ag": change_ag_slider.value,
-#         "change_solid_waste": change_solid_waste_slider.value,
-#         "change_wastewater": change_wasterwater_slider.value,
-#         "change_industrial_processes": change_industrial_processes_slider.value,
-#         "change_urban_trees": change_urban_trees_slider.value,
-#         "change_forest": change_forest_slider.value,
-#         "ff_carbon_capture": ff_carbon_capture_slider.value,
-#         "AirCapture": AirCaptureSlider.value,  # TK, possibly
-#     }
-#
-#     # update the data for the charts
-#     bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
-#     stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
-#     pie_chart_source.data = wrangle_data_for_pie_chart(user_inputs)
-#
-#     # update text and style for the grid paragraph widget
-#     grid_text.text, grid_text.style = generate_text_and_style(user_inputs)
+##############################
+# Functions to create charts #
+##############################
 
-###############
-# functions that create charts
+"""
+We need these functions that create the charts - rather than creating the charts directly and
+importing them into the appropriate view - because bokeh requires that each Figure be in only
+one document, otherwise it seems that multiple users could be changing the same chart/input
+at the same time. So main/views.py imports these functions, and then individual views create
+the charts as needed.
+
+Additionally, the data/source (for the bar chart and stacked bar chart) and source (for pie chart)
+are created outside these functions and then used as parameters because, in order to update the
+chart, we need to directly update the source.data attribute after user inputs change. Otherwise,
+they could be created at the top of each function and then used within them.
+"""
 
 
-def create_bar_chart(bar_chart_data, bar_chart_source):
+def create_bar_chart(data, source):
     """
-    *bar_chart_data* is the result of wrangle_data_for_bar_chart(), which takes the user_inputs
-    dictionary as an input.
-    *bar_chart_source* is the result of feeding bar_chart_data into bokeh's ColumnDataSource
-    function.
+    Return a figure object.
 
-    This is needed to be done separately and outside of this function because the callbacks for
-    the various inputs (sliders/text inputs) need to update *bar_chart_source.data* so that the
-    charts are updated when user changes inputs.
+    *data* is output of wrangle_data_for_bar_chart().
 
-    Additionally, we need this separate function to create the chart (rather than just creating
-    the chart/updating data here and then importing into the view) because bokeh requires that
-    each Figure be in only one Document - otherwise it seems that multiple users could be
-    change the same chart/input at one time.
+    *source* is the result of feeding *data* into bokeh's ColumnDataSource().
     """
     bar_chart = figure(
-        x_range=bar_chart_data["Category"],
+        x_range=data["Category"],
         y_range=(0, 50),
         plot_height=500,
         plot_width=450,
@@ -1844,7 +1797,7 @@ def create_bar_chart(bar_chart_data, bar_chart_source):
     bar_chart.vbar(
         x=dodge("Category", -0.15, range=bar_chart.x_range),
         top="2015",
-        source=bar_chart_source,
+        source=source,
         width=0.2,
         color="steelblue",
         legend_label="2015",
@@ -1852,7 +1805,7 @@ def create_bar_chart(bar_chart_data, bar_chart_source):
     bar_chart.vbar(
         x=dodge("Category", 0.15, range=bar_chart.x_range),
         top="Scenario",
-        source=bar_chart_source,
+        source=source,
         width=0.2,
         color="darkseagreen",
         legend_label="Scenario",
@@ -1870,7 +1823,7 @@ def create_bar_chart(bar_chart_data, bar_chart_source):
         text_font_size="9px",
         angle=1.57,
         level="glyph",
-        source=bar_chart_source,
+        source=source,
     )
     labels_2015 = LabelSet(
         x=dodge("Category", 0.15, range=bar_chart.x_range),
@@ -1881,7 +1834,7 @@ def create_bar_chart(bar_chart_data, bar_chart_source):
         text_font_size="9px",
         angle=1.57,
         level="glyph",
-        source=bar_chart_source,
+        source=source,
     )
     bar_chart.add_layout(labels_scenario)
     bar_chart.add_layout(labels_2015)
@@ -1890,6 +1843,13 @@ def create_bar_chart(bar_chart_data, bar_chart_source):
 
 
 def create_stacked_chart(data, source):
+    """
+    Return a figure object.
+
+    *data* is output of wrangle_data_for_stacked_chart().
+
+    *source* is the result of feeding *data* into bokeh's ColumnDataSource().
+    """
     stacked_bar_chart = figure(
         x_range=data["Year"],
         y_range=(0, 100),
@@ -1906,14 +1866,20 @@ def create_stacked_chart(data, source):
         source=source,
         legend_label=SECTORS,
     )
-    stacked_bar_chart.legend[0].items.reverse()  # Reverse legend items to match order  in stack
+    stacked_bar_chart.legend[0].items.reverse()  # Reverse legend items to match order in stack
     stacked_bar_chart_legend = stacked_bar_chart.legend[0]
     stacked_bar_chart.add_layout(stacked_bar_chart_legend, "right")
 
     return stacked_bar_chart
 
 
-def create_pie_chart(pie_chart_source):
+def create_pie_chart(source):
+    """
+    Return a figure object.
+
+    *source* is the result of feeding the output from wrangle_data_for_piechart() into
+    bokeh's ColumnDataSource().
+    """
     pie_chart = figure(
         title="Electricity Grid Resource Mix",
         toolbar_location=None,
@@ -1932,123 +1898,10 @@ def create_pie_chart(pie_chart_source):
         line_color="white",
         fill_color="color",
         legend_field="FuelType",
-        source=pie_chart_source,
+        source=source,
     )
     pie_chart.axis.axis_label = None
     pie_chart.axis.visible = False
     pie_chart.grid.grid_line_color = None
 
     return pie_chart
-
-
-###############################################################
-# create the input widgets that allow user to change the charts
-
-"""
-
-# non-energy
-change_ag_slider = Slider(
-    start=-100, end=100, value=0, step=1, title="% Change in Emissions from Agriculture"
-)
-change_ag_slider.on_change("value", callback)
-
-change_solid_waste_slider = Slider(
-    start=-100, end=100, value=0, step=1, title="% Change in Per Capita Landfill Waste"
-)
-change_solid_waste_slider.on_change("value", callback)
-
-change_wasterwater_slider = Slider(
-    start=-100, end=100, value=0, step=1, title="% Change in Per Capita Wastewater"
-)
-change_wasterwater_slider.on_change("value", callback)
-
-change_industrial_processes_slider = Slider(
-    start=-100,
-    end=100,
-    value=0,
-    step=1,
-    title="% Change in Emissions from Industrial Processes",
-)
-change_industrial_processes_slider.on_change("value", callback)
-
-change_urban_trees_slider = Slider(
-    start=-100, end=100, value=0, step=1, title="% Change in Urban Tree Coverage"
-)
-change_urban_trees_slider.on_change("value", callback)
-
-change_forest_slider = Slider(
-    start=-100, end=100, value=0, step=1, title="% Change in Forest Coverage"
-)
-change_forest_slider.on_change("value", callback)
-
-# carbon capture
-ff_carbon_capture_slider = Slider(
-    start=0,
-    end=100,
-    value=0,
-    step=1,
-    title="% Carbon Captured at Combustion Site for Electricity Generation",
-)
-ff_carbon_capture_slider.on_change("value", callback)
-
-AirCaptureSlider = Slider(start=0, end=100, value=0, step=1, title="MMTCO2e Captured from the Air")
-AirCaptureSlider.on_change("value", callback)
-
-#########################
-# group the input widgets
-
-# population_inputs = Column(
-#     create_pop_slider(),
-#     urban_pop_percentTextInput,
-#     suburban_pop_percentTextInput,
-#     rural_pop_percentTextInput,
-# )
-
-grid_inputs = Column(
-    grid_text,
-    grid_coal_input,
-    grid_oil_input,
-    grid_ng_input,
-    grid_nuclear_input,
-    grid_solar_input,
-    grid_wind_input,
-    grid_bio_input,
-    grid_hydro_input,
-    grid_geo_input,
-    grid_other_ff_input,
-)
-res_inputs = Column(
-    res_energy_change_slider,
-    urb_energy_elec_slider,
-    sub_energy_elec_slider,
-    rur_energy_elec_slider,
-)
-ci_inputs = Column(ci_energy_change_slider, ci_energy_elec_slider)
-highway_inputs = Column(change_veh_miles_slider, veh_miles_elec_slider, reg_fleet_mpg_slider)
-transit_inputs = Column(
-    PerTransRailRidershipSlider,
-    TransRailUrbanPerElecMotionSlider,
-    TransRailSuburbanPerElecMotionSlider,
-    TransRailRuralPerElecMotionSlider,
-)
-other_mobile_inputs = Column(
-    change_air_travel_slider,
-    PerFreightRailSlider,
-    FreightRailPerElecMotionSlider,
-    PerInterCityRailSlider,
-    InterCityRailPerElecMotionSlider,
-    PerMarinePortSlider,
-    MarinePortPerElectrificationSlider,
-    PerOffroadSlider,
-    OffroadPerElectrificationSlider,
-)
-non_energy_inputs = Column(
-    change_ag_slider,
-    change_solid_waste_slider,
-    change_wasterwater_slider,
-    change_industrial_processes_slider,
-    change_urban_trees_slider,
-    change_forest_slider,
-)
-carbon_capture_inputs = Column(ff_carbon_capture_slider, AirCaptureSlider)
-"""
