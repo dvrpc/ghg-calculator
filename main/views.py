@@ -44,7 +44,7 @@ from bokeh_apps.ghg_calc import (
     F_ENERGY_ELEC_MOTION,
     ICR_ENERGY_ELEC_MOTION,
     MP_ENERGY_ELEC_MOTION,
-    OF_ENERGY_ELEC_MOTION,
+    OR_ENERGY_ELEC_MOTION,
 )
 
 
@@ -252,7 +252,7 @@ def mobile_energy_handler(doc: Document) -> None:
         user_inputs["change_marine_port"] = change_marine_port_slider.value
         user_inputs["mp_energy_elec_motion"] = mp_energy_elec_motion_slider.value
         user_inputs["change_off_road"] = change_off_road_slider.value
-        user_inputs["of_energy_elec_motion"] = of_energy_elec_motion_slider.value
+        user_inputs["or_energy_elec_motion"] = or_energy_elec_motion_slider.value
         user_inputs["change_air_travel"] = change_air_travel_slider.value
         bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
         stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
@@ -366,14 +366,14 @@ def mobile_energy_handler(doc: Document) -> None:
     )
     change_off_road_slider.on_change("value", callback)
 
-    of_energy_elec_motion_slider = Slider(
+    or_energy_elec_motion_slider = Slider(
         start=0,
         end=100,
-        value=OF_ENERGY_ELEC_MOTION,
+        value=OR_ENERGY_ELEC_MOTION,
         step=1,
         title="% Electrification of Offroad vehicles",
     )
-    of_energy_elec_motion_slider.on_change("value", callback)
+    or_energy_elec_motion_slider.on_change("value", callback)
 
     bar_chart_data = wrangle_data_for_bar_chart(user_inputs)
     bar_chart_source = ColumnDataSource(data=bar_chart_data)
@@ -399,7 +399,7 @@ def mobile_energy_handler(doc: Document) -> None:
         change_marine_port_slider,
         mp_energy_elec_motion_slider,
         change_off_road_slider,
-        of_energy_elec_motion_slider,
+        or_energy_elec_motion_slider,
     )
     charts = Column(bar_chart, stacked_chart)
     doc.add_root(layout([[inputs, charts]]))

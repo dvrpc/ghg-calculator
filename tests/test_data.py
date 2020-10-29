@@ -112,7 +112,7 @@ def test_calc_other_mobile_ghg():
         0,  # change in inter-city rail ridership
         0,  # change in marine and port-related activity
         0,  # change in off-road vehicle and equipment use
-        g.OF_ENERGY_ELEC_MOTION,
+        g.OR_ENERGY_ELEC_MOTION,
     )
     assert ghg == GHG_OTHER_MOB
 

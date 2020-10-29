@@ -496,32 +496,32 @@ MP_FF_DFO_ENERGY_MOTION = MP_DFO_ENERGY_MOTION / MP_FF_ENERGY_MOTION * 100
 
 # Off-Road Vehicles and Equipment
 OR_ELEC_MOTION = 90
-OF_MG_MOTION = 20
-OF_DFO_MOTION = 20
-OF_LPG_MOTION = 20
+OR_MG_MOTION = 20
+OR_DFO_MOTION = 20
+OR_LPG_MOTION = 20
 
-OF_ELEC = 0
-OF_MG = 6041.46
-OF_DFO = 889.30
-OF_LPG = 31.67
-OF_ELEC_MOTION_BBTU = OF_ELEC * OR_ELEC_MOTION / 100
-OF_MG_MOTION_BBTU = OF_MG * OF_MG_MOTION / 100
-OF_DFO_MOTION_BBTU = OF_DFO * OF_DFO_MOTION / 100
-OF_LPG_MOTION_BBTU = OF_LPG * OF_LPG_MOTION / 100
-OF_ENERGY_MOTION_BBTU = (
-    OF_ELEC_MOTION_BBTU + OF_MG_MOTION_BBTU + OF_DFO_MOTION_BBTU + OF_LPG_MOTION_BBTU
+OR_ELEC = 0
+OR_MG = 6041.46
+OR_DFO = 889.30
+OR_LPG = 31.67
+OR_ELEC_MOTION_BBTU = OR_ELEC * OR_ELEC_MOTION / 100
+OR_MG_MOTION_BBTU = OR_MG * OR_MG_MOTION / 100
+OR_DFO_MOTION_BBTU = OR_DFO * OR_DFO_MOTION / 100
+OR_LPG_MOTION_BBTU = OR_LPG * OR_LPG_MOTION / 100
+OR_ENERGY_MOTION_BBTU = (
+    OR_ELEC_MOTION_BBTU + OR_MG_MOTION_BBTU + OR_DFO_MOTION_BBTU + OR_LPG_MOTION_BBTU
 )
-OF_ENERGY_ELEC_MOTION = OF_ELEC_MOTION_BBTU / OF_ENERGY_MOTION_BBTU * 100
-OF_MG_ENERGY_MOTION = OF_MG_MOTION_BBTU / OF_ENERGY_MOTION_BBTU * 100
-OF_DFO_ENERGY_MOTION = OF_DFO_MOTION_BBTU / OF_ENERGY_MOTION_BBTU * 100
-OF_LPG_ENERGY_MOTION = OF_LPG_MOTION_BBTU / OF_ENERGY_MOTION_BBTU * 100
-OF_MG_CO2_MT_BBTU = 74.05165922
-OF_DFO_CO2_MT_BBTU = 74.20539973
-OF_LPG_CO2_MT_BBTU = 62.05918303
-OF_FF_ENERGY_MOTION = 100 - OF_ENERGY_ELEC_MOTION
-OF_FF_MG_ENERGY_MOTION = OF_MG_ENERGY_MOTION / OF_FF_ENERGY_MOTION * 100
-OF_FF_DFO_ENERGY_MOTION = OF_DFO_ENERGY_MOTION / OF_FF_ENERGY_MOTION * 100
-OF_FF_LPG_ENERGY_MOTION = OF_LPG_ENERGY_MOTION / OF_FF_ENERGY_MOTION * 100
+OR_ENERGY_ELEC_MOTION = OR_ELEC_MOTION_BBTU / OR_ENERGY_MOTION_BBTU * 100
+OR_MG_ENERGY_MOTION = OR_MG_MOTION_BBTU / OR_ENERGY_MOTION_BBTU * 100
+OR_DFO_ENERGY_MOTION = OR_DFO_MOTION_BBTU / OR_ENERGY_MOTION_BBTU * 100
+OR_LPG_ENERGY_MOTION = OR_LPG_MOTION_BBTU / OR_ENERGY_MOTION_BBTU * 100
+OR_MG_CO2_MT_BBTU = 74.05165922
+OR_DFO_CO2_MT_BBTU = 74.20539973
+OR_LPG_CO2_MT_BBTU = 62.05918303
+OR_FF_ENERGY_MOTION = 100 - OR_ENERGY_ELEC_MOTION
+OR_FF_MG_ENERGY_MOTION = OR_MG_ENERGY_MOTION / OR_FF_ENERGY_MOTION * 100
+OR_FF_DFO_ENERGY_MOTION = OR_DFO_ENERGY_MOTION / OR_FF_ENERGY_MOTION * 100
+OR_FF_LPG_ENERGY_MOTION = OR_LPG_ENERGY_MOTION / OR_FF_ENERGY_MOTION * 100
 
 # create dictionary (and set initial values) of all variables that user can change
 # will be passed to functions that create charts
@@ -540,7 +540,7 @@ user_inputs = {
     "grid_other_ff": GRID_OTHER_FF,
     "icr_energy_elec_motion": ICR_ENERGY_ELEC_MOTION,
     "mp_energy_elec_motion": MP_ENERGY_ELEC_MOTION,
-    "of_energy_elec_motion": OF_ENERGY_ELEC_MOTION,
+    "or_energy_elec_motion": OR_ENERGY_ELEC_MOTION,
     "change_ag": 0,
     "change_air_travel": 0,
     "res_energy_change": 0,
@@ -1191,7 +1191,7 @@ def calc_other_mobile_ghg(
     change_inter_city_rail,
     change_marine_port,
     change_off_road,
-    of_energy_elec_motion,
+    or_energy_elec_motion,
 ):
     """
     Calculate GHG emissions for freight & intercity rail, marine & port-related, and off-road
@@ -1299,12 +1299,12 @@ def calc_other_mobile_ghg(
 
     mp_ghg = (mp_elec_ghg + mp_rfo_ghg + mp_dfo_ghg) * (1 + change_marine_port / 100)
 
-    of_ff_motion = 100 - of_energy_elec_motion
-    of_percent_changed_ff_motion = (of_ff_motion - OF_FF_ENERGY_MOTION) / OF_FF_ENERGY_MOTION
+    or_ff_motion = 100 - or_energy_elec_motion
+    or_percent_changed_ff_motion = (or_ff_motion - OR_FF_ENERGY_MOTION) / OR_FF_ENERGY_MOTION
 
-    of_elec_ghg = (
-        OF_ENERGY_MOTION_BBTU
-        * (of_energy_elec_motion / 100)
+    or_elec_ghg = (
+        OR_ENERGY_MOTION_BBTU
+        * (or_energy_elec_motion / 100)
         / (OR_ELEC_MOTION / 100)
         * 1000000000
         * (1 / BTU_MWH)
@@ -1321,39 +1321,39 @@ def calc_other_mobile_ghg(
         * (1 - ff_carbon_capture / 100)
     )
 
-    of_mg_ghg = (
-        OF_ENERGY_MOTION_BBTU
-        * (OF_FF_MG_ENERGY_MOTION / 100)
-        * (of_ff_motion / 100)
-        * (1 + of_percent_changed_ff_motion)
-        * OF_MG_CO2_MT_BBTU
+    or_mg_ghg = (
+        OR_ENERGY_MOTION_BBTU
+        * (OR_FF_MG_ENERGY_MOTION / 100)
+        * (or_ff_motion / 100)
+        * (1 + or_percent_changed_ff_motion)
+        * OR_MG_CO2_MT_BBTU
         * MT_TO_MMT
-        / (OF_MG_MOTION / 100)
+        / (OR_MG_MOTION / 100)
     )
 
-    of_dfo_ghg = (
-        OF_ENERGY_MOTION_BBTU
-        * (OF_FF_DFO_ENERGY_MOTION / 100)
-        * (of_ff_motion / 100)
-        * (1 + of_percent_changed_ff_motion)
-        * OF_DFO_CO2_MT_BBTU
+    or_dfo_ghg = (
+        OR_ENERGY_MOTION_BBTU
+        * (OR_FF_DFO_ENERGY_MOTION / 100)
+        * (or_ff_motion / 100)
+        * (1 + or_percent_changed_ff_motion)
+        * OR_DFO_CO2_MT_BBTU
         * MT_TO_MMT
-        / (OF_DFO_MOTION / 100)
+        / (OR_DFO_MOTION / 100)
     )
 
-    of_lpg_ghg = (
-        OF_ENERGY_MOTION_BBTU
-        * (OF_FF_LPG_ENERGY_MOTION / 100)
-        * (of_ff_motion / 100)
-        * (1 + of_percent_changed_ff_motion)
-        * OF_LPG_CO2_MT_BBTU
+    or_lpg_ghg = (
+        OR_ENERGY_MOTION_BBTU
+        * (OR_FF_LPG_ENERGY_MOTION / 100)
+        * (or_ff_motion / 100)
+        * (1 + or_percent_changed_ff_motion)
+        * OR_LPG_CO2_MT_BBTU
         * MT_TO_MMT
-        / (OF_LPG_MOTION / 100)
+        / (OR_LPG_MOTION / 100)
     )
 
-    of_ghg = (of_elec_ghg + of_mg_ghg + of_dfo_ghg + of_lpg_ghg) * (1 + change_off_road / 100)
+    or_ghg = (or_elec_ghg + or_mg_ghg + or_dfo_ghg + or_lpg_ghg) * (1 + change_off_road / 100)
 
-    return f_ghg + icr_ghg + mp_ghg + of_ghg
+    return f_ghg + icr_ghg + mp_ghg + or_ghg
 
 
 def calc_non_energy_ghg(
@@ -1520,7 +1520,7 @@ def wrangle_data_for_bar_chart(user_inputs):
                 user_inputs["change_inter_city_rail"],
                 user_inputs["change_marine_port"],
                 user_inputs["change_off_road"],
-                user_inputs["of_energy_elec_motion"],
+                user_inputs["or_energy_elec_motion"],
             ),
             calc_non_energy_ghg(
                 user_inputs["ci_energy_elec"],
@@ -1634,7 +1634,7 @@ def wrangle_data_for_stacked_chart(user_inputs):
                 user_inputs["change_inter_city_rail"],
                 user_inputs["change_marine_port"],
                 user_inputs["change_off_road"],
-                user_inputs["of_energy_elec_motion"],
+                user_inputs["or_energy_elec_motion"],
             ),
         ],
         "Non-Energy": [
