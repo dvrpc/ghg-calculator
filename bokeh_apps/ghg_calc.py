@@ -4,26 +4,15 @@ from statistics import mean
 import numpy as np
 import pandas as pd
 
-from bokeh.layouts import column
-from bokeh.models import Slider, Column, ColumnDataSource, TextInput, Paragraph, LabelSet
+from bokeh.models import LabelSet
 from bokeh.palettes import Viridis7, Spectral10
-from bokeh.plotting import figure, curdoc
+from bokeh.plotting import figure
 from bokeh.transform import dodge, cumsum
 
 
-SECTORS = [
-    "Residential",
-    "Commercial/Industrial",
-    "Mobile-Highway",
-    "Mobile-Transit",
-    "Mobile-Aviation",
-    "Mobile-Other",
-    "Non-Energy",
-]
-
 # Implied National Emissions rate from NG Transmission, Storage, Distribution (fugitive emissions in MMTCO2e/million CF)
-MMTCO2ePerMillionCFNG_CH4 = 0.00000169
-MMTCO2ePerMillionCFNG_CO2 = 0.000000004
+NE_CO2_MMT_NG_METHANE = 0.00000169
+NE_CO2_MMT_NG_CO = 0.000000004
 
 # 2015 GHG Inventory Total Emissions (MMTCO2E)
 GHG_RES = 15.37
@@ -49,7 +38,7 @@ GHG_NON_ENERGY = (
     + GHG_URBAN_TREES
     + GHG_FORESTS
     + GHG_FOREST_CHANGE
-    + (RES_NG + CI_NG) * (MMTCO2ePerMillionCFNG_CH4 + MMTCO2ePerMillionCFNG_CO2)
+    + (RES_NG + CI_NG) * (NE_CO2_MMT_NG_METHANE + NE_CO2_MMT_NG_CO)
 )
 
 # Demographics
@@ -105,16 +94,16 @@ BTU_B_LPG = 3540000
 BTU_GAL_LPG = BTU_B_LPG * (1 / 42)
 
 # MTCO2e per BBtu - From ComInd 2015
-CO2_MMT_BBTU_NG = 53.20
-CO2_MMT_BBTU_COAL = 95.13
-CO2_MMT_BBTU_DFO = 74.39
-CO2_MMT_BBTU_KER = 73.63
-CO2_MMT_BBTU_LPG = 65.15
-CO2_MMT_BBTU_MOTOR_GAS = 71.60
-CO2_MMT_BBTU_RFO = 75.35
-CO2_MMT_BBTU_PETCOKE = 102.36
-CO2_MMT_BBTU_STILL_GAS = 66.96
-CO2_MMT_BBTU_NAPHTHAS = 72.62
+CO2_MT_BBTU_NG = 53.20
+CO2_MT_BBTU_COAL = 95.13
+CO2_MT_BBTU_DFO = 74.39
+CO2_MT_BBTU_KER = 73.63
+CO2_MT_BBTU_LPG = 65.15
+CO2_MT_BBTU_MG = 71.60
+CO2_MT_BBTU_RFO = 75.35
+CO2_MT_BBTU_PETCOKE = 102.36
+CO2_MT_BBTU_STILL_GAS = 66.96
+CO2_MT_BBTU_NAPHTHAS = 72.62
 
 ###############################
 # Residential Stationary Energy
@@ -358,7 +347,7 @@ CI_COAL_USEFUL = 0.85
 CI_DFO_USEFUL = 0.80
 CI_K_USEFUL = 0.80
 CI_LPG_USEFUL = 0.80
-CI_MOTOR_GAS_USEFUL = 0.80
+CI_MG_USEFUL = 0.80
 CI_RFO_USEFUL = 0.80
 CI_PET_COKE_USEFUL = 0.80
 CI_STILL_GAS_USEFUL = 0.80
@@ -371,7 +360,7 @@ CI_COAL_BTU = 6581.08 * CI_COAL_USEFUL
 CI_DFO_BTU = 24342.05 * CI_DFO_USEFUL
 CI_K_BTU = 41.91 * CI_K_USEFUL
 CI_LPG_BTU = 2581.22 * CI_LPG_USEFUL
-CI_MOTOR_GAS_BTU = 12584.78 * CI_MOTOR_GAS_USEFUL
+CI_MG_BTU = 12584.78 * CI_MG_USEFUL
 CI_RFO_BTU = 261.42 * CI_RFO_USEFUL
 CI_PET_COKE_BTU = 15067.33 * CI_PET_COKE_USEFUL
 CI_STILL_GAS_BTU = 25628.52 * CI_STILL_GAS_USEFUL
@@ -384,7 +373,7 @@ CI_ENERGY_BTU = (
     + CI_DFO_BTU
     + CI_K_BTU
     + CI_LPG_BTU
-    + CI_MOTOR_GAS_BTU
+    + CI_MG_BTU
     + CI_RFO_BTU
     + CI_PET_COKE_BTU
     + CI_STILL_GAS_BTU
@@ -398,7 +387,7 @@ CI_ENERGY_COAL = CI_COAL_BTU / CI_ENERGY_BTU * 100
 CI_ENERGY_DFO = CI_DFO_BTU / CI_ENERGY_BTU * 100
 CI_ENERGY_K = CI_K_BTU / CI_ENERGY_BTU * 100
 CI_ENERGY_LPG = CI_LPG_BTU / CI_ENERGY_BTU * 100
-CI_ENERGY_MOTOR_GAS = CI_MOTOR_GAS_BTU / CI_ENERGY_BTU * 100
+CI_ENERGY_MG = CI_MG_BTU / CI_ENERGY_BTU * 100
 CI_ENERGY_RFO = CI_RFO_BTU / CI_ENERGY_BTU * 100
 CI_ENERGY_PET_COKE = CI_PET_COKE_BTU / CI_ENERGY_BTU * 100
 CI_ENERGY_STILL_GAS = CI_STILL_GAS_BTU / CI_ENERGY_BTU * 100
@@ -411,7 +400,7 @@ CI_ENERGY_FF_COAL = CI_ENERGY_COAL / CI_ENERGY_FF
 CI_ENERGY_FF_DFO = CI_ENERGY_DFO / CI_ENERGY_FF
 CI_ENERGY_FF_K = CI_ENERGY_K / CI_ENERGY_FF
 CI_ENERGY_FF_LPG = CI_ENERGY_LPG / CI_ENERGY_FF
-CI_ENERGY_FF_MOTOR_GAS = CI_ENERGY_MOTOR_GAS / CI_ENERGY_FF
+CI_ENERGY_FF_MG = CI_ENERGY_MG / CI_ENERGY_FF
 CI_ENERGY_FF_RFO = CI_ENERGY_RFO / CI_ENERGY_FF
 CI_ENERGY_FF_PET_COKE = CI_ENERGY_PET_COKE / CI_ENERGY_FF
 CI_ENERGY_FF_STILL_GAS = CI_ENERGY_STILL_GAS / CI_ENERGY_FF
@@ -430,154 +419,115 @@ CO2_LB_GAL_GAS = 20.50758459351  # lbs co2e per gallon of gasoline (imputed from
 #################################
 # Mobile-Rail Transit GHG Factors
 
-PerTransRailRidership = 0
-TransRailBBtuPerThBarrelDiesel = 5.768
-TransRailMTCO2ePerBBtuDiesel = 74.66024683
-PerEnergyToMotionRailDiesel = 35  # https://www.eesi.org/articles/view/electrification-of-u.s.-railways-pie-in-the-sky-or-realistic-goal
-PerEnergyToMotionRailElec = 95  # https://www.eesi.org/articles/view/electrification-of-u.s.-railways-pie-in-the-sky-or-realistic-goal
+RT_BBTU_KB_D = 5.768
+RT_CO2_MT_BBTU_D = 74.66024683
+RT_D_ENERGY_MOTION = 35  # https://www.eesi.org/articles/view/electrification-of-u.s.-railways-pie-in-the-sky-or-realistic-goal
+RT_ELEC_ENERGY_MOTION = 95  # https://www.eesi.org/articles/view/electrification-of-u.s.-railways-pie-in-the-sky-or-realistic-goal
 
-TransRailUrbanPerCapElec = 115.85  # kWh/person
-TransRailSuburbanPerCapElec = 66.10  # kWh/person
-TransRailRuralPerCapElec = 21.37  # kWh/person
+RT_ELEC_URB_CAP = 115.85  # kWh/person
+RT_ELEC_SUB_CAP = 66.10  # kWh/person
+RT_ELEC_RUR_CAP = 21.37  # kWh/person
 
-TransRailUrbanBTUPerCapElec = TransRailUrbanPerCapElec * BTU_KWH  # BTU/Person
-TransRailSuburbanBTUPerCapElec = TransRailSuburbanPerCapElec * BTU_KWH  # BTU/Person
-TransRailRuralBTUPerCapElec = TransRailRuralPerCapElec * BTU_KWH  # BTU/Person
+RT_D_GAL_URB = 0.1995  # gallons/person for rail transit diesel in urban areas
+RT_D_GAL_SUB = 0.1138  # gallons/person
+RT_D_GAL_RUR = 0.0368  # gallons/person
 
-TransRailUrbanPerCapDiesel = 0.1995  # gallons/person
-TransRailSuburbanPerCapDiesel = 0.1138  # gallons/person
-TransRailRuralPerCapDiesel = 0.0368  # gallons/person
+RT_D_BTU_URB = RT_D_GAL_URB * KB_G * RT_BBTU_KB_D * 1000000000  # BTU/Person
+RT_D_BTU_SUB = RT_D_GAL_SUB * KB_G * RT_BBTU_KB_D * 1000000000  # BTU/Person
+RT_D_BTU_RUR = RT_D_GAL_RUR * KB_G * RT_BBTU_KB_D * 1000000000  # BTU/Person
 
-TransRailUrbanBTUPerCapDiesel = (
-    TransRailUrbanPerCapDiesel * KB_G * TransRailBBtuPerThBarrelDiesel * 1000000000
-)  # BTU/Person
-TransRailSuburbanBTUPerCapDiesel = (
-    TransRailSuburbanPerCapDiesel * KB_G * TransRailBBtuPerThBarrelDiesel * 1000000000
-)  # BTU/Person
-TransRailRuralBTUPerCapDiesel = (
-    TransRailRuralPerCapDiesel * KB_G * TransRailBBtuPerThBarrelDiesel * 1000000000
-)  # BTU/Person
+RT_ELEC_MOTION_URB = (RT_ELEC_URB_CAP * BTU_KWH) * RT_ELEC_ENERGY_MOTION / 100
+RT_ELEC_MOTION_SUB = (RT_ELEC_SUB_CAP * BTU_KWH) * RT_ELEC_ENERGY_MOTION / 100
+RT_ELEC_MOTION_RUR = (RT_ELEC_RUR_CAP * BTU_KWH) * RT_ELEC_ENERGY_MOTION / 100
 
-TransRailUrbanBTUPerCapElecMotion = TransRailUrbanBTUPerCapElec * PerEnergyToMotionRailElec / 100
-TransRailSuburbanBTUPerCapElecMotion = (
-    TransRailSuburbanBTUPerCapElec * PerEnergyToMotionRailElec / 100
-)
-TransRailRuralBTUPerCapElecMotion = TransRailRuralBTUPerCapElec * PerEnergyToMotionRailElec / 100
+RT_D_MOTION_URB = RT_D_BTU_URB * RT_D_ENERGY_MOTION / 100
+RT_D_MOTION_SUB = RT_D_BTU_SUB * RT_D_ENERGY_MOTION / 100
+RT_D_MOTION_RUR = RT_D_BTU_RUR * RT_D_ENERGY_MOTION / 100
 
-TransRailUrbanBTUPerCapDieselMotion = (
-    TransRailUrbanBTUPerCapDiesel * PerEnergyToMotionRailDiesel / 100
-)
-TransRailSuburbanBTUPerCapDieselMotion = (
-    TransRailSuburbanBTUPerCapDiesel * PerEnergyToMotionRailDiesel / 100
-)
-TransRailRuralBTUPerCapDieselMotion = (
-    TransRailRuralBTUPerCapDiesel * PerEnergyToMotionRailDiesel / 100
-)
+RT_ENERGY_MOTION_URB = RT_ELEC_MOTION_URB + RT_D_MOTION_URB
+RT_ENERGY_MOTION_SUB = RT_ELEC_MOTION_SUB + RT_D_MOTION_SUB
+RT_ENERGY_MOTION_RUR = RT_ELEC_MOTION_RUR + RT_D_MOTION_RUR
 
-TransRailUrbanBTUPerCapMotion = (
-    TransRailUrbanBTUPerCapElecMotion + TransRailUrbanBTUPerCapDieselMotion
-)
-TransRailSuburbanBTUPerCapMotion = (
-    TransRailSuburbanBTUPerCapElecMotion + TransRailSuburbanBTUPerCapDieselMotion
-)
-TransRailRuralBTUPerCapMotion = (
-    TransRailRuralBTUPerCapElecMotion + TransRailRuralBTUPerCapDieselMotion
-)
-
-TransRailUrbanPerElecMotion = (
-    TransRailUrbanBTUPerCapElecMotion / TransRailUrbanBTUPerCapMotion * 100
-)
-TransRailSuburbanPerElecMotion = (
-    TransRailSuburbanBTUPerCapElecMotion / TransRailSuburbanBTUPerCapMotion * 100
-)
-TransRailRuralPerElecMotion = (
-    TransRailRuralBTUPerCapElecMotion / TransRailRuralBTUPerCapMotion * 100
-)
+RT_ENERGY_ELEC_MOTION_URB = RT_ELEC_MOTION_URB / RT_ENERGY_MOTION_URB * 100
+RT_ENERGY_ELEC_MOTION_SUB = RT_ELEC_MOTION_SUB / RT_ENERGY_MOTION_SUB * 100
+RT_ENERGY_ELEC_MOTION_RUR = RT_ELEC_MOTION_RUR / RT_ENERGY_MOTION_RUR * 100
 
 
 ##########################
 # Mobile-Other GHG Factors
 
 # Freight Rail
-PerFreightRail = 0
-FreightRailElecBBtu = 0
-FreightRailDieselBBtu = 3525.18
-FreightRailElecBBtuMotion = FreightRailElecBBtu * PerEnergyToMotionRailElec / 100
-FreightRailDieselBBtuMotion = FreightRailDieselBBtu * PerEnergyToMotionRailDiesel / 100
-FreightRailBBtuMotion = FreightRailElecBBtuMotion + FreightRailDieselBBtuMotion
-FreightRailPerElecMotion = FreightRailElecBBtuMotion / FreightRailBBtuMotion * 100
-FreightRailMTCO2ePerBBtuDiesel = 74.5937203
+F_ELEC = 0
+F_D = 3525.18
+F_ELEC_MOTION = F_ELEC * RT_ELEC_ENERGY_MOTION / 100
+F_D_MOTION = F_D * RT_D_ENERGY_MOTION / 100
+F_ENERGY_MOTION = F_ELEC_MOTION + F_D_MOTION
+F_ENERGY_ELEC_MOTION = F_ELEC_MOTION / F_ENERGY_MOTION * 100
+F_D_CO2_MT_BBTU = 74.5937203
 
 # InterCity Rail
-PerInterCityRail = 0
-InterCityRailElecBBtu = 319.07
-InterCityRailDieselBBtu = 24.93
-InterCityRailElecBBtuMotion = InterCityRailElecBBtu * PerEnergyToMotionRailElec / 100
-InterCityRailDieselBBtuMotion = InterCityRailDieselBBtu * PerEnergyToMotionRailDiesel / 100
-InterCityRailBBtuMotion = InterCityRailElecBBtuMotion + InterCityRailDieselBBtuMotion
-InterCityRailPerElecMotion = InterCityRailElecBBtuMotion / InterCityRailBBtuMotion * 100
-InterCityRailMTCO2ePerBBtuDiesel = 73.978
+ICR_ELEC = 319.07
+ICR_D = 24.93
+ICR_ELEC_MOTION = ICR_ELEC * RT_ELEC_ENERGY_MOTION / 100
+ICR_D_MOTION = ICR_D * RT_D_ENERGY_MOTION / 100
+ICR_ENERGY_MOTION = ICR_ELEC_MOTION + ICR_D_MOTION
+ICR_ENERGY_ELEC_MOTION = ICR_ELEC_MOTION / ICR_ENERGY_MOTION * 100
+ICR_D_CO2_MT_BBTU = 73.978
 
 # Marine and Port
-PerEnergyToMotionMarineElec = 100
-PerEnergyToMotionMarineRFO = 50  # Calculation of Efficiencies of a Ship Power Plant Operating with Waste Heat Recovery through Combined Heat and Power Production by Mirko Grljušić 1,2,*, Vladimir Medica 3,† and Gojmir Radica 1,†
-PerEnergyToMotionMarineDFO = 50  # Calculation of Efficiencies of a Ship Power Plant Operating with Waste Heat Recovery through Combined Heat and Power Production by Mirko Grljušić 1,2,*, Vladimir Medica 3,† and Gojmir Radica 1,†
-PerMarinePort = 0
-MarinePortElecBBtu = 0
-MarinePortRFOBBtu = 2221.436
-MarinePortDFOBBtu = 1855.010
-MarinePortElecBBtuMotion = MarinePortElecBBtu * PerEnergyToMotionMarineElec / 100
-MarinePortRFOBBtuMotion = MarinePortRFOBBtu * PerEnergyToMotionMarineRFO / 100
-MarinePortDFOBBtuMotion = MarinePortDFOBBtu * PerEnergyToMotionMarineDFO / 100
-MarinePortBBtuMotion = MarinePortElecBBtuMotion + MarinePortRFOBBtuMotion + MarinePortDFOBBtuMotion
-MarinePortPerElecMotion = MarinePortElecBBtuMotion / MarinePortBBtuMotion * 100
-MarinePortPerRFOMotion = MarinePortRFOBBtuMotion / MarinePortBBtuMotion * 100
-MarinePortPerDFOMotion = MarinePortDFOBBtuMotion / MarinePortBBtuMotion * 100
-MarinePortMTCO2ePerBBtuRFO = 75.732
-MarinePortMTCO2ePerBBtuDFO = 74.581
-MarinePortPerFossilFuelMotion2015 = 100 - MarinePortPerElecMotion
-MarinePortPerFFRFOMotion = MarinePortPerRFOMotion / MarinePortPerFossilFuelMotion2015 * 100
-MarinePortPerFFDFOMotion = MarinePortPerDFOMotion / MarinePortPerFossilFuelMotion2015 * 100
-MarinePortMinPerElectrification = MarinePortPerElecMotion
-MarinePortPerElectrification = MarinePortMinPerElectrification
+MP_ELEC_MOTION = 100
+MP_RFO_MOTION = 50  # Calculation of Efficiencies of a Ship Power Plant Operating with Waste Heat Recovery through Combined Heat and Power Production by Mirko Grljušić 1,2,*, Vladimir Medica 3,† and Gojmir Radica 1,†
+MP_DFO_MOTION = 50  # Calculation of Efficiencies of a Ship Power Plant Operating with Waste Heat Recovery through Combined Heat and Power Production by Mirko Grljušić 1,2,*, Vladimir Medica 3,† and Gojmir Radica 1,†
+MP_ELEC = 0
+MP_RFO = 2221.436
+MP_DFO = 1855.010
+MP_ELEC_MOTION_BBTU = MP_ELEC * MP_ELEC_MOTION / 100
+MP_RFO_MOTION_BBTU = MP_RFO * MP_RFO_MOTION / 100
+MP_DFO_MOTION_BBTU = MP_DFO * MP_DFO_MOTION / 100
+MP_ENERGY_MOTION_BBTU = MP_ELEC_MOTION_BBTU + MP_RFO_MOTION_BBTU + MP_DFO_MOTION_BBTU
+MP_ENERGY_ELEC_MOTION = MP_ELEC_MOTION_BBTU / MP_ENERGY_MOTION_BBTU * 100
+MP_RFO_ENERGY_MOTION = MP_RFO_MOTION_BBTU / MP_ENERGY_MOTION_BBTU * 100
+MP_DFO_ENERGY_MOTION = MP_DFO_MOTION_BBTU / MP_ENERGY_MOTION_BBTU * 100
+MP_RFO_CO2_MMT_BBTU = 75.732
+MP_DFO_CO2_MMT_BBTU = 74.581
+MP_FF_ENERGY_MOTION = 100 - MP_ENERGY_ELEC_MOTION
+MP_FF_RFO_ENERGY_MOTION = MP_RFO_ENERGY_MOTION / MP_FF_ENERGY_MOTION * 100
+MP_FF_DFO_ENERGY_MOTION = MP_DFO_ENERGY_MOTION / MP_FF_ENERGY_MOTION * 100
 
 # Off-Road Vehicles and Equipment
-PerOffroad = 0
-PerEnergyToMotionOffroadElec = 90
-PerEnergyToMotionOffroadMotGas = 20
-PerEnergyToMotionOffroadDFO = 20
-PerEnergyToMotionOffroadLPG = 20
+OR_ELEC_MOTION = 90
+OF_MG_MOTION = 20
+OF_DFO_MOTION = 20
+OF_LPG_MOTION = 20
 
-OffroadElecBBtu = 0
-OffroadMotGasBBtu = 6041.46
-OffroadDFOBBtu = 889.30
-OffroadLPGBBtu = 31.67
-OffroadElecBBtuMotion = OffroadElecBBtu * PerEnergyToMotionOffroadElec / 100
-OffroadMotGasBBtuMotion = OffroadMotGasBBtu * PerEnergyToMotionOffroadMotGas / 100
-OffroadDFOBBtuMotion = OffroadDFOBBtu * PerEnergyToMotionOffroadDFO / 100
-OffroadLPGBBtuMotion = OffroadLPGBBtu * PerEnergyToMotionOffroadLPG / 100
-OffroadBBtuMotion = (
-    OffroadElecBBtuMotion + OffroadMotGasBBtuMotion + OffroadDFOBBtuMotion + OffroadLPGBBtuMotion
+OF_ELEC = 0
+OF_MG = 6041.46
+OF_DFO = 889.30
+OF_LPG = 31.67
+OF_ELEC_MOTION_BBTU = OF_ELEC * OR_ELEC_MOTION / 100
+OF_MG_MOTION_BBTU = OF_MG * OF_MG_MOTION / 100
+OF_DFO_MOTION_BBTU = OF_DFO * OF_DFO_MOTION / 100
+OF_LPG_MOTION_BBTU = OF_LPG * OF_LPG_MOTION / 100
+OF_ENERGY_MOTION_BBTU = (
+    OF_ELEC_MOTION_BBTU + OF_MG_MOTION_BBTU + OF_DFO_MOTION_BBTU + OF_LPG_MOTION_BBTU
 )
-OffroadPerElecMotion = OffroadElecBBtuMotion / OffroadBBtuMotion * 100
-OffroadPerMotGasMotion = OffroadMotGasBBtuMotion / OffroadBBtuMotion * 100
-OffroadPerDFOMotion = OffroadDFOBBtuMotion / OffroadBBtuMotion * 100
-OffroadPerLPGMotion = OffroadLPGBBtuMotion / OffroadBBtuMotion * 100
-OffroadMTCO2ePerBBtuMotGas = 74.05165922
-OffroadMTCO2ePerBBtuDFO = 74.20539973
-OffroadMTCO2ePerBBtuLPG = 62.05918303
-OffroadPerFossilFuelMotion2015 = 100 - OffroadPerElecMotion
-OffroadPerFFMotGasMotion = OffroadPerMotGasMotion / OffroadPerFossilFuelMotion2015 * 100
-OffroadPerFFDFOMotion = OffroadPerDFOMotion / OffroadPerFossilFuelMotion2015 * 100
-OffroadPerFFLPGMotion = OffroadPerLPGMotion / OffroadPerFossilFuelMotion2015 * 100
-OffroadMinPerElectrification = OffroadPerElecMotion
-OffroadPerElectrification = OffroadMinPerElectrification
+OF_ENERGY_ELEC_MOTION = OF_ELEC_MOTION_BBTU / OF_ENERGY_MOTION_BBTU * 100
+OF_MG_ENERGY_MOTION = OF_MG_MOTION_BBTU / OF_ENERGY_MOTION_BBTU * 100
+OF_DFO_ENERGY_MOTION = OF_DFO_MOTION_BBTU / OF_ENERGY_MOTION_BBTU * 100
+OF_LPG_ENERGY_MOTION = OF_LPG_MOTION_BBTU / OF_ENERGY_MOTION_BBTU * 100
+OF_MG_CO2_MT_BBTU = 74.05165922
+OF_DFO_CO2_MT_BBTU = 74.20539973
+OF_LPG_CO2_MT_BBTU = 62.05918303
+OF_FF_ENERGY_MOTION = 100 - OF_ENERGY_ELEC_MOTION
+OF_FF_MG_ENERGY_MOTION = OF_MG_ENERGY_MOTION / OF_FF_ENERGY_MOTION * 100
+OF_FF_DFO_ENERGY_MOTION = OF_DFO_ENERGY_MOTION / OF_FF_ENERGY_MOTION * 100
+OF_FF_LPG_ENERGY_MOTION = OF_LPG_ENERGY_MOTION / OF_FF_ENERGY_MOTION * 100
 
 # create dictionary (and set initial values) of all variables that user can change
 # will be passed to functions that create charts
 user_inputs = {
     "ci_energy_elec": CI_ENERGY_ELEC,
-    "FreightRailPerElecMotion": FreightRailPerElecMotion,
+    "f_energy_elec_motion": F_ENERGY_ELEC_MOTION,
     "grid_coal": GRID_COAL,
     "grid_oil": GRID_OIL,
     "grid_ng": GRID_NG,
@@ -588,9 +538,9 @@ user_inputs = {
     "grid_hydro": GRID_HYDRO,
     "grid_geo": GRID_GEO,
     "grid_other_ff": GRID_OTHER_FF,
-    "InterCityRailPerElecMotion": InterCityRailPerElecMotion,
-    "MarinePortPerElectrification": MarinePortPerElectrification,
-    "OffroadPerElectrification": OffroadPerElectrification,
+    "icr_energy_elec_motion": ICR_ENERGY_ELEC_MOTION,
+    "mp_energy_elec_motion": MP_ENERGY_ELEC_MOTION,
+    "of_energy_elec_motion": OF_ENERGY_ELEC_MOTION,
     "change_ag": 0,
     "change_air_travel": 0,
     "res_energy_change": 0,
@@ -598,12 +548,12 @@ user_inputs = {
     "ci_energy_change": 0,
     "veh_miles_elec": 0,
     "change_forest": 0,
-    "PerFreightRail": PerFreightRail,
-    "PerInterCityRail": PerInterCityRail,
+    "change_freight_rail": 0,
+    "change_inter_city_rail": 0,
     "change_industrial_processes": 0,
-    "PerMarinePort": PerMarinePort,
-    "PerOffroad": PerOffroad,
-    "PerTransRailRidership": PerTransRailRidership,
+    "change_marine_port": 0,
+    "change_off_road": 0,
+    "change_rail_transit": 0,
     "change_urban_trees": 0,
     "change_solid_waste": 0,
     "change_wastewater": 0,
@@ -613,9 +563,9 @@ user_inputs = {
     "rural_pop_percent": RURAL_POP_PERCENT,
     "sub_energy_elec": SUB_ENERGY_ELEC * 100,  # convert to % b/c func will take user % later
     "suburban_pop_percent": SUBURBAN_POP_PERCENT,
-    "TransRailRuralPerElecMotion": TransRailRuralPerElecMotion,
-    "TransRailSuburbanPerElecMotion": TransRailSuburbanPerElecMotion,
-    "TransRailUrbanPerElecMotion": TransRailUrbanPerElecMotion,
+    "rt_energy_elec_motion_rur": RT_ENERGY_ELEC_MOTION_RUR,
+    "rt_energy_elec_motion_sub": RT_ENERGY_ELEC_MOTION_SUB,
+    "rt_energy_elec_motion_urb": RT_ENERGY_ELEC_MOTION_URB,
     "urb_energy_elec": URB_ENERGY_ELEC * 100,  # convert to % b/c func will take user % later
     "urban_pop_percent": URBAN_POP_PERCENT,
     "change_veh_miles": 0,
@@ -990,7 +940,7 @@ def calc_ci_ghg(
         * (1 + change_ff)
         * CI_ENERGY_FF_NG
         / CI_NG_USEFUL
-        * CO2_MMT_BBTU_NG
+        * CO2_MT_BBTU_NG
         * MT_TO_MMT
     )
 
@@ -1001,7 +951,7 @@ def calc_ci_ghg(
         * (1 + change_ff)
         * CI_ENERGY_FF_COAL
         / CI_COAL_USEFUL
-        * CO2_MMT_BBTU_COAL
+        * CO2_MT_BBTU_COAL
         * MT_TO_MMT
     )
 
@@ -1012,7 +962,7 @@ def calc_ci_ghg(
         * (1 + change_ff)
         * CI_ENERGY_FF_DFO
         / CI_DFO_USEFUL
-        * CO2_MMT_BBTU_DFO
+        * CO2_MT_BBTU_DFO
         * MT_TO_MMT
     )
 
@@ -1023,7 +973,7 @@ def calc_ci_ghg(
         * (1 + change_ff)
         * CI_ENERGY_FF_K
         / CI_K_USEFUL
-        * CO2_MMT_BBTU_KER
+        * CO2_MT_BBTU_KER
         * MT_TO_MMT
     )
 
@@ -1034,7 +984,7 @@ def calc_ci_ghg(
         * (1 + change_ff)
         * CI_ENERGY_FF_LPG
         / CI_LPG_USEFUL
-        * CO2_MMT_BBTU_LPG
+        * CO2_MT_BBTU_LPG
         * MT_TO_MMT
     )
 
@@ -1043,9 +993,9 @@ def calc_ci_ghg(
         * (1 + ci_energy_change / 100)
         * (ci_ff / 100)
         * (1 + change_ff)
-        * CI_ENERGY_FF_MOTOR_GAS
-        / CI_MOTOR_GAS_USEFUL
-        * CO2_MMT_BBTU_MOTOR_GAS
+        * CI_ENERGY_FF_MG
+        / CI_MG_USEFUL
+        * CO2_MT_BBTU_MG
         * MT_TO_MMT
     )
 
@@ -1056,7 +1006,7 @@ def calc_ci_ghg(
         * (1 + change_ff)
         * CI_ENERGY_FF_RFO
         / CI_RFO_USEFUL
-        * CO2_MMT_BBTU_RFO
+        * CO2_MT_BBTU_RFO
         * MT_TO_MMT
     )
 
@@ -1067,7 +1017,7 @@ def calc_ci_ghg(
         * (1 + change_ff)
         * CI_ENERGY_FF_PET_COKE
         / CI_PET_COKE_USEFUL
-        * CO2_MMT_BBTU_PETCOKE
+        * CO2_MT_BBTU_PETCOKE
         * MT_TO_MMT
     )
 
@@ -1078,7 +1028,7 @@ def calc_ci_ghg(
         * (1 + change_ff)
         * CI_ENERGY_FF_STILL_GAS
         / CI_STILL_GAS_USEFUL
-        * CO2_MMT_BBTU_STILL_GAS
+        * CO2_MT_BBTU_STILL_GAS
         * MT_TO_MMT
     )
 
@@ -1089,7 +1039,7 @@ def calc_ci_ghg(
         * (1 + change_ff)
         * CI_ENERGY_FF_NAPHTHAS
         / CI_NAPHTHAS_USEFUL
-        * CO2_MMT_BBTU_NAPHTHAS
+        * CO2_MT_BBTU_NAPHTHAS
         * MT_TO_MMT
     )
 
@@ -1161,48 +1111,26 @@ def calc_transit_ghg(
     grid_oil,
     grid_other_ff,
     ff_carbon_capture,
-    PerTransRailRidership,
+    change_rail_transit,
     change_pop,
     rural_pop_percent,
     suburban_pop_percent,
-    TransRailUrbanPerElecMotion,
-    TransRailSuburbanPerElecMotion,
-    TransRailRuralPerElecMotion,
+    rt_energy_elec_motion_urb,
+    rt_energy_elec_motion_sub,
+    rt_energy_elec_motion_rur,
     urban_pop_percent,
 ):
-    TransRailUrbanPerDieselMotion = 100 - TransRailUrbanPerElecMotion
-    TransRailSuburbanPerDieselMotion = 100 - TransRailSuburbanPerElecMotion
-    TransRailRuralPerDieselMotion = 100 - TransRailRuralPerElecMotion
-
-    MobTransitElecGHG = (
+    transit_elec_ghg = (
         POP
         * (1 + change_pop / 100)
         * (1 / BTU_MWH)
         / (1 - GRID_LOSS)
         * (
-            (
-                urban_pop_percent
-                / 100
-                * TransRailUrbanBTUPerCapMotion
-                * TransRailUrbanPerElecMotion
-                / 100
-            )
-            + (
-                suburban_pop_percent
-                / 100
-                * TransRailSuburbanBTUPerCapMotion
-                * TransRailSuburbanPerElecMotion
-                / 100
-            )
-            + (
-                rural_pop_percent
-                / 100
-                * TransRailRuralBTUPerCapMotion
-                * TransRailRuralPerElecMotion
-                / 100
-            )
+            (urban_pop_percent / 100 * RT_ENERGY_MOTION_URB * rt_energy_elec_motion_urb / 100)
+            + (suburban_pop_percent / 100 * RT_ENERGY_MOTION_SUB * rt_energy_elec_motion_sub / 100)
+            + (rural_pop_percent / 100 * RT_ENERGY_MOTION_RUR * rt_energy_elec_motion_rur / 100)
         )
-        / (PerEnergyToMotionRailElec / 100)
+        / (RT_ELEC_ENERGY_MOTION / 100)
         * (
             (
                 (grid_coal / 100 * CO2_LB_MWH_COAL)
@@ -1215,66 +1143,64 @@ def calc_transit_ghg(
         * (1 - ff_carbon_capture / 100)
     )
 
-    MobTransitDieselGHG = (
+    transit_d_ghg = (
         POP
         * (1 + change_pop / 100)
-        * TransRailMTCO2ePerBBtuDiesel
+        * RT_CO2_MT_BBTU_D
         * (1 / 1000000000)
         * MT_TO_MMT
         * (
             (
                 urban_pop_percent
                 / 100
-                * TransRailUrbanBTUPerCapMotion
-                * TransRailUrbanPerDieselMotion
+                * RT_ENERGY_MOTION_URB
+                * (100 - rt_energy_elec_motion_urb)
                 / 100
             )
             + (
                 suburban_pop_percent
                 / 100
-                * TransRailSuburbanBTUPerCapMotion
-                * TransRailSuburbanPerDieselMotion
+                * RT_ENERGY_MOTION_SUB
+                * (100 - rt_energy_elec_motion_sub)
                 / 100
             )
             + (
                 rural_pop_percent
                 / 100
-                * TransRailRuralBTUPerCapMotion
-                * TransRailRuralPerDieselMotion
+                * RT_ENERGY_MOTION_RUR
+                * (100 - rt_energy_elec_motion_rur)
                 / 100
             )
         )
-        / (PerEnergyToMotionRailDiesel / 100)
+        / (RT_D_ENERGY_MOTION / 100)
     )
 
-    return (MobTransitElecGHG + MobTransitDieselGHG) * (1 + PerTransRailRidership / 100)
+    return (transit_elec_ghg + transit_d_ghg) * (1 + change_rail_transit / 100)
 
 
 def calc_other_mobile_ghg(
-    FreightRailPerElecMotion,
+    f_energy_elec_motion,
     grid_coal,
     grid_ng,
     grid_oil,
     grid_other_ff,
-    InterCityRailPerElecMotion,
-    MarinePortPerElectrification,
+    icr_energy_elec_motion,
+    mp_energy_elec_motion,
     ff_carbon_capture,
-    PerFreightRail,
-    PerInterCityRail,
-    PerMarinePort,
-    PerOffroad,
-    OffroadPerElectrification,
+    change_freight_rail,
+    change_inter_city_rail,
+    change_marine_port,
+    change_off_road,
+    of_energy_elec_motion,
 ):
     """
     Calculate GHG emissions for freight & intercity rail, marine & port-related, and off-road
     vehicles and equipment.
     """
-    FreightRailPerDieselMotion = 100 - FreightRailPerElecMotion
-
-    FreightRailElecGHG = (
-        FreightRailBBtuMotion
-        * (FreightRailPerElecMotion / 100)
-        / (PerEnergyToMotionRailElec / 100)
+    f_elec_ghg = (
+        F_ENERGY_MOTION
+        * (f_energy_elec_motion / 100)
+        / (RT_ELEC_ENERGY_MOTION / 100)
         * 1000000000
         * (1 / BTU_MWH)
         / (1 - GRID_LOSS)
@@ -1290,21 +1216,20 @@ def calc_other_mobile_ghg(
         * (1 - ff_carbon_capture / 100)
     )
 
-    FreightRailDieselGHG = (
-        FreightRailBBtuMotion
-        * (FreightRailPerDieselMotion / 100)
-        * FreightRailMTCO2ePerBBtuDiesel
+    f_d_ghg = (
+        F_ENERGY_MOTION
+        * ((100 - f_energy_elec_motion) / 100)
+        * F_D_CO2_MT_BBTU
         * MT_TO_MMT
-        / (PerEnergyToMotionRailDiesel / 100)
+        / (RT_D_ENERGY_MOTION / 100)
     )
 
-    FreightRailGHG = (FreightRailElecGHG + FreightRailDieselGHG) * (1 + PerFreightRail / 100)
+    f_ghg = (f_elec_ghg + f_d_ghg) * (1 + change_freight_rail / 100)
 
-    InterCityRailPerDieselMotion = 100 - InterCityRailPerElecMotion
-    InterCityRailElecGHG = (
-        InterCityRailBBtuMotion
-        * (InterCityRailPerElecMotion / 100)
-        / (PerEnergyToMotionRailElec / 100)
+    icr_elec_ghg = (
+        ICR_ENERGY_MOTION
+        * (icr_energy_elec_motion / 100)
+        / (RT_ELEC_ENERGY_MOTION / 100)
         * 1000000000
         * (1 / BTU_MWH)
         / (1 - GRID_LOSS)
@@ -1320,27 +1245,23 @@ def calc_other_mobile_ghg(
         * (1 - ff_carbon_capture / 100)
     )
 
-    InterCityRailDieselGHG = (
-        InterCityRailBBtuMotion
-        * (InterCityRailPerDieselMotion / 100)
-        * InterCityRailMTCO2ePerBBtuDiesel
+    icr_d_ghg = (
+        ICR_ENERGY_MOTION
+        * ((100 - icr_energy_elec_motion) / 100)
+        * ICR_D_CO2_MT_BBTU
         * MT_TO_MMT
-        / (PerEnergyToMotionRailDiesel / 100)
+        / (RT_D_ENERGY_MOTION / 100)
     )
 
-    InterCityRailGHG = (InterCityRailElecGHG + InterCityRailDieselGHG) * (
-        1 + PerInterCityRail / 100
-    )
+    icr_ghg = (icr_elec_ghg + icr_d_ghg) * (1 + change_inter_city_rail / 100)
 
-    MarinePortPerFossilFuelMotion = 100 - MarinePortPerElectrification
-    MarinePortPerChangedFossilFuelMotion = (
-        MarinePortPerFossilFuelMotion - MarinePortPerFossilFuelMotion2015
-    ) / MarinePortPerFossilFuelMotion2015
+    mp_ff_motion = 100 - mp_energy_elec_motion
+    mp_percent_changed_ff_motion = (mp_ff_motion - MP_FF_ENERGY_MOTION) / MP_FF_ENERGY_MOTION
 
-    MarinePortElecGHG = (
-        MarinePortBBtuMotion
-        * (MarinePortPerElectrification / 100)
-        / (PerEnergyToMotionMarineElec / 100)
+    mp_elec_ghg = (
+        MP_ENERGY_MOTION_BBTU
+        * (mp_energy_elec_motion / 100)
+        / (MP_ELEC_MOTION / 100)
         * 1000000000
         * (1 / BTU_MWH)
         / (1 - GRID_LOSS)
@@ -1356,39 +1277,35 @@ def calc_other_mobile_ghg(
         * (1 - ff_carbon_capture / 100)
     )
 
-    MarinePortRFOGHG = (
-        MarinePortBBtuMotion
-        * (MarinePortPerFFRFOMotion / 100)
-        * (MarinePortPerFossilFuelMotion / 100)
-        * (1 + MarinePortPerChangedFossilFuelMotion)
-        * MarinePortMTCO2ePerBBtuRFO
+    mp_rfo_ghg = (
+        MP_ENERGY_MOTION_BBTU
+        * (MP_FF_RFO_ENERGY_MOTION / 100)
+        * (mp_ff_motion / 100)
+        * (1 + mp_percent_changed_ff_motion)
+        * MP_RFO_CO2_MMT_BBTU
         * MT_TO_MMT
-        / (PerEnergyToMotionMarineRFO / 100)
+        / (MP_RFO_MOTION / 100)
     )
 
-    MarinePortDFOGHG = (
-        MarinePortBBtuMotion
-        * (MarinePortPerFFDFOMotion / 100)
-        * (MarinePortPerFossilFuelMotion / 100)
-        * (1 + MarinePortPerChangedFossilFuelMotion)
-        * MarinePortMTCO2ePerBBtuDFO
+    mp_dfo_ghg = (
+        MP_ENERGY_MOTION_BBTU
+        * (MP_FF_DFO_ENERGY_MOTION / 100)
+        * (mp_ff_motion / 100)
+        * (1 + mp_percent_changed_ff_motion)
+        * MP_DFO_CO2_MMT_BBTU
         * MT_TO_MMT
-        / (PerEnergyToMotionMarineDFO / 100)
+        / (MP_DFO_MOTION / 100)
     )
 
-    MarinePortGHG = (MarinePortElecGHG + MarinePortRFOGHG + MarinePortDFOGHG) * (
-        1 + PerMarinePort / 100
-    )
+    mp_ghg = (mp_elec_ghg + mp_rfo_ghg + mp_dfo_ghg) * (1 + change_marine_port / 100)
 
-    OffroadPerFossilFuelMotion = 100 - OffroadPerElectrification
-    OffroadPerChangedFossilFuelMotion = (
-        OffroadPerFossilFuelMotion - OffroadPerFossilFuelMotion2015
-    ) / OffroadPerFossilFuelMotion2015
+    of_ff_motion = 100 - of_energy_elec_motion
+    of_percent_changed_ff_motion = (of_ff_motion - OF_FF_ENERGY_MOTION) / OF_FF_ENERGY_MOTION
 
-    OffroadElecGHG = (
-        OffroadBBtuMotion
-        * (OffroadPerElectrification / 100)
-        / (PerEnergyToMotionOffroadElec / 100)
+    of_elec_ghg = (
+        OF_ENERGY_MOTION_BBTU
+        * (of_energy_elec_motion / 100)
+        / (OR_ELEC_MOTION / 100)
         * 1000000000
         * (1 / BTU_MWH)
         / (1 - GRID_LOSS)
@@ -1404,41 +1321,39 @@ def calc_other_mobile_ghg(
         * (1 - ff_carbon_capture / 100)
     )
 
-    OffroadMotGasGHG = (
-        OffroadBBtuMotion
-        * (OffroadPerFFMotGasMotion / 100)
-        * (OffroadPerFossilFuelMotion / 100)
-        * (1 + OffroadPerChangedFossilFuelMotion)
-        * OffroadMTCO2ePerBBtuMotGas
+    of_mg_ghg = (
+        OF_ENERGY_MOTION_BBTU
+        * (OF_FF_MG_ENERGY_MOTION / 100)
+        * (of_ff_motion / 100)
+        * (1 + of_percent_changed_ff_motion)
+        * OF_MG_CO2_MT_BBTU
         * MT_TO_MMT
-        / (PerEnergyToMotionOffroadMotGas / 100)
+        / (OF_MG_MOTION / 100)
     )
 
-    OffroadDFOGHG = (
-        OffroadBBtuMotion
-        * (OffroadPerFFDFOMotion / 100)
-        * (OffroadPerFossilFuelMotion / 100)
-        * (1 + OffroadPerChangedFossilFuelMotion)
-        * OffroadMTCO2ePerBBtuDFO
+    of_dfo_ghg = (
+        OF_ENERGY_MOTION_BBTU
+        * (OF_FF_DFO_ENERGY_MOTION / 100)
+        * (of_ff_motion / 100)
+        * (1 + of_percent_changed_ff_motion)
+        * OF_DFO_CO2_MT_BBTU
         * MT_TO_MMT
-        / (PerEnergyToMotionOffroadDFO / 100)
+        / (OF_DFO_MOTION / 100)
     )
 
-    OffroadLPGGHG = (
-        OffroadBBtuMotion
-        * (OffroadPerFFLPGMotion / 100)
-        * (OffroadPerFossilFuelMotion / 100)
-        * (1 + OffroadPerChangedFossilFuelMotion)
-        * OffroadMTCO2ePerBBtuLPG
+    of_lpg_ghg = (
+        OF_ENERGY_MOTION_BBTU
+        * (OF_FF_LPG_ENERGY_MOTION / 100)
+        * (of_ff_motion / 100)
+        * (1 + of_percent_changed_ff_motion)
+        * OF_LPG_CO2_MT_BBTU
         * MT_TO_MMT
-        / (PerEnergyToMotionOffroadLPG / 100)
+        / (OF_LPG_MOTION / 100)
     )
 
-    OffroadGHG = (OffroadElecGHG + OffroadMotGasGHG + OffroadDFOGHG + OffroadLPGGHG) * (
-        1 + PerOffroad / 100
-    )
+    of_ghg = (of_elec_ghg + of_mg_ghg + of_dfo_ghg + of_lpg_ghg) * (1 + change_off_road / 100)
 
-    return FreightRailGHG + InterCityRailGHG + MarinePortGHG + OffroadGHG
+    return f_ghg + icr_ghg + mp_ghg + of_ghg
 
 
 def calc_non_energy_ghg(
@@ -1461,12 +1376,12 @@ def calc_non_energy_ghg(
     urb_energy_elec,
     urban_pop_percent,  # TODO: why only urban_pop_percent and not sub and rural?
 ):
-    AgricultureGHG = GHG_AG * (1 + change_ag / 100)
-    SolidWasteGHG = GHG_SOLID_WASTE * (1 + change_solid_waste / 100) * (1 + change_pop / 100)
-    WasteWaterGHG = GHG_WASTEWATER * (1 + change_wastewater / 100) * (1 + change_pop / 100)
-    IndProcGHG = GHG_IP * (1 + change_industrial_processes / 100)
+    ag_ghg = GHG_AG * (1 + change_ag / 100)
+    solid_waste_ghg = GHG_SOLID_WASTE * (1 + change_solid_waste / 100) * (1 + change_pop / 100)
+    wastewater_ghg = GHG_WASTEWATER * (1 + change_wastewater / 100) * (1 + change_pop / 100)
+    ip_ghg = GHG_IP * (1 + change_industrial_processes / 100)
 
-    ResNGConsumption = calc_res_ghg(
+    res_ng_consumption = calc_res_ghg(
         grid_coal,
         grid_ng,
         grid_oil,
@@ -1484,7 +1399,7 @@ def calc_non_energy_ghg(
     ci_ff = 100 - ci_energy_elec
     change_ff = (ci_ff - CI_ENERGY_FF) / CI_ENERGY_FF
 
-    ComIndNGConsumption = (
+    ci_ng_consumption = (
         CI_ENERGY_BTU
         * (1 + ci_energy_change / 100)
         * (ci_ff / 100)
@@ -1494,24 +1409,36 @@ def calc_non_energy_ghg(
         * 1000000000
     )
 
-    NGSystemsGHG = (
-        (ResNGConsumption + ComIndNGConsumption)
+    ng_systems_ghg = (
+        (res_ng_consumption + ci_ng_consumption)
         * (1 / BTU_CCF_AVG)
         * 100
         * 0.000001
-        * (MMTCO2ePerMillionCFNG_CH4 + MMTCO2ePerMillionCFNG_CO2)
+        * (NE_CO2_MMT_NG_METHANE + NE_CO2_MMT_NG_CO)
     )
 
-    LULUCFGHG = GHG_URBAN_TREES * (1 + change_urban_trees / 100) + (
+    land_use_forestry_ghg = GHG_URBAN_TREES * (1 + change_urban_trees / 100) + (
         GHG_FORESTS + GHG_FOREST_CHANGE
     ) * (1 + change_forest / 100)
 
-    return AgricultureGHG + SolidWasteGHG + WasteWaterGHG + IndProcGHG + NGSystemsGHG + LULUCFGHG
+    return (
+        ag_ghg + solid_waste_ghg + wastewater_ghg + ip_ghg + ng_systems_ghg + land_use_forestry_ghg
+    )
 
 
 ###########################
 # Prepare data for charts #
 ###########################
+
+SECTORS = [
+    "Residential",
+    "Commercial/Industrial",
+    "Mobile-Highway",
+    "Mobile-Transit",
+    "Mobile-Aviation",
+    "Mobile-Other",
+    "Non-Energy",
+]
 
 
 def wrangle_data_for_bar_chart(user_inputs):
@@ -1570,30 +1497,30 @@ def wrangle_data_for_bar_chart(user_inputs):
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
                 user_inputs["ff_carbon_capture"],
-                user_inputs["PerTransRailRidership"],
+                user_inputs["change_rail_transit"],
                 user_inputs["change_pop"],
                 user_inputs["rural_pop_percent"],
                 user_inputs["suburban_pop_percent"],
-                user_inputs["TransRailUrbanPerElecMotion"],
-                user_inputs["TransRailSuburbanPerElecMotion"],
-                user_inputs["TransRailRuralPerElecMotion"],
+                user_inputs["rt_energy_elec_motion_urb"],
+                user_inputs["rt_energy_elec_motion_sub"],
+                user_inputs["rt_energy_elec_motion_rur"],
                 user_inputs["urban_pop_percent"],
             ),
             calc_aviation_ghg(user_inputs["change_pop"], user_inputs["change_air_travel"]),
             calc_other_mobile_ghg(
-                user_inputs["FreightRailPerElecMotion"],
+                user_inputs["f_energy_elec_motion"],
                 user_inputs["grid_coal"],
                 user_inputs["grid_ng"],
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
-                user_inputs["InterCityRailPerElecMotion"],
-                user_inputs["MarinePortPerElectrification"],
+                user_inputs["icr_energy_elec_motion"],
+                user_inputs["mp_energy_elec_motion"],
                 user_inputs["ff_carbon_capture"],
-                user_inputs["PerFreightRail"],
-                user_inputs["PerInterCityRail"],
-                user_inputs["PerMarinePort"],
-                user_inputs["PerOffroad"],
-                user_inputs["OffroadPerElectrification"],
+                user_inputs["change_freight_rail"],
+                user_inputs["change_inter_city_rail"],
+                user_inputs["change_marine_port"],
+                user_inputs["change_off_road"],
+                user_inputs["of_energy_elec_motion"],
             ),
             calc_non_energy_ghg(
                 user_inputs["ci_energy_elec"],
@@ -1678,13 +1605,13 @@ def wrangle_data_for_stacked_chart(user_inputs):
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
                 user_inputs["ff_carbon_capture"],
-                user_inputs["PerTransRailRidership"],
+                user_inputs["change_rail_transit"],
                 user_inputs["change_pop"],
                 user_inputs["rural_pop_percent"],
                 user_inputs["suburban_pop_percent"],
-                user_inputs["TransRailUrbanPerElecMotion"],
-                user_inputs["TransRailSuburbanPerElecMotion"],
-                user_inputs["TransRailRuralPerElecMotion"],
+                user_inputs["rt_energy_elec_motion_urb"],
+                user_inputs["rt_energy_elec_motion_sub"],
+                user_inputs["rt_energy_elec_motion_rur"],
                 user_inputs["urban_pop_percent"],
             ),
         ],
@@ -1695,19 +1622,19 @@ def wrangle_data_for_stacked_chart(user_inputs):
         "Mobile-Other": [
             GHG_OTHER_MOBILE,
             calc_other_mobile_ghg(
-                user_inputs["FreightRailPerElecMotion"],
+                user_inputs["f_energy_elec_motion"],
                 user_inputs["grid_coal"],
                 user_inputs["grid_ng"],
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
-                user_inputs["InterCityRailPerElecMotion"],
-                user_inputs["MarinePortPerElectrification"],
+                user_inputs["icr_energy_elec_motion"],
+                user_inputs["mp_energy_elec_motion"],
                 user_inputs["ff_carbon_capture"],
-                user_inputs["PerFreightRail"],
-                user_inputs["PerInterCityRail"],
-                user_inputs["PerMarinePort"],
-                user_inputs["PerOffroad"],
-                user_inputs["OffroadPerElectrification"],
+                user_inputs["change_freight_rail"],
+                user_inputs["change_inter_city_rail"],
+                user_inputs["change_marine_port"],
+                user_inputs["change_off_road"],
+                user_inputs["of_energy_elec_motion"],
             ),
         ],
         "Non-Energy": [

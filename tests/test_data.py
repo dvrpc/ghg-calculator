@@ -1,6 +1,6 @@
 """Test that the funcs that calculate GHG continue to return correct values during refactor."""
 
-from main import ghg_calc as g
+from bokeh_apps import ghg_calc as g
 
 """
 print("Stationary - Residential = ", ResGHG)
@@ -86,13 +86,13 @@ def test_calc_mob_transit_ghg():
         g.GRID_OIL,
         g.GRID_OTHER_FF,
         g.ff_carbon_capture,
-        g.PerTransRailRidership,
+        0,  # change in transit rail ridership
         0,  # change in population
         g.RURAL_POP_PERCENT,
         g.SUBURBAN_POP_PERCENT,
-        g.TransRailUrbanPerElecMotion,
-        g.TransRailSuburbanPerElecMotion,
-        g.TransRailRuralPerElecMotion,
+        g.RT_ENERGY_ELEC_MOTION_URB,
+        g.RT_ENERGY_ELEC_MOTION_SUB,
+        g.RT_ENERGY_ELEC_MOTION_RUR,
         g.URBAN_POP_PERCENT,
     )
     assert ghg == GHG_TRANSIT
@@ -100,19 +100,19 @@ def test_calc_mob_transit_ghg():
 
 def test_calc_other_mobile_ghg():
     ghg = g.calc_other_mobile_ghg(
-        g.FreightRailPerElecMotion,
+        g.F_ENERGY_ELEC_MOTION,
         g.GRID_COAL,
         g.GRID_NG,
         g.GRID_OIL,
         g.GRID_OTHER_FF,
-        g.InterCityRailPerElecMotion,
-        g.MarinePortPerElectrification,
+        g.ICR_ENERGY_ELEC_MOTION,
+        g.MP_ENERGY_ELEC_MOTION,
         g.ff_carbon_capture,
-        g.PerFreightRail,
-        g.PerInterCityRail,
-        g.PerMarinePort,
-        g.PerOffroad,
-        g.OffroadPerElectrification,
+        0,  # change in freight rail ridership
+        0,  # change in inter-city rail ridership
+        0,  # change in marine and port-related activity
+        0,  # change in off-road vehicle and equipment use
+        g.OF_ENERGY_ELEC_MOTION,
     )
     assert ghg == GHG_OTHER_MOB
 
@@ -225,13 +225,13 @@ def test_increase_pop_increase_transit_ghg():
         g.GRID_OIL,
         g.GRID_OTHER_FF,
         g.ff_carbon_capture,
-        g.PerTransRailRidership,
+        0,  # change in rail transit ridership
         1,  # change in population
         g.RURAL_POP_PERCENT,
         g.SUBURBAN_POP_PERCENT,
-        g.TransRailUrbanPerElecMotion,
-        g.TransRailSuburbanPerElecMotion,
-        g.TransRailRuralPerElecMotion,
+        g.RT_ENERGY_ELEC_MOTION_URB,
+        g.RT_ENERGY_ELEC_MOTION_SUB,
+        g.RT_ENERGY_ELEC_MOTION_RUR,
         g.URBAN_POP_PERCENT,
     )
     assert ghg > GHG_TRANSIT
@@ -244,13 +244,13 @@ def test_decrease_pop_decrease_transit_ghg():
         g.GRID_OIL,
         g.GRID_OTHER_FF,
         g.ff_carbon_capture,
-        g.PerTransRailRidership,
+        0,  # change in rail transit ridership
         -1,  # change in population
         g.RURAL_POP_PERCENT,
         g.SUBURBAN_POP_PERCENT,
-        g.TransRailUrbanPerElecMotion,
-        g.TransRailSuburbanPerElecMotion,
-        g.TransRailRuralPerElecMotion,
+        g.RT_ENERGY_ELEC_MOTION_URB,
+        g.RT_ENERGY_ELEC_MOTION_SUB,
+        g.RT_ENERGY_ELEC_MOTION_RUR,
         g.URBAN_POP_PERCENT,
     )
     assert ghg < GHG_TRANSIT

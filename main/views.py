@@ -1,14 +1,10 @@
-import numpy as np
-
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
-from bokeh.models import Slider, Column, ColumnDataSource, TextInput, Paragraph, LabelSet
+from bokeh.models import Slider, Column, ColumnDataSource, TextInput, Paragraph
 from bokeh.document import Document
 from bokeh.embed import server_document
 from bokeh.layouts import row, layout
-from bokeh.plotting import figure, curdoc
-from bokeh.transform import dodge, cumsum
 
 from bokeh_apps.ghg_calc import (
     wrangle_data_for_bar_chart,
@@ -42,12 +38,13 @@ from bokeh_apps.ghg_calc import (
     RUR_ENERGY_ELEC,
     CI_ENERGY_ELEC,
     REG_FLEET_MPG,
-    TransRailUrbanPerElecMotion,
-    TransRailRuralPerElecMotion,
-    FreightRailPerElecMotion,
-    InterCityRailPerElecMotion,
-    MarinePortPerElecMotion,
-    OffroadPerElecMotion,
+    RT_ENERGY_ELEC_MOTION_URB,
+    RT_ENERGY_ELEC_MOTION_SUB,
+    RT_ENERGY_ELEC_MOTION_RUR,
+    F_ENERGY_ELEC_MOTION,
+    ICR_ENERGY_ELEC_MOTION,
+    MP_ENERGY_ELEC_MOTION,
+    OF_ENERGY_ELEC_MOTION,
 )
 
 
@@ -98,7 +95,7 @@ def population_handler(doc: Document) -> None:
         user_inputs["change_pop"] = pop_slider.value
         user_inputs["urban_pop_percent"] = float(urban_pop_percent_text_input.value)
         user_inputs["suburban_pop_percent"] = float(suburban_pop_percent_text_input.value)
-        user_inputs["rural_pop_pecent"] = float(rural_pop_percent_text_input.value)
+        user_inputs["rural_pop_percent"] = float(rural_pop_percent_text_input.value)
         bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
         stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
 
@@ -244,18 +241,18 @@ def mobile_energy_handler(doc: Document) -> None:
         user_inputs["change_veh_miles"] = change_veh_miles_slider.value
         user_inputs["reg_fleet_mpg"] = reg_fleet_mpg_slider.value
         user_inputs["veh_miles_elec"] = veh_miles_elec_slider.value
-        user_inputs["PerTransRailRidership"] = PerTransRailRidershipSlider.value
-        user_inputs["TransRailUrbanPerElecMotion"] = TransRailUrbanPerElecMotionSlider.value
-        user_inputs["TransRailSuburbanPerElecMotion"] = TransRailSuburbanPerElecMotionSlider.value
-        user_inputs["TransRailRuralPerElecMotion"] = TransRailRuralPerElecMotionSlider.value
-        user_inputs["PerFreightRail"] = PerFreightRailSlider.value
-        user_inputs["FreightRailPerElecMotion"] = FreightRailPerElecMotionSlider.value
-        user_inputs["PerInterCityRail"] = PerInterCityRailSlider.value
-        user_inputs["InterCityRailPerElecMotion"] = InterCityRailPerElecMotionSlider.value
-        user_inputs["PerMarinePort"] = PerMarinePortSlider.value
-        user_inputs["MarinePortPerElectrification"] = MarinePortPerElectrificationSlider.value
-        user_inputs["PerOffroad"] = PerOffroadSlider.value
-        user_inputs["OffroadPerElectrification"] = OffroadPerElectrificationSlider.value
+        user_inputs["change_rail_transit"] = change_rail_transit_slider.value
+        user_inputs["rt_energy_elec_motion_urb"] = rt_energy_elec_motion_urb_slider.value
+        user_inputs["rt_energy_elec_motion_sub"] = rt_energy_elec_motion_sub_slider.value
+        user_inputs["rt_energy_elec_motion_rur"] = rt_energy_elec_motion_rur_slider.value
+        user_inputs["change_freight_rail"] = change_freight_rail_slider.value
+        user_inputs["f_energy_elec_motion"] = f_energy_elec_motion_slider.value
+        user_inputs["change_inter_city_rail"] = change_inter_city_rail_slider.value
+        user_inputs["icr_energy_elec_motion"] = icr_energy_motion_elec_slider.value
+        user_inputs["change_marine_port"] = change_marine_port_slider.value
+        user_inputs["mp_energy_elec_motion"] = mp_energy_elec_motion_slider.value
+        user_inputs["change_off_road"] = change_off_road_slider.value
+        user_inputs["of_energy_elec_motion"] = of_energy_elec_motion_slider.value
         user_inputs["change_air_travel"] = change_air_travel_slider.value
         bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
         stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
@@ -280,37 +277,37 @@ def mobile_energy_handler(doc: Document) -> None:
     reg_fleet_mpg_slider.on_change("value", callback)
 
     # rail transit
-    PerTransRailRidershipSlider = Slider(
+    change_rail_transit_slider = Slider(
         start=-100, end=100, value=0, step=1, title="% Change in Transit Ridership"
     )
-    PerTransRailRidershipSlider.on_change("value", callback)
+    change_rail_transit_slider.on_change("value", callback)
 
-    TransRailUrbanPerElecMotionSlider = Slider(
+    rt_energy_elec_motion_urb_slider = Slider(
         start=0,
         end=100,
-        value=TransRailUrbanPerElecMotion,
+        value=RT_ENERGY_ELEC_MOTION_URB,
         step=1,
         title="% Electrification of Rail Transit Urban Areas",
     )
-    TransRailUrbanPerElecMotionSlider.on_change("value", callback)
+    rt_energy_elec_motion_urb_slider.on_change("value", callback)
 
-    TransRailSuburbanPerElecMotionSlider = Slider(
+    rt_energy_elec_motion_sub_slider = Slider(
         start=0,
         end=100,
-        value=TransRailRuralPerElecMotion,
+        value=RT_ENERGY_ELEC_MOTION_SUB,
         step=1,
         title="% Electrification of Rail Transit in Suburban Areas",
     )
-    TransRailSuburbanPerElecMotionSlider.on_change("value", callback)
+    rt_energy_elec_motion_sub_slider.on_change("value", callback)
 
-    TransRailRuralPerElecMotionSlider = Slider(
+    rt_energy_elec_motion_rur_slider = Slider(
         start=0,
         end=100,
-        value=TransRailRuralPerElecMotion,
+        value=RT_ENERGY_ELEC_MOTION_RUR,
         step=1,
         title="% Electrification of Rail Transit in Rural Areas",
     )
-    TransRailRuralPerElecMotionSlider.on_change("value", callback)
+    rt_energy_elec_motion_rur_slider.on_change("value", callback)
 
     # aviation
     change_air_travel_slider = Slider(
@@ -319,64 +316,64 @@ def mobile_energy_handler(doc: Document) -> None:
     change_air_travel_slider.on_change("value", callback)
 
     # freight rail
-    PerFreightRailSlider = Slider(
+    change_freight_rail_slider = Slider(
         start=-100, end=100, value=0, step=1, title="% Change in Freight Rail"
     )
-    PerFreightRailSlider.on_change("value", callback)
+    change_freight_rail_slider.on_change("value", callback)
 
-    FreightRailPerElecMotionSlider = Slider(
+    f_energy_elec_motion_slider = Slider(
         start=0,
         end=100,
-        value=FreightRailPerElecMotion,
+        value=F_ENERGY_ELEC_MOTION,
         step=1,
         title="% Electrification of Rail Freight",
     )
-    FreightRailPerElecMotionSlider.on_change("value", callback)
+    f_energy_elec_motion_slider.on_change("value", callback)
 
     # inter-city rail
-    PerInterCityRailSlider = Slider(
+    change_inter_city_rail_slider = Slider(
         start=-100, end=100, value=0, step=1, title="% Change in Inter-city Rail Travel"
     )
-    PerInterCityRailSlider.on_change("value", callback)
+    change_inter_city_rail_slider.on_change("value", callback)
 
-    InterCityRailPerElecMotionSlider = Slider(
+    icr_energy_motion_elec_slider = Slider(
         start=0,
         end=100,
-        value=InterCityRailPerElecMotion,
+        value=ICR_ENERGY_ELEC_MOTION,
         step=1,
         title="% Electrification of Inter-city Rail",
     )
-    InterCityRailPerElecMotionSlider.on_change("value", callback)
+    icr_energy_motion_elec_slider.on_change("value", callback)
 
     # marine and port
-    PerMarinePortSlider = Slider(
+    change_marine_port_slider = Slider(
         start=-100, end=100, value=0, step=1, title="% Change in Marine and Port-related Activity"
     )
-    PerMarinePortSlider.on_change("value", callback)
+    change_marine_port_slider.on_change("value", callback)
 
-    MarinePortPerElectrificationSlider = Slider(
+    mp_energy_elec_motion_slider = Slider(
         start=0,
         end=100,
-        value=MarinePortPerElecMotion,
+        value=MP_ENERGY_ELEC_MOTION,
         step=1,
         title="% Electrification of Marine and Port-related Activity",
     )
-    MarinePortPerElectrificationSlider.on_change("value", callback)
+    mp_energy_elec_motion_slider.on_change("value", callback)
 
     # off-road
-    PerOffroadSlider = Slider(
+    change_off_road_slider = Slider(
         start=-100, end=100, value=0, step=1, title="% Change in Offroad Vehicle Use"
     )
-    PerOffroadSlider.on_change("value", callback)
+    change_off_road_slider.on_change("value", callback)
 
-    OffroadPerElectrificationSlider = Slider(
+    of_energy_elec_motion_slider = Slider(
         start=0,
         end=100,
-        value=OffroadPerElecMotion,
+        value=OF_ENERGY_ELEC_MOTION,
         step=1,
         title="% Electrification of Offroad vehicles",
     )
-    OffroadPerElectrificationSlider.on_change("value", callback)
+    of_energy_elec_motion_slider.on_change("value", callback)
 
     bar_chart_data = wrangle_data_for_bar_chart(user_inputs)
     bar_chart_source = ColumnDataSource(data=bar_chart_data)
@@ -390,19 +387,19 @@ def mobile_energy_handler(doc: Document) -> None:
         change_veh_miles_slider,
         veh_miles_elec_slider,
         reg_fleet_mpg_slider,
-        PerTransRailRidershipSlider,
-        TransRailUrbanPerElecMotionSlider,
-        TransRailSuburbanPerElecMotionSlider,
-        TransRailRuralPerElecMotionSlider,
+        change_rail_transit_slider,
+        rt_energy_elec_motion_urb_slider,
+        rt_energy_elec_motion_sub_slider,
+        rt_energy_elec_motion_rur_slider,
         change_air_travel_slider,
-        PerFreightRailSlider,
-        FreightRailPerElecMotionSlider,
-        PerInterCityRailSlider,
-        InterCityRailPerElecMotionSlider,
-        PerMarinePortSlider,
-        MarinePortPerElectrificationSlider,
-        PerOffroadSlider,
-        OffroadPerElectrificationSlider,
+        change_freight_rail_slider,
+        f_energy_elec_motion_slider,
+        change_inter_city_rail_slider,
+        icr_energy_motion_elec_slider,
+        change_marine_port_slider,
+        mp_energy_elec_motion_slider,
+        change_off_road_slider,
+        of_energy_elec_motion_slider,
     )
     charts = Column(bar_chart, stacked_chart)
     doc.add_root(layout([[inputs, charts]]))
@@ -470,10 +467,10 @@ def non_energy_handler(doc: Document) -> None:
     )
     ff_carbon_capture_slider.on_change("value", callback)
 
-    air_capture_slider = Slider(
-        start=0, end=100, value=0, step=1, title="MMTCO2e Captured from the Air"
-    )
-    air_capture_slider.on_change("value", callback)
+    # air_capture_slider = Slider(
+    #     start=0, end=100, value=0, step=1, title="MMTCO2e Captured from the Air"
+    # )
+    # air_capture_slider.on_change("value", callback)
 
     bar_chart_data = wrangle_data_for_bar_chart(user_inputs)
     bar_chart_source = ColumnDataSource(data=bar_chart_data)
@@ -556,11 +553,11 @@ def grid_mix_handler(doc: Document) -> None:
     )
     grid_other_ff_input.on_change("value", callback)
 
-    net_zero_carbon_input = TextInput(
-        value=str(round(GRID_NUCLEAR + GRID_SOLAR + GRID_WIND + GRID_BIO + GRID_HYDRO + GRID_GEO)),
-        title="% Net Zero Carbon Sources in Grid Mix",
-    )
-    net_zero_carbon_input.on_change("value", callback)
+    # net_zero_carbon_input = TextInput(
+    #     value=str(round(GRID_NUCLEAR + GRID_SOLAR + GRID_WIND + GRID_BIO + GRID_HYDRO + GRID_GEO)),
+    #     title="% Net Zero Carbon Sources in Grid Mix",
+    # )
+    # net_zero_carbon_input.on_change("value", callback)
 
     inputs = Column(
         grid_text,
