@@ -145,14 +145,12 @@ def population(request: HttpRequest) -> HttpResponse:
     return render(request, "main/base.html", dict(script=script))
 
 
-def stationary_energy_handler(doc: Document) -> None:
+def res_stationary_handler(doc: Document) -> None:
     def callback(attr, old, new):
         user_inputs["res_energy_change"] = res_energy_change_slider.value
         user_inputs["urb_energy_elec"] = urb_energy_elec_slider.value
         user_inputs["sub_energy_elec"] = sub_energy_elec_slider.value
         user_inputs["rur_energy_elec"] = rur_energy_elec_slider.value
-        user_inputs["ci_energy_change"] = ci_energy_change_slider.value
-        user_inputs["ci_energy_elec"] = ci_energy_elec_slider.value
         bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
         stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
 
@@ -192,6 +190,36 @@ def stationary_energy_handler(doc: Document) -> None:
     )
     rur_energy_elec_slider.on_change("value", callback)
 
+    bar_chart_data = wrangle_data_for_bar_chart(user_inputs)
+    bar_chart_source = ColumnDataSource(data=bar_chart_data)
+    bar_chart = create_bar_chart(bar_chart_data, bar_chart_source)
+
+    stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
+    stacked_chart_source = ColumnDataSource(data=stacked_chart_data)
+    stacked_chart = create_stacked_chart(stacked_chart_data, stacked_chart_source)
+
+    inputs = Column(
+        res_energy_change_slider,
+        urb_energy_elec_slider,
+        sub_energy_elec_slider,
+        rur_energy_elec_slider,
+    )
+    charts = Column(bar_chart, stacked_chart)
+    doc.add_root(layout([[inputs, charts]]))
+
+
+def res_stationary(request: HttpRequest) -> HttpResponse:
+    script = server_document(request.build_absolute_uri())
+    return render(request, "main/base.html", dict(script=script))
+
+
+def ci_stationary_handler(doc: Document) -> None:
+    def callback(attr, old, new):
+        user_inputs["ci_energy_change"] = ci_energy_change_slider.value
+        user_inputs["ci_energy_elec"] = ci_energy_elec_slider.value
+        bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
+        stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
+
     # commercial and industrial
     ci_energy_change_slider = Slider(
         start=-100,
@@ -220,10 +248,6 @@ def stationary_energy_handler(doc: Document) -> None:
     stacked_chart = create_stacked_chart(stacked_chart_data, stacked_chart_source)
 
     inputs = Column(
-        res_energy_change_slider,
-        urb_energy_elec_slider,
-        sub_energy_elec_slider,
-        rur_energy_elec_slider,
         ci_energy_change_slider,
         ci_energy_elec_slider,
     )
@@ -231,29 +255,16 @@ def stationary_energy_handler(doc: Document) -> None:
     doc.add_root(layout([[inputs, charts]]))
 
 
-def stationary_energy(request: HttpRequest) -> HttpResponse:
+def ci_stationary(request: HttpRequest) -> HttpResponse:
     script = server_document(request.build_absolute_uri())
     return render(request, "main/base.html", dict(script=script))
 
 
-def mobile_energy_handler(doc: Document) -> None:
+def mobile_highway_handler(doc: Document) -> None:
     def callback(attr, old, new):
         user_inputs["change_veh_miles"] = change_veh_miles_slider.value
         user_inputs["reg_fleet_mpg"] = reg_fleet_mpg_slider.value
         user_inputs["veh_miles_elec"] = veh_miles_elec_slider.value
-        user_inputs["change_rail_transit"] = change_rail_transit_slider.value
-        user_inputs["rt_energy_elec_motion_urb"] = rt_energy_elec_motion_urb_slider.value
-        user_inputs["rt_energy_elec_motion_sub"] = rt_energy_elec_motion_sub_slider.value
-        user_inputs["rt_energy_elec_motion_rur"] = rt_energy_elec_motion_rur_slider.value
-        user_inputs["change_freight_rail"] = change_freight_rail_slider.value
-        user_inputs["f_energy_elec_motion"] = f_energy_elec_motion_slider.value
-        user_inputs["change_inter_city_rail"] = change_inter_city_rail_slider.value
-        user_inputs["icr_energy_elec_motion"] = icr_energy_motion_elec_slider.value
-        user_inputs["change_marine_port"] = change_marine_port_slider.value
-        user_inputs["mp_energy_elec_motion"] = mp_energy_elec_motion_slider.value
-        user_inputs["change_off_road"] = change_off_road_slider.value
-        user_inputs["or_energy_elec_motion"] = or_energy_elec_motion_slider.value
-        user_inputs["change_air_travel"] = change_air_travel_slider.value
         bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
         stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
 
@@ -276,7 +287,37 @@ def mobile_energy_handler(doc: Document) -> None:
     )
     reg_fleet_mpg_slider.on_change("value", callback)
 
-    # rail transit
+    bar_chart_data = wrangle_data_for_bar_chart(user_inputs)
+    bar_chart_source = ColumnDataSource(data=bar_chart_data)
+    bar_chart = create_bar_chart(bar_chart_data, bar_chart_source)
+
+    stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
+    stacked_chart_source = ColumnDataSource(data=stacked_chart_data)
+    stacked_chart = create_stacked_chart(stacked_chart_data, stacked_chart_source)
+
+    inputs = Column(
+        change_veh_miles_slider,
+        veh_miles_elec_slider,
+        reg_fleet_mpg_slider,
+    )
+    charts = Column(bar_chart, stacked_chart)
+    doc.add_root(layout([[inputs, charts]]))
+
+
+def mobile_highway(request: HttpRequest) -> HttpResponse:
+    script = server_document(request.build_absolute_uri())
+    return render(request, "main/base.html", dict(script=script))
+
+
+def mobile_transit_handler(doc: Document) -> None:
+    def callback(attr, old, new):
+        user_inputs["change_rail_transit"] = change_rail_transit_slider.value
+        user_inputs["rt_energy_elec_motion_urb"] = rt_energy_elec_motion_urb_slider.value
+        user_inputs["rt_energy_elec_motion_sub"] = rt_energy_elec_motion_sub_slider.value
+        user_inputs["rt_energy_elec_motion_rur"] = rt_energy_elec_motion_rur_slider.value
+        bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
+        stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
+
     change_rail_transit_slider = Slider(
         start=-100, end=100, value=0, step=1, title="% Change in Transit Ridership"
     )
@@ -309,11 +350,72 @@ def mobile_energy_handler(doc: Document) -> None:
     )
     rt_energy_elec_motion_rur_slider.on_change("value", callback)
 
-    # aviation
+    bar_chart_data = wrangle_data_for_bar_chart(user_inputs)
+    bar_chart_source = ColumnDataSource(data=bar_chart_data)
+    bar_chart = create_bar_chart(bar_chart_data, bar_chart_source)
+
+    stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
+    stacked_chart_source = ColumnDataSource(data=stacked_chart_data)
+    stacked_chart = create_stacked_chart(stacked_chart_data, stacked_chart_source)
+
+    inputs = Column(
+        change_rail_transit_slider,
+        rt_energy_elec_motion_urb_slider,
+        rt_energy_elec_motion_sub_slider,
+        rt_energy_elec_motion_rur_slider,
+    )
+    charts = Column(bar_chart, stacked_chart)
+    doc.add_root(layout([[inputs, charts]]))
+
+
+def mobile_transit(request: HttpRequest) -> HttpResponse:
+    script = server_document(request.build_absolute_uri())
+    return render(request, "main/base.html", dict(script=script))
+
+
+def mobile_aviation_handler(doc: Document) -> None:
+    def callback(attr, old, new):
+        user_inputs["change_air_travel"] = change_air_travel_slider.value
+        bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
+        stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
+
     change_air_travel_slider = Slider(
         start=-100, end=100, value=0, step=1, title="% Change in Air Travel"
     )
     change_air_travel_slider.on_change("value", callback)
+
+    bar_chart_data = wrangle_data_for_bar_chart(user_inputs)
+    bar_chart_source = ColumnDataSource(data=bar_chart_data)
+    bar_chart = create_bar_chart(bar_chart_data, bar_chart_source)
+
+    stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
+    stacked_chart_source = ColumnDataSource(data=stacked_chart_data)
+    stacked_chart = create_stacked_chart(stacked_chart_data, stacked_chart_source)
+
+    inputs = Column(
+        change_air_travel_slider,
+    )
+    charts = Column(bar_chart, stacked_chart)
+    doc.add_root(layout([[inputs, charts]]))
+
+
+def mobile_aviation(request: HttpRequest) -> HttpResponse:
+    script = server_document(request.build_absolute_uri())
+    return render(request, "main/base.html", dict(script=script))
+
+
+def mobile_other_handler(doc: Document) -> None:
+    def callback(attr, old, new):
+        user_inputs["change_freight_rail"] = change_freight_rail_slider.value
+        user_inputs["f_energy_elec_motion"] = f_energy_elec_motion_slider.value
+        user_inputs["change_inter_city_rail"] = change_inter_city_rail_slider.value
+        user_inputs["icr_energy_elec_motion"] = icr_energy_motion_elec_slider.value
+        user_inputs["change_marine_port"] = change_marine_port_slider.value
+        user_inputs["mp_energy_elec_motion"] = mp_energy_elec_motion_slider.value
+        user_inputs["change_off_road"] = change_off_road_slider.value
+        user_inputs["or_energy_elec_motion"] = or_energy_elec_motion_slider.value
+        bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
+        stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
 
     # freight rail
     change_freight_rail_slider = Slider(
@@ -384,14 +486,6 @@ def mobile_energy_handler(doc: Document) -> None:
     stacked_chart = create_stacked_chart(stacked_chart_data, stacked_chart_source)
 
     inputs = Column(
-        change_veh_miles_slider,
-        veh_miles_elec_slider,
-        reg_fleet_mpg_slider,
-        change_rail_transit_slider,
-        rt_energy_elec_motion_urb_slider,
-        rt_energy_elec_motion_sub_slider,
-        rt_energy_elec_motion_rur_slider,
-        change_air_travel_slider,
         change_freight_rail_slider,
         f_energy_elec_motion_slider,
         change_inter_city_rail_slider,
@@ -405,7 +499,7 @@ def mobile_energy_handler(doc: Document) -> None:
     doc.add_root(layout([[inputs, charts]]))
 
 
-def mobile_energy(request: HttpRequest) -> HttpResponse:
+def mobile_other(request: HttpRequest) -> HttpResponse:
     script = server_document(request.build_absolute_uri())
     return render(request, "main/base.html", dict(script=script))
 
@@ -511,7 +605,7 @@ def grid_mix_handler(doc: Document) -> None:
         user_inputs["grid_hydro"] = float(grid_hydro_input.value)
         user_inputs["grid_geo"] = float(grid_geo_input.value)
         user_inputs["grid_other_ff"] = float(grid_other_ff_input.value)
-        # user_inputs["net_zero_carbon_input"] = (float(net_zero_carbon_input.value),)  # TK, possibly
+        # user_inputs["net_zero_carbon_input"] = (float(net_zero_carbon_input.value_input),)  # TK, possibly
         bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
         stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
         pie_chart_source.data = wrangle_data_for_pie_chart(user_inputs)
@@ -521,43 +615,102 @@ def grid_mix_handler(doc: Document) -> None:
     text, style = generate_text_and_style(user_inputs)
     grid_text = Paragraph(text=text, style=style)
 
-    grid_coal_input = TextInput(value=str(round(GRID_COAL, 1)), title="% Coal in Grid Mix")
-    grid_coal_input.on_change("value", callback)
+    # grid_oil_input = TextInput(value=str(round(GRID_OIL, 1)), title="% Oil in Grid Mix")
+    # grid_oil_input.on_change("value", callback)
 
-    grid_oil_input = TextInput(value=str(round(GRID_OIL, 1)), title="% Oil in Grid Mix")
-    grid_oil_input.on_change("value", callback)
+    # grid_ng_input = TextInput(value=str(round(GRID_NG, 1)), title="% Natural Gas in Grid Mix")
+    # grid_ng_input.on_change("value", callback)
 
-    grid_ng_input = TextInput(value=str(round(GRID_NG, 1)), title="% Natural Gas in Grid Mix")
-    grid_ng_input.on_change("value", callback)
+    # grid_nuclear_input = TextInput(value=str(round(GRID_NUCLEAR, 1)), title="% Nuclear in Grid Mix")
+    # grid_nuclear_input.on_change("value", callback)
 
-    grid_nuclear_input = TextInput(value=str(round(GRID_NUCLEAR, 1)), title="% Nuclear in Grid Mix")
-    grid_nuclear_input.on_change("value", callback)
+    # grid_solar_input = TextInput(value=str(round(GRID_SOLAR, 1)), title="% Solar in Grid Mix")
+    # grid_solar_input.on_change("value", callback)
 
-    grid_solar_input = TextInput(value=str(round(GRID_SOLAR, 1)), title="% Solar in Grid Mix")
-    grid_solar_input.on_change("value", callback)
+    # grid_wind_input = TextInput(value=str(round(GRID_WIND, 1)), title="% Wind in Grid Mix")
+    # grid_wind_input.on_change("value", callback)
 
-    grid_wind_input = TextInput(value=str(round(GRID_WIND, 1)), title="% Wind in Grid Mix")
-    grid_wind_input.on_change("value", callback)
+    # grid_bio_input = TextInput(value=str(round(GRID_BIO, 1)), title="% Biomass in Grid Mix")
+    # grid_bio_input.on_change("value", callback)
 
-    grid_bio_input = TextInput(value=str(round(GRID_BIO, 1)), title="% Biomass in Grid Mix")
-    grid_bio_input.on_change("value", callback)
+    # grid_hydro_input = TextInput(value=str(round(GRID_HYDRO, 1)), title="% Hydropower in Grid Mix")
+    # grid_hydro_input.on_change("value", callback)
 
-    grid_hydro_input = TextInput(value=str(round(GRID_HYDRO, 1)), title="% Hydropower in Grid Mix")
-    grid_hydro_input.on_change("value", callback)
+    # grid_geo_input = TextInput(value=str(round(GRID_GEO, 1)), title="% Geothermal in Grid Mix")
+    # grid_geo_input.on_change("value", callback)
 
-    grid_geo_input = TextInput(value=str(round(GRID_GEO, 1)), title="% Geothermal in Grid Mix")
-    grid_geo_input.on_change("value", callback)
-
-    grid_other_ff_input = TextInput(
-        value=str(round(GRID_OTHER_FF, 1)), title="% Other Fossil Fuel in Grid Mix"
-    )
-    grid_other_ff_input.on_change("value", callback)
+    # grid_other_ff_input = TextInput(
+    #     value=str(round(GRID_OTHER_FF, 1)), title="% Other Fossil Fuel in Grid Mix"
+    # )
+    # grid_other_ff_input.on_change("value", callback)
 
     # net_zero_carbon_input = TextInput(
     #     value=str(round(GRID_NUCLEAR + GRID_SOLAR + GRID_WIND + GRID_BIO + GRID_HYDRO + GRID_GEO)),
     #     title="% Net Zero Carbon Sources in Grid Mix",
     # )
     # net_zero_carbon_input.on_change("value", callback)
+
+    # ff_carbon_capture_slider = Slider(
+    #     start=0,
+    #     end=100,
+    #     value=0,
+    #     step=1,
+    #     title="% Carbon Captured at Combustion Site for Electricity Generation",
+    # )
+
+    grid_coal_input = Slider(
+        start=0, end=100, step=0.1, value=round(GRID_COAL, 1), title="% Coal in Grid Mix"
+    )
+    grid_coal_input.on_change("value", callback)
+
+    grid_oil_input = Slider(
+        start=0, end=100, step=0.1, value=round(GRID_OIL, 1), title="% Oil in Grid Mix"
+    )
+    grid_oil_input.on_change("value", callback)
+
+    grid_ng_input = Slider(
+        start=0, end=100, step=0.1, value=round(GRID_NG, 1), title="% Natural Gas in Grid Mix"
+    )
+    grid_ng_input.on_change("value", callback)
+
+    grid_nuclear_input = Slider(
+        start=0, end=100, step=0.1, value=round(GRID_NUCLEAR, 1), title="% Nuclear in Grid Mix"
+    )
+    grid_nuclear_input.on_change("value", callback)
+
+    grid_solar_input = Slider(
+        start=0, end=100, step=0.1, value=round(GRID_SOLAR, 1), title="% Solar in Grid Mix"
+    )
+    grid_solar_input.on_change("value", callback)
+
+    grid_wind_input = Slider(
+        start=0, end=100, step=0.1, value=round(GRID_WIND, 1), title="% Wind in Grid Mix"
+    )
+    grid_wind_input.on_change("value", callback)
+
+    grid_bio_input = Slider(
+        start=0, end=100, step=0.1, value=round(GRID_BIO, 1), title="% Biomass in Grid Mix"
+    )
+    grid_bio_input.on_change("value", callback)
+
+    grid_hydro_input = Slider(
+        start=0, end=100, step=0.1, value=round(GRID_HYDRO, 1), title="% Hydropower in Grid Mix"
+    )
+    grid_hydro_input.on_change("value", callback)
+
+    grid_geo_input = Slider(
+        start=0, end=100, step=0.1, value=round(GRID_GEO, 1), title="% Geothermal in Grid Mix"
+    )
+    grid_geo_input.on_change("value", callback)
+
+    grid_other_ff_input = Slider(
+        start=0,
+        end=100,
+        step=0.1,
+        value=round(GRID_OTHER_FF, 1),
+        title="% Other Fossil Fuel in Grid Mix",
+    )
+    grid_other_ff_input.on_change("value", callback)
 
     inputs = Column(
         grid_text,

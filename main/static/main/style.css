@@ -4,7 +4,7 @@
 }
 
 body {
-  margin: 0 auto;
+  margin: 10 auto;
   padding: 10px 0px 0px 0px;
   background-color: var(--background);
   font-family: 'Roboto', sans-serif;
