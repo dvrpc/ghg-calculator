@@ -11,27 +11,40 @@
   <title>GHG Calculator</title>
 </head>
 <body>
-  <header>
-    <h1>Header</h1>
-    <p> Development server URLs:</p>
+    <nav>
+      <div class="nav-logos">
+        <img src="" alt="DVRPC logo" />
+        |
+        <img src="" alt="Project logo?" />
+      </div>
+      <div class="nav-text">
+        DVRPC GHG Calculator
+      </div>
+    </nav>
+
+    <header>
+      <h1>Greenhouse Gas Calculator</h1>
+    </header>
+
+    <p class="homepage-intro-text">Waterways esplanade accessory use a parking disadvantaged unincorporated community Levittown external open space high speed rail affordable housing. Riparian buffer unincorporated internal groundwater conservation value capture, a sewer auction redevelopment agencies superhighway landscape architecture unmarked crosswalk normative local control hotel taxes. Transportation finance dwelling unit zoning or. Plan local control disadvantaged unincorporated community vacant value capture municipal government.</p>
+    
+    <h2> Development server URLs:</h2>
     <ul>
-      <li><a href="http://127.0.0.1:8000/population/">http://127.0.0.1:8000/population/</a></li>
-      <li><a href="http://127.0.0.1:8000/res_stationary/">http://127.0.0.1:8000/res_stationary/</a></li>
-      <li><a href="http://127.0.0.1:8000/ci_stationary/">http://127.0.0.1:8000/ci_stationary/</a></li>
-      <li><a href="http://127.0.0.1:8000/mobile_highway/">http://127.0.0.1:8000/mobile_highway/</a></li>
-      <li><a href="http://127.0.0.1:8000/mobile_transit/">http://127.0.0.1:8000/mobile_transit/</a></li>
-      <li><a href="http://127.0.0.1:8000/mobile_aviation/">http://127.0.0.1:8000/mobile_aviation/</a></li>
-      <li><a href="http://127.0.0.1:8000/mobile_other/">http://127.0.0.1:8000/mobile_other/</a></li>
-      <li><a href="http://127.0.0.1:8000/non_energy/">http://127.0.0.1:8000/non_energy/</a></li>
-      <li><a href="http://127.0.0.1:8000/grid_mix/">http://127.0.0.1:8000/grid_mix/</a></li>
+      <li><a href="http://127.0.0.1:8000/population/">population</a></li>
+      <li><a href="http://127.0.0.1:8000/res_stationary/">residential stationary</a></li>
+      <li><a href="http://127.0.0.1:8000/ci_stationary/">ci stationary</a></li>
+      <li><a href="http://127.0.0.1:8000/mobile_highway/">mobile highway</a></li>
+      <li><a href="http://127.0.0.1:8000/mobile_transit/">mobile transit</a></li>
+      <li><a href="http://127.0.0.1:8000/mobile_aviation/">mobile aviation</a></li>
+      <li><a href="http://127.0.0.1:8000/mobile_other/">mobile other</a></li>
+      <li><a href="http://127.0.0.1:8000/non_energy/">non energy</a></li>
+      <li><a href="http://127.0.0.1:8000/grid_mix/">grid mix</a></li>
     </ul>
-  </header>
   <main>
     {% block main %}
       {{ script|safe }}
 
     {% endblock %}
-    </div>
   </main>
   <footer>
     Footer

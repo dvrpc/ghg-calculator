@@ -1,28 +1,41 @@
+/************/
+/* General */
 :root {
-  --background: white;
+  --off-white-soft: #f7f7f7;
   --lightgray: hsl(0, 0, 30);
+  --font-large: 1.2rem;
+  --font-extra-large: 1.4rem;
 }
-
 body {
-  margin: 10 auto;
-  padding: 10px 0px 0px 0px;
-  background-color: var(--background);
-  font-family: 'Roboto', sans-serif;
   font-size: 16px;
-  height: 100vh;
+  margin: 0;
+  padding: 10px 0px 0px 0px;
+  background-color: var(--off-white-soft);
+  font-family: 'Roboto', sans-serif;
   display: grid;
   grid-template-rows: auto 1fr auto;
   grid-template-areas: "header" "main" "footer";
 }
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-content: center;
+  background: green;
+  padding: 15px;
+  color: var(--off-white-soft);
+}
 header {
   padding-bottom: 10px;
-  grid-area: header;
+  text-align: center;
 }
-main a {
-  color: blue;
+a {
+  text-decoration: none;
 }
-main a:hover {
-  font-decoration: underline;
+a:hover {
+  text-decoration: underline;
+}
+p {
+  max-width: 70ch;
 }
 main {
   background-color: transparent;
@@ -43,21 +56,30 @@ main .right {
   background-color: var(--light-gray);
   padding: 10px;
 }
-.bold {
-  font-weight: bold;
+/* END General */
+/***************/
+
+
+
+/*************/
+/* Homepage */
+.homepage-intro-text {
+  font-size: var(--font-large);
+  margin: 0 auto;
 }
-.italic {
-  font-style: italic;
-}
-.center {
-  text-align: center;
-}
-.smaller {
-  font-size: .9rem;
-}
-.bigger {
-  font-size: 1.1rem;
-}
+/* Homepage */
+/*************/
+
+
+
+/****************/
+/* Chart Pages */
+
+/* End Chart Pages */
+/****************/
+
+
+
 /* Responsive layout */
 @media screen and (max-width: 768px) {
   body {
@@ -82,3 +104,4 @@ main .right {
   footer img {
     width: 125px;
   }
+}
