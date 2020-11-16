@@ -8,7 +8,7 @@
   --font-color-gas: green;
   --icon-shadow: -1px 2px 3px rgba(0,0,0,0.3);
   --icon-shadow-hover: 0px 4px 6px rgba(0,0,0,0.2);
-  --main-text-color: #0E3B43;
+  --main-text-color: #1F2232;
   --header-text-color: #312509;
 }
 body {
@@ -20,7 +20,22 @@ body {
   display: grid;
   grid-template-rows: auto 1fr auto;
   grid-template-areas: "header" "main" "footer";
-  background: linear-gradient(165deg, #477f3c 0%, #FDFCDC 50%);
+  
+  /* @GRADIENTS */
+  /* background: linear-gradient(165deg, #477f3c 0%, #FDFCDC 50%); */
+
+
+  /* background: #159957;
+  background: -webkit-linear-gradient(to right, #159957, #155799);
+  background: linear-gradient(to right, #159957, #155799); */
+
+  background: #67B26F;
+  background: -webkit-linear-gradient(165deg, #4ca2cd, #67B26F); 
+  background: linear-gradient(165deg, #4ca2cd, #67B26F);
+  
+
+  /* END GRADIENTS */
+
   color: var(--main-text-color);
 }
 nav {
@@ -159,9 +174,10 @@ main .right {
 /**********/
 /* Footer */
 footer {
+  background: rgba(0,0,0,0.2);
   margin-top: 3%;
   width: 100%;
-  padding: 12px 0;
+  padding: 5% 0;
 }
 /**********/
 /* Footer */
