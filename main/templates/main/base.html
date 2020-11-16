@@ -3,51 +3,121 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <title>GHG Calculator</title>
   <meta name="viewport" content="width=device-width" />
   <meta name="description" content="">
   <link href="http://cdn.pydata.org/bokeh/release/bokeh-2.1.1.min.css" rel="stylesheet" type="text/css">
   <link href="http://cdn.pydata.org/bokeh/release/bokeh-widgets-2.1.1.min.css" rel=”stylesheet" type="text/css">
+  <!-- @TODO create breakpoint stylesheets -->
   <link rel="stylesheet" href="{% static 'main/style.css' %}">
-  <title>GHG Calculator</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@800&display=swap" rel="stylesheet">
 </head>
 <body>
     <nav>
       <div class="nav-logos">
-        <img src="" alt="DVRPC logo" />
-        |
-        <img src="" alt="Project logo?" />
-      </div>
-      <div class="nav-text">
-        DVRPC GHG Calculator
+        <a href="http://127.0.0.1:8000/">
+          <img src="../static/img/logo-main.svg" alt="Project logo" id="project-logo-main" />
+        </a>
+        <!-- <img src="" alt="DVRPC logo" /> -->
       </div>
     </nav>
 
-    <header>
-      <h1>Greenhouse Gas Calculator</h1>
-    </header>
-
-    <p class="homepage-intro-text">Waterways esplanade accessory use a parking disadvantaged unincorporated community Levittown external open space high speed rail affordable housing. Riparian buffer unincorporated internal groundwater conservation value capture, a sewer auction redevelopment agencies superhighway landscape architecture unmarked crosswalk normative local control hotel taxes. Transportation finance dwelling unit zoning or. Plan local control disadvantaged unincorporated community vacant value capture municipal government.</p>
+    <div id="header-content-wrapper">
+      <header>
+        <h1>
+          <span>Greenhouse</span>
+          <span class="text-center" id="gas">Gas</span>
+          <span class="text-right">Calculator</span>
+      </h1>
+      </header>
+  
+      <p class="header-paragraph">Geospatial inventory bicycle yes in my back yard public works department general plan Levittown industrial parklet transferable development right. School zone signage origination fee 8-80. Ordinance suburbanization traffic mixed use legal crosswalk road hierarchy parking meter ground floor retail medina industrialized city esplanade commercial. Affordable housing transit market analysis travel shed redevelopment agencies, rising property values ordinance external inventory overpass.</p>
+    </div>
     
-    <h2> Development server URLs:</h2>
-    <ul>
-      <li><a href="http://127.0.0.1:8000/population/">population</a></li>
-      <li><a href="http://127.0.0.1:8000/res_stationary/">residential stationary</a></li>
-      <li><a href="http://127.0.0.1:8000/ci_stationary/">ci stationary</a></li>
-      <li><a href="http://127.0.0.1:8000/mobile_highway/">mobile highway</a></li>
-      <li><a href="http://127.0.0.1:8000/mobile_transit/">mobile transit</a></li>
-      <li><a href="http://127.0.0.1:8000/mobile_aviation/">mobile aviation</a></li>
-      <li><a href="http://127.0.0.1:8000/mobile_other/">mobile other</a></li>
-      <li><a href="http://127.0.0.1:8000/non_energy/">non energy</a></li>
-      <li><a href="http://127.0.0.1:8000/grid_mix/">grid mix</a></li>
+    <h2>Pick a Jawn:</h2>
+    <ul id="homepage-cat-list">
+      <li>
+        <figure>
+          <a href="http://127.0.0.1:8000/population/">
+            <img src="../static/img/population.svg" alt="icon" class="homepage-cat-icon" />
+            <figcaption>population</figcaption>
+          </a>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <a href="http://127.0.0.1:8000/res_stationary/">
+            <img src="../static/img/res-stationary.svg" alt="icon" class="homepage-cat-icon" />
+            <figcaption>residential stationary</figcaption>
+          </a>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <a href="http://127.0.0.1:8000/ci_stationary/">
+            <img src="../static/img/ci-stationary.svg" alt="icon" class="homepage-cat-icon" />
+            <figcaption>ci stationary</figcaption>
+          </a>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <a href="http://127.0.0.1:8000/mobile_highway/">
+            <img src="../static/img/mobile-highway.svg" alt="icon" class="homepage-cat-icon" />
+            <figcaption>mobile highway</figcaption>
+          </a>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <a href="http://127.0.0.1:8000/mobile_transit/">
+            <img src="../static/img/mobile-transit.svg" alt="icon" class="homepage-cat-icon" />
+            <figcaption>mobile transit</figcaption>
+          </a>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <a href="http://127.0.0.1:8000/mobile_aviation/">
+            <img src="../static/img/mobile-aviation.svg" alt="icon" class="homepage-cat-icon" />
+            <figcaption>mobile aviation</figcaption>
+          </a>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <a href="http://127.0.0.1:8000/mobile_other/">
+            <img src="../static/img/mobile-other.svg" alt="icon" class="homepage-cat-icon" />
+            <figcaption>mobile other</figcaption>
+          </a>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <a href="http://127.0.0.1:8000/non_energy/">
+            <img src="../static/img/non-energy.svg" alt="icon" class="homepage-cat-icon" />
+            <figcaption>non energy</figcaption>
+          </a>
+        </figure>
+      </li>
+      <li>
+        <figure>
+          <a href="http://127.0.0.1:8000/grid_mix/">
+            <img src="../static/img/grid-mix.svg" alt="icon" class="homepage-cat-icon" />
+            <figcaption>grid mix</figcaption>
+          </a>
+        </figure>
+      </li>
     </ul>
   <main>
     {% block main %}
       {{ script|safe }}
-
     {% endblock %}
   </main>
   <footer>
     Footer
+    Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
   </footer>
 </body>
 </html>
