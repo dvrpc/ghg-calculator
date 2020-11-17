@@ -204,7 +204,8 @@ def res_stationary_handler(doc: Document) -> None:
         sub_energy_elec_slider,
         rur_energy_elec_slider,
     )
-    charts = Column(bar_chart, stacked_chart)
+    # @HERE
+    charts = row(bar_chart, stacked_chart) 
     doc.add_root(layout([[inputs, charts]]))
 
 
@@ -251,7 +252,8 @@ def ci_stationary_handler(doc: Document) -> None:
         ci_energy_change_slider,
         ci_energy_elec_slider,
     )
-    charts = Column(bar_chart, stacked_chart)
+    # @LAYOUT: changed to row. Look into grid and whatnot
+    charts = row(bar_chart, stacked_chart)
     doc.add_root(layout([[inputs, charts]]))
 
 
@@ -300,7 +302,8 @@ def mobile_highway_handler(doc: Document) -> None:
         veh_miles_elec_slider,
         reg_fleet_mpg_slider,
     )
-    charts = Column(bar_chart, stacked_chart)
+    # @LAYOUT: changed to row. Look into grid and whatnot
+    charts = row(bar_chart, stacked_chart)
     doc.add_root(layout([[inputs, charts]]))
 
 
@@ -364,7 +367,8 @@ def mobile_transit_handler(doc: Document) -> None:
         rt_energy_elec_motion_sub_slider,
         rt_energy_elec_motion_rur_slider,
     )
-    charts = Column(bar_chart, stacked_chart)
+    # @LAYOUT: changed to row. Look into grid and whatnot
+    charts = row(bar_chart, stacked_chart)
     doc.add_root(layout([[inputs, charts]]))
 
 
@@ -395,7 +399,8 @@ def mobile_aviation_handler(doc: Document) -> None:
     inputs = Column(
         change_air_travel_slider,
     )
-    charts = Column(bar_chart, stacked_chart)
+    # @LAYOUT: changed to row. Look into grid and whatnot
+    charts = row(bar_chart, stacked_chart)
     doc.add_root(layout([[inputs, charts]]))
 
 
@@ -495,7 +500,8 @@ def mobile_other_handler(doc: Document) -> None:
         change_off_road_slider,
         or_energy_elec_motion_slider,
     )
-    charts = Column(bar_chart, stacked_chart)
+    # @LAYOUT: changed to row. Look into grid and whatnot
+    charts = row(bar_chart, stacked_chart)
     doc.add_root(layout([[inputs, charts]]))
 
 
@@ -584,7 +590,8 @@ def non_energy_handler(doc: Document) -> None:
         ff_carbon_capture_slider,
         # air_capture_slider,
     )
-    charts = Column(bar_chart, stacked_chart)
+    # @LAYOUT: changed to row. Look into grid and whatnot
+    charts = row(bar_chart, stacked_chart)
     doc.add_root(layout([[inputs, charts]]))
 
 
@@ -737,7 +744,8 @@ def grid_mix_handler(doc: Document) -> None:
     pie_chart_source = ColumnDataSource(data=pie_chart_data)
     pie_chart = create_pie_chart(pie_chart_source)
 
-    charts = Column(bar_chart, stacked_chart, pie_chart)
+    # @LAYOUT: changed to row. Look into grid and whatnot
+    charts = row(bar_chart, stacked_chart, pie_chart)
     doc.add_root(layout([[inputs, charts]]))
 
 
