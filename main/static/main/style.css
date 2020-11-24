@@ -8,7 +8,7 @@
   --font-color-gas: green;
   --icon-shadow: -1px 2px 3px rgba(0,0,0,0.3);
   --icon-shadow-hover: 0px 4px 6px #99cae2;
-  --text-shadow: -1px 2px 3px #99cae2;
+  --text-shadow: -1px 2px 3px #99cae2; /* @TODO try a darker shade of blue */
   --main-text-color: #1F2232;
   --header-text-color: #312509;
 }
