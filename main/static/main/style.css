@@ -1,30 +1,148 @@
+/************/
+/* General */
 :root {
-  --background: white;
+  --off-white-soft: #f7f7f7;
   --lightgray: hsl(0, 0, 30);
+  --font-large: 1.3rem;
+  --font-extra-large: 1.6rem;
+  --font-color-gas: green;
+  --icon-shadow: -1px 2px 3px rgba(0,0,0,0.3);
+  --icon-shadow-hover: 0px 4px 6px #99cae2;
+  --text-shadow: -1px 2px 3px #99cae2; /* @TODO try a darker shade of blue */
+  --main-text-color: #1F2232;
+  --header-text-color: #312509;
 }
-
 body {
-  margin: 10 auto;
-  padding: 10px 0px 0px 0px;
-  background-color: var(--background);
-  font-family: 'Roboto', sans-serif;
+  line-height: 1.2;
   font-size: 16px;
-  height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
   display: grid;
   grid-template-rows: auto 1fr auto;
   grid-template-areas: "header" "main" "footer";
+  
+  /* @GRADIENTS */
+  /* background: linear-gradient(165deg, #477f3c 0%, #FDFCDC 50%); */
+
+
+  /* background: #159957;
+  background: -webkit-linear-gradient(to right, #159957, #155799);
+  background: linear-gradient(to right, #159957, #155799); */
+
+  background: #67B26F;
+  background: -webkit-linear-gradient(165deg, #4ca2cd, #67B26F); 
+  background: linear-gradient(165deg, #4ca2cd, #67B26F);
+  
+
+  /* END GRADIENTS */
+
+  color: var(--main-text-color);
 }
-header {
-  padding-bottom: 10px;
-  grid-area: header;
+a {
+  text-decoration: none;
 }
-main a {
-  color: blue;
+a:hover {
+  text-decoration: underline;
 }
-main a:hover {
-  font-decoration: underline;
+h1, h2, h3, h4 {
+  font-family: 'Raleway', sans-serif;
+  color: var(--header-text-color);
+  text-align: center;
+  filter: drop-shadow(var(--text-shadow));
+
 }
-main {
+p {
+  max-width: 70ch;
+}
+.text-center {
+  text-align: center;
+}
+.text-right {
+  text-align: right;
+}
+/* END General */
+/***************/
+
+
+
+/********/
+/* Nav */
+nav {
+  display: flex;
+  justify-self: flex-end;
+  padding: 15px 30px;
+  color: var(--off-white-soft);
+}
+#project-logo-main {
+  filter: drop-shadow(var(--icon-shadow));
+  width: 60px;
+  height: 60px;
+}
+#project-logo-main:hover {
+  filter: drop-shadow(var(--icon-shadow-hover));
+}
+/* END Nav */
+/***********/
+
+
+
+/***********/
+/* Header */
+h1 {
+  margin: 45px auto;
+  font-size: 3rem;
+  /* @SHADOW old */
+  /* filter: drop-shadow(var(--icon-shadow)); */
+}
+.header-paragraph {
+  font-size: var(--font-large);
+  margin: 0 auto 45px auto;
+  line-height: 1.7;
+  align-self: flex-end;
+}
+/* END Header */
+/***********/
+
+
+
+/*************/
+/* Homepage */
+#homepage-cat-list {
+  list-style-type: none;
+  padding-left: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#homepage-cat-list a {
+  color: var(--main-text-color);
+  font-weight: 700;
+  display: flex;
+  flex-direction: column-reverse;
+}
+.homepage-cat-icon {
+  display: block;
+  margin: 0 auto;
+  width: 75px;
+  height: 75px;
+  filter: drop-shadow(var(--icon-shadow));
+}
+.homepage-cat-icon-caption:hover + .homepage-cat-icon , .homepage-cat-icon:hover {
+  filter: drop-shadow(var(--icon-shadow-hover));
+}
+figcaption {
+  text-align: center;
+}
+/* END Homepage */
+/*************/
+
+
+
+/****************/
+/* Chart Pages */
+/* @TODO get back into this */
+/* main {
   background-color: transparent;
   display: grid;
   grid-area: main;
@@ -42,23 +160,28 @@ main .right {
   grid-area: right;
   background-color: var(--light-gray);
   padding: 10px;
+} */
+/* END Chart Pages */
+/****************/
+
+
+
+/**********/
+/* Footer */
+footer {
+  background: rgba(0,0,0,0.1);
+  margin-top: 3%;
+  width: 100%;
+  padding: 5% 0;
 }
-.bold {
-  font-weight: bold;
-}
-.italic {
-  font-style: italic;
-}
-.center {
-  text-align: center;
-}
-.smaller {
-  font-size: .9rem;
-}
-.bigger {
-  font-size: 1.1rem;
-}
-/* Responsive layout */
+/**********/
+/* END Footer */
+
+
+
+/**********************/
+/* @TODO move into separate, width-dependent stylesheets */
+/**********************/
 @media screen and (max-width: 768px) {
   body {
     padding: 0px;
@@ -82,3 +205,4 @@ main .right {
   footer img {
     width: 125px;
   }
+}

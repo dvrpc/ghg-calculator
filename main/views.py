@@ -136,8 +136,8 @@ def population_handler(doc: Document) -> None:
         sizing_mode="fixed",
         width=150,
     )
-    charts = row(bar_chart, stacked_chart, sizing_mode="scale_width")
-    doc.add_root(layout([[inputs, charts]]))
+    charts = row(bar_chart, inputs, stacked_chart, sizing_mode="stretch_both")
+    doc.add_root(layout([[charts]]))
 
 
 def population(request: HttpRequest) -> HttpResponse:
@@ -204,8 +204,9 @@ def res_stationary_handler(doc: Document) -> None:
         sub_energy_elec_slider,
         rur_energy_elec_slider,
     )
-    charts = Column(bar_chart, stacked_chart)
-    doc.add_root(layout([[inputs, charts]]))
+    # @HERE
+    charts = row(bar_chart, inputs, stacked_chart, sizing_mode="stretch_both")
+    doc.add_root(layout([[charts]]))
 
 
 def res_stationary(request: HttpRequest) -> HttpResponse:
@@ -251,8 +252,9 @@ def ci_stationary_handler(doc: Document) -> None:
         ci_energy_change_slider,
         ci_energy_elec_slider,
     )
-    charts = Column(bar_chart, stacked_chart)
-    doc.add_root(layout([[inputs, charts]]))
+    # @LAYOUT: changed to row. Look into grid and whatnot
+    charts = row(bar_chart, inputs, stacked_chart, sizing_mode="stretch_both")
+    doc.add_root(layout([[charts]]))
 
 
 def ci_stationary(request: HttpRequest) -> HttpResponse:
@@ -300,8 +302,9 @@ def mobile_highway_handler(doc: Document) -> None:
         veh_miles_elec_slider,
         reg_fleet_mpg_slider,
     )
-    charts = Column(bar_chart, stacked_chart)
-    doc.add_root(layout([[inputs, charts]]))
+    # @LAYOUT: changed to row. Look into grid and whatnot
+    charts = row(bar_chart, inputs, stacked_chart, sizing_mode="stretch_both")
+    doc.add_root(layout([[charts]]))
 
 
 def mobile_highway(request: HttpRequest) -> HttpResponse:
@@ -364,8 +367,9 @@ def mobile_transit_handler(doc: Document) -> None:
         rt_energy_elec_motion_sub_slider,
         rt_energy_elec_motion_rur_slider,
     )
-    charts = Column(bar_chart, stacked_chart)
-    doc.add_root(layout([[inputs, charts]]))
+    # @LAYOUT: changed to row. Look into grid and whatnot
+    charts = row(bar_chart, inputs, stacked_chart, sizing_mode="stretch_both")
+    doc.add_root(layout([[charts]]))
 
 
 def mobile_transit(request: HttpRequest) -> HttpResponse:
@@ -395,8 +399,9 @@ def mobile_aviation_handler(doc: Document) -> None:
     inputs = Column(
         change_air_travel_slider,
     )
-    charts = Column(bar_chart, stacked_chart)
-    doc.add_root(layout([[inputs, charts]]))
+    # @LAYOUT: changed to row. Look into grid and whatnot
+    charts = row(bar_chart, inputs, stacked_chart, sizing_mode="stretch_both")
+    doc.add_root(layout([[charts]]))
 
 
 def mobile_aviation(request: HttpRequest) -> HttpResponse:
@@ -495,8 +500,9 @@ def mobile_other_handler(doc: Document) -> None:
         change_off_road_slider,
         or_energy_elec_motion_slider,
     )
-    charts = Column(bar_chart, stacked_chart)
-    doc.add_root(layout([[inputs, charts]]))
+    # @LAYOUT: changed to row. Look into grid and whatnot
+    charts = row(bar_chart, inputs, stacked_chart, sizing_mode="stretch_both")
+    doc.add_root(layout([[charts]]))
 
 
 def mobile_other(request: HttpRequest) -> HttpResponse:
@@ -584,8 +590,9 @@ def non_energy_handler(doc: Document) -> None:
         ff_carbon_capture_slider,
         # air_capture_slider,
     )
-    charts = Column(bar_chart, stacked_chart)
-    doc.add_root(layout([[inputs, charts]]))
+    # @LAYOUT: changed to row. Look into grid and whatnot
+    charts = row(bar_chart, inputs, stacked_chart)
+    doc.add_root(layout([[charts]]))
 
 
 def non_energy(request: HttpRequest) -> HttpResponse:
@@ -737,7 +744,8 @@ def grid_mix_handler(doc: Document) -> None:
     pie_chart_source = ColumnDataSource(data=pie_chart_data)
     pie_chart = create_pie_chart(pie_chart_source)
 
-    charts = Column(bar_chart, stacked_chart, pie_chart)
+    # @LAYOUT: changed to row. Look into grid and whatnot
+    charts = row(bar_chart, stacked_chart, pie_chart)
     doc.add_root(layout([[inputs, charts]]))
 
 
