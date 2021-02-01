@@ -526,8 +526,6 @@ OR_FF_LPG_ENERGY_MOTION = OR_LPG_ENERGY_MOTION / OR_FF_ENERGY_MOTION * 100
 # create dictionary (and set initial values) of all variables that user can change
 # will be passed to functions that create charts
 user_inputs = {
-    "ci_energy_elec": CI_ENERGY_ELEC,
-    "f_energy_elec_motion": F_ENERGY_ELEC_MOTION,
     "grid_coal": GRID_COAL,
     "grid_oil": GRID_OIL,
     "grid_ng": GRID_NG,
@@ -538,37 +536,38 @@ user_inputs = {
     "grid_hydro": GRID_HYDRO,
     "grid_geo": GRID_GEO,
     "grid_other_ff": GRID_OTHER_FF,
-    "icr_energy_elec_motion": ICR_ENERGY_ELEC_MOTION,
-    "mp_energy_elec_motion": MP_ENERGY_ELEC_MOTION,
-    "or_energy_elec_motion": OR_ENERGY_ELEC_MOTION,
-    "change_ag": 0,
-    "change_air_travel": 0,
+    "change_pop": 0,
+    "urban_pop_percent": URBAN_POP_PERCENT,
+    "rural_pop_percent": RURAL_POP_PERCENT,
+    "suburban_pop_percent": SUBURBAN_POP_PERCENT,
+    "rur_energy_elec": RUR_ENERGY_ELEC * 100,  # convert to % b/c func will take user % later
+    "sub_energy_elec": SUB_ENERGY_ELEC * 100,  # convert to % b/c func will take user % later
+    "urb_energy_elec": URB_ENERGY_ELEC * 100,  # convert to % b/c func will take user % later
     "res_energy_change": 0,
-    "ff_carbon_capture": ff_carbon_capture,
+    "ci_energy_elec": CI_ENERGY_ELEC,
     "ci_energy_change": 0,
-    "veh_miles_elec": 0,
-    "change_forest": 0,
-    "change_freight_rail": 0,
-    "change_inter_city_rail": 0,
     "change_industrial_processes": 0,
-    "change_marine_port": 0,
-    "change_off_road": 0,
+    "reg_fleet_mpg": REG_FLEET_MPG,
+    "change_veh_miles": 0,
+    "veh_miles_elec": 0,
+    "rt_energy_elec_motion": RT_ENERGY_ELEC_MOTION,
     "change_rail_transit": 0,
+    "f_energy_elec_motion": F_ENERGY_ELEC_MOTION,
+    "change_freight_rail": 0,
+    "icr_energy_elec_motion": ICR_ENERGY_ELEC_MOTION,
+    "change_inter_city_rail": 0,
+    "mp_energy_elec_motion": MP_ENERGY_ELEC_MOTION,
+    "change_marine_port": 0,
+    "or_energy_elec_motion": OR_ENERGY_ELEC_MOTION,
+    "change_off_road": 0,
+    "change_air_travel": 0,
+    "ff_carbon_capture": ff_carbon_capture,
+    "air_capture": 0,
+    "change_forest": 0,
     "change_urban_trees": 0,
+    "change_ag": 0,
     "change_solid_waste": 0,
     "change_wastewater": 0,
-    "change_pop": 0,
-    "reg_fleet_mpg": REG_FLEET_MPG,
-    "rur_energy_elec": RUR_ENERGY_ELEC * 100,  # convert to % b/c func will take user % later
-    "rural_pop_percent": RURAL_POP_PERCENT,
-    "sub_energy_elec": SUB_ENERGY_ELEC * 100,  # convert to % b/c func will take user % later
-    "suburban_pop_percent": SUBURBAN_POP_PERCENT,
-    "rt_energy_elec_motion_rur": RT_ENERGY_ELEC_MOTION_RUR,
-    "rt_energy_elec_motion_sub": RT_ENERGY_ELEC_MOTION_SUB,
-    "rt_energy_elec_motion_urb": RT_ENERGY_ELEC_MOTION_URB,
-    "urb_energy_elec": URB_ENERGY_ELEC * 100,  # convert to % b/c func will take user % later
-    "urban_pop_percent": URBAN_POP_PERCENT,
-    "change_veh_miles": 0,
 }
 
 
