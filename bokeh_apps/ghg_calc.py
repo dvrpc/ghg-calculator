@@ -19,15 +19,33 @@ GHG_RES = 15.37
 GHG_CI = 27.96  # non-residential/commercial & industrial
 GHG_HIGHWAY = 17.94
 GHG_TRANSIT = 0.18
+GHG_F = 0.26  # freight rail
+GHG_ICR = 0.04  # inter-city rail
+GHG_RAIL = GHG_TRANSIT + GHG_F + GHG_ICR
 GHG_AVIATION = 3.90
-GHG_OTHER_MOBILE = 1.12  # includes freight & intercity rail, marine & port-related, off-road vehicles and equipment
+GHG_MP = 0.31
+GHG_OR = 0.52
+GHG_OTHER_MOBILE = (
+    GHG_MP + GHG_OR
+)  # includes marine & port-related, off-road vehicles and equipment
 GHG_AG = 0.41  # agriculture
 GHG_SOLID_WASTE = 2.01  # landfills
 GHG_WASTEWATER = 0.49
 GHG_IP = 5.52  # industrial processes; includes Hydrogen production, iron & steel production, industrial wastewater treatment, ODS substitutes, and petroleum refining
-GHG_URBAN_TREES = -1.025
-GHG_FORESTS = -1.109
-GHG_FOREST_CHANGE = 0.380  # TODO: why is this not 0?
+SEQ_URBAN_TREES = -1.025
+SEQ_FORESTS = -1.110  # corrected rounding
+GHG_FOREST_CHANGE = 0.380  # TODO: why is this not 0? #Answer - this is the number
+# for emissions from loss of forest for the year. so from beginning of 2015 to
+# end of 2015, forest loss caused emissions of 0.380 MMTCO2e
+FOREST_ACRE_2010 = 792534.1253
+FOREST_ACRE_2015 = 785312.64
+FOREST_CHANGE_ACRE_ANNUAL = (FOREST_ACRE_2015 - FOREST_ACRE_2010) / 5
+FOREST_SEQ_ACRE = -0.00000141308092029381  # MMTCO2 per acre
+FOREST_ACRE_2014 = FOREST_ACRE_2015 - FOREST_CHANGE_ACRE_ANNUAL
+PER_ANNUAL_FOREST_CHANGE = FOREST_CHANGE_ACRE_ANNUAL / FOREST_ACRE_2014
+FOREST_GHG_ACRELOSS = 0.00026284935386546
+URBAN_TREES_SEQ_ACRE = -0.00000143705967830054
+
 RES_NG = 115884601.50 / 1000  # NG Consumpton 2015 (million CF)
 CI_NG = 139139475 / 1000  # NG Consumpton 2015 (million CF)
 GHG_NON_ENERGY = (
@@ -35,11 +53,11 @@ GHG_NON_ENERGY = (
     + GHG_SOLID_WASTE
     + GHG_WASTEWATER
     + GHG_IP
-    + GHG_URBAN_TREES
-    + GHG_FORESTS
     + GHG_FOREST_CHANGE
     + (RES_NG + CI_NG) * (NE_CO2_MMT_NG_METHANE + NE_CO2_MMT_NG_CO)
 )
+
+GHG_SEQ = SEQ_URBAN_TREES + SEQ_FORESTS
 
 # Demographics
 URBAN_POP = 1691830
@@ -57,6 +75,7 @@ CO2_LB_MWH_COAL = (2169.484351 + 2225.525) / 2
 CO2_LB_MWH_OIL = (1600.098812 + 1341.468) / 2
 CO2_LB_MWH_NG = (929.651872 + 897.037) / 2
 CO2_LB_MWH_OTHER_FF = (1488.036692 + 1334.201) / 2
+
 
 # Percent of carbon emissions from combustion of fossil fuels for electricity that are captured and stored
 ff_carbon_capture = 0
@@ -878,7 +897,6 @@ def calc_res_ghg(
             )
             * MMT_LB
         )
-        * (1 - ff_carbon_capture / 100)
     )
     res_ng_btu = urban_ng_btu + suburban_ng_btu + rural_ng_btu
     res_ng_ghg = (
@@ -904,7 +922,7 @@ def calc_res_ghg(
 
     res_ghg = res_elec_ghg + res_ng_ghg + res_fok_ghg + res_lpg_ghg
 
-    return res_ghg, res_ng_btu
+    return res_ghg, res_ng_btu, res_elec_btu
 
 
 def calc_ci_ghg(
@@ -913,18 +931,20 @@ def calc_ci_ghg(
     grid_ng,
     grid_oil,
     grid_other_ff,
-    ff_carbon_capture,
     ci_energy_change,
 ):
     ci_ff = 100 - ci_energy_elec
     change_ff = (ci_ff - CI_ENERGY_FF) / CI_ENERGY_FF
 
-    ci_elec_ghg = (
+    ci_elec_btu = (
         CI_ENERGY_BTU
         * (1 + ci_energy_change / 100)
         * (ci_energy_elec / 100)
         / CI_ELEC_USEFUL
         * 1000000000
+    )
+    ci_elec_ghg = (
+        ci_elec_btu
         * (1 / BTU_MWH)
         / (1 - GRID_LOSS)
         * (
@@ -936,7 +956,6 @@ def calc_ci_ghg(
             )
             * MMT_LB
         )
-        * (1 - ff_carbon_capture / 100)
     )
 
     ci_ng_ghg = (
@@ -1050,17 +1069,20 @@ def calc_ci_ghg(
     )
 
     return (
-        ci_elec_ghg
-        + ci_ng_ghg
-        + ci_coal_ghg
-        + ci_dfo_ghg
-        + ci_k_ghg
-        + ci_lpg_ghg
-        + ci_motor_gas_ghg
-        + ci_rfo_ghg
-        + ci_pet_coke_ghg
-        + ci_still_gas_ghg
-        + ci_naphthas_ghg
+        (
+            ci_elec_ghg
+            + ci_ng_ghg
+            + ci_coal_ghg
+            + ci_dfo_ghg
+            + ci_k_ghg
+            + ci_lpg_ghg
+            + ci_motor_gas_ghg
+            + ci_rfo_ghg
+            + ci_pet_coke_ghg
+            + ci_still_gas_ghg
+            + ci_naphthas_ghg
+        ),
+        ci_elec_btu,
     )
 
 
@@ -1085,6 +1107,8 @@ def calc_highway_ghg(
     ) * (1 + change_veh_miles / 100)
 
     elec_miles_percent = veh_miles_traveled * veh_miles_elec / 100
+
+    highway_elec_btu = elec_miles_percent * ELEC_VEH_EFFICIENCY * BTU_KWH
 
     highway_ghg = (
         veh_miles_traveled - elec_miles_percent
@@ -1146,7 +1170,6 @@ def calc_rail_ghg(
             )
             * MMT_LB
         )
-        * (1 - ff_carbon_capture / 100)
     )
 
     transit_d_ghg = (
@@ -1199,7 +1222,14 @@ def calc_rail_ghg(
             )
             * MMT_LB
         )
-        * (1 - ff_carbon_capture / 100)
+    )
+
+    f_elec_btu = (
+        F_ENERGY_MOTION
+        * (f_energy_elec_motion / 100)
+        / (RT_ELEC_ENERGY_MOTION / 100)
+        * 1000000000
+        * (1 + change_freight_rail / 100)
     )
 
     f_d_ghg = (
@@ -1228,7 +1258,6 @@ def calc_rail_ghg(
             )
             * MMT_LB
         )
-        * (1 - ff_carbon_capture / 100)
     )
 
     icr_d_ghg = (
@@ -1239,7 +1268,33 @@ def calc_rail_ghg(
         / (RT_D_ENERGY_MOTION / 100)
     )
 
+    icr_elec_btu = (
+        ICR_ENERGY_MOTION
+        * (icr_energy_elec_motion / 100)
+        / (RT_ELEC_ENERGY_MOTION / 100)
+        * 1000000000
+        * (1 + change_inter_city_rail / 100)
+    )
+
     icr_ghg = (icr_elec_ghg + icr_d_ghg) * (1 + change_inter_city_rail / 100)
+
+    return transit_ghg + f_ghg + icr_ghg, transit_elec_btu + f_elec_btu + icr_elec_btu
+
+
+def calc_other_mobile_ghg(
+    grid_coal,
+    grid_ng,
+    grid_oil,
+    grid_other_ff,
+    mp_energy_elec_motion,
+    change_marine_port,
+    change_off_road,
+    or_energy_elec_motion,
+):
+    """
+    Calculate GHG emissions for freight & intercity rail, marine & port-related, and off-road
+    vehicles and equipment.
+    """
 
     mp_ff_motion = 100 - mp_energy_elec_motion
     mp_percent_changed_ff_motion = (mp_ff_motion - MP_FF_ENERGY_MOTION) / MP_FF_ENERGY_MOTION
@@ -1260,7 +1315,14 @@ def calc_rail_ghg(
             )
             * MMT_LB
         )
-        * (1 - ff_carbon_capture / 100)
+    )
+
+    mp_elec_btu = (
+        MP_ENERGY_MOTION_BBTU
+        * (mp_energy_elec_motion / 100)
+        / (MP_ELEC_MOTION / 100)
+        * 1000000000
+        * (1 + change_marine_port / 100)
     )
 
     mp_rfo_ghg = (
@@ -1304,7 +1366,14 @@ def calc_rail_ghg(
             )
             * MMT_LB
         )
-        * (1 - ff_carbon_capture / 100)
+    )
+
+    or_elec_btu = (
+        OR_ENERGY_MOTION_BBTU
+        * (or_energy_elec_motion / 100)
+        / (OR_ELEC_MOTION / 100)
+        * 1000000000
+        * (1 + change_off_road / 100)
     )
 
     or_mg_ghg = (
@@ -1339,7 +1408,26 @@ def calc_rail_ghg(
 
     or_ghg = (or_elec_ghg + or_mg_ghg + or_dfo_ghg + or_lpg_ghg) * (1 + change_off_road / 100)
 
-    return f_ghg + icr_ghg + mp_ghg + or_ghg
+    return mp_ghg + or_ghg, mp_elec_btu + or_elec_btu
+
+
+def calc_lulucf(
+    change_forest,
+    change_urban_trees,
+):
+
+    seq_urban_trees = SEQ_URBAN_TREES * (1 + change_urban_trees)
+    seq_forest = FOREST_ACRE_2014 * (1 + change_forest) * FOREST_SEQ_ACRE
+    if change_forest < 0:
+        ghg_forest = FOREST_ACRE_2014 * (-change_forest) * FOREST_GHG_ACRELOSS
+    else:
+        ghg_forest = 0
+
+    seq_lulucf = seq_urban_trees + seq_forest
+
+    ghg_lulucf = ghg_forest
+
+    return seq_lulucf, ghg_lulucf
 
 
 def calc_non_energy_ghg(
@@ -1360,7 +1448,9 @@ def calc_non_energy_ghg(
     rur_energy_elec,
     sub_energy_elec,
     urb_energy_elec,
-    urban_pop_percent,  # TODO: why only urban_pop_percent and not sub and rural?
+    rural_pop_percent,
+    suburban_pop_percent,
+    urban_pop_percent,
 ):
     ag_ghg = GHG_AG * (1 + change_ag / 100)
     solid_waste_ghg = GHG_SOLID_WASTE * (1 + change_solid_waste / 100) * (1 + change_pop / 100)
@@ -1377,8 +1467,8 @@ def calc_non_energy_ghg(
         rur_energy_elec,
         sub_energy_elec,
         urb_energy_elec,
-        RURAL_POP_PERCENT,
-        SUBURBAN_POP_PERCENT,
+        rural_pop_percent,
+        suburban_pop_percent,
         urban_pop_percent,
     )[1]
 
@@ -1403,13 +1493,226 @@ def calc_non_energy_ghg(
         * (NE_CO2_MMT_NG_METHANE + NE_CO2_MMT_NG_CO)
     )
 
-    land_use_forestry_ghg = GHG_URBAN_TREES * (1 + change_urban_trees / 100) + (
-        GHG_FORESTS + GHG_FOREST_CHANGE
-    ) * (1 + change_forest / 100)
+    lulucf_ghg = calc_lulucf(change_forest, change_urban_trees)[1]
 
-    return (
-        ag_ghg + solid_waste_ghg + wastewater_ghg + ip_ghg + ng_systems_ghg + land_use_forestry_ghg
+    return ag_ghg + solid_waste_ghg + wastewater_ghg + ip_ghg + ng_systems_ghg + lulucf_ghg
+
+
+def calc_sequestration(  # May need all inputs for electricity calculations below
+    grid_coal,
+    grid_ng,
+    grid_oil,
+    grid_other_ff,
+    res_energy_change,
+    change_pop,
+    rur_energy_elec,
+    sub_energy_elec,
+    urb_energy_elec,
+    rural_pop_percent,
+    suburban_pop_percent,
+    urban_pop_percent,
+    ci_energy_elec,
+    ci_energy_change,
+    veh_miles_elec,
+    reg_fleet_mpg,
+    change_veh_miles,
+    change_rail_transit,
+    rt_energy_elec_motion,
+    f_energy_elec_motion,
+    icr_energy_elec_motion,
+    change_freight_rail,
+    change_inter_city_rail,
+    mp_energy_elec_motion,
+    change_marine_port,
+    change_off_road,
+    or_energy_elec_motion,
+    change_ag,
+    change_industrial_processes,
+    change_solid_waste,
+    change_wastewater,
+    change_forest,
+    change_urban_trees,
+    ff_carbon_capture,
+    air_capture,
+):
+
+    lulucf_seq = calc_lulucf(change_forest, change_urban_trees)[0]
+
+    res_elec_btu = calc_res_ghg(
+        grid_coal,
+        grid_ng,
+        grid_oil,
+        grid_other_ff,
+        res_energy_change,
+        change_pop,
+        rur_energy_elec,
+        sub_energy_elec,
+        urb_energy_elec,
+        rural_pop_percent,
+        suburban_pop_percent,
+        urban_pop_percent,
+    )[2]
+
+    ci_elec_btu = calc_ci_ghg(
+        ci_energy_elec,
+        grid_coal,
+        grid_ng,
+        grid_oil,
+        grid_other_ff,
+        ci_energy_change,
+    )[1]
+
+    highway_elec_btu = calc_highway_ghg(
+        grid_coal,
+        grid_ng,
+        grid_oil,
+        grid_other_ff,
+        veh_miles_elec,
+        change_pop,
+        reg_fleet_mpg,
+        rural_pop_percent,
+        suburban_pop_percent,
+        urban_pop_percent,
+        change_veh_miles,
+    )[1]
+
+    rail_elec_btu = calc_rail_ghg(
+        grid_coal,
+        grid_ng,
+        grid_oil,
+        grid_other_ff,
+        change_rail_transit,
+        change_pop,
+        rural_pop_percent,
+        suburban_pop_percent,
+        urban_pop_percent,
+        rt_energy_elec_motion,
+        f_energy_elec_motion,
+        icr_energy_elec_motion,
+        change_freight_rail,
+        change_inter_city_rail,
+    )[1]
+
+    om_elec_btu = calc_other_mobile_ghg(
+        grid_coal,
+        grid_ng,
+        grid_oil,
+        grid_other_ff,
+        mp_energy_elec_motion,
+        change_marine_port,
+        change_off_road,
+        or_energy_elec_motion,
+    )[1]
+
+    total_elec_btu = res_elec_btu + ci_elec_btu + highway_elec_btu + rail_elec_btu + om_elec_btu
+
+    seq_source_capture = -(
+        total_elec_btu
+        * (1 / BTU_MWH)
+        / (1 - GRID_LOSS)
+        * (
+            (
+                (grid_coal / 100 * CO2_LB_MWH_COAL)
+                + (grid_oil / 100 * CO2_LB_MWH_OIL)
+                + (grid_ng / 100 * CO2_LB_MWH_NG)
+                + (grid_other_ff / 100 * CO2_LB_MWH_OTHER_FF)
+            )
+        )
+        * MMT_LB
+        * ff_carbon_capture
     )
+
+    gross_ghg = (
+        calc_res_ghg(
+            grid_coal,
+            grid_ng,
+            grid_oil,
+            grid_other_ff,
+            res_energy_change,
+            change_pop,
+            rur_energy_elec,
+            sub_energy_elec,
+            urb_energy_elec,
+            rural_pop_percent,
+            suburban_pop_percent,
+            urban_pop_percent,
+        )[0]
+        + calc_ci_ghg(
+            ci_energy_elec,
+            grid_coal,
+            grid_ng,
+            grid_oil,
+            grid_other_ff,
+            ci_energy_change,
+        )[0]
+        + calc_highway_ghg(
+            grid_coal,
+            grid_ng,
+            grid_oil,
+            grid_other_ff,
+            ff_carbon_capture,
+            veh_miles_elec,
+            change_pop,
+            reg_fleet_mpg,
+            rural_pop_percent,
+            suburban_pop_percent,
+            urban_pop_percent,
+            change_veh_miles,
+        )[0]
+        + calc_rail_ghg(
+            grid_coal,
+            grid_ng,
+            grid_oil,
+            grid_other_ff,
+            change_rail_transit,
+            change_pop,
+            rural_pop_percent,
+            suburban_pop_percent,
+            urban_pop_percent,
+            rt_energy_elec_motion,
+            f_energy_elec_motion,
+            icr_energy_elec_motion,
+            change_freight_rail,
+            change_inter_city_rail,
+        )[0]
+        + calc_other_mobile_ghg(
+            grid_coal,
+            grid_ng,
+            grid_oil,
+            grid_other_ff,
+            mp_energy_elec_motion,
+            change_marine_port,
+            change_off_road,
+            or_energy_elec_motion,
+        )[0]
+        + calc_non_energy_ghg(
+            ci_energy_elec,
+            grid_coal,
+            grid_ng,
+            grid_oil,
+            grid_other_ff,
+            change_ag,
+            res_energy_change,
+            ci_energy_change,
+            change_forest,
+            change_industrial_processes,
+            change_urban_trees,
+            change_solid_waste,
+            change_wastewater,
+            change_pop,
+            rur_energy_elec,
+            sub_energy_elec,
+            urb_energy_elec,
+            rural_pop_percent,
+            suburban_pop_percent,
+            urban_pop_percent,
+        )
+    )
+    seq_air_capture = -(gross_ghg + seq_source_capture + lulucf_seq) * air_capture
+
+    seq_total = seq_air_capture + seq_source_capture + lulucf_seq
+
+    return seq_total
 
 
 ###########################
@@ -1460,7 +1763,6 @@ def wrangle_data_for_bar_chart(user_inputs):
                 user_inputs["grid_ng"],
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
-                user_inputs["ff_carbon_capture"],
                 user_inputs["ci_energy_change"],
             ),
             calc_highway_ghg(
@@ -1522,6 +1824,8 @@ def wrangle_data_for_bar_chart(user_inputs):
                 user_inputs["rur_energy_elec"],
                 user_inputs["sub_energy_elec"],
                 user_inputs["urb_energy_elec"],
+                user_inputs["rural_pop_percent"],
+                user_inputs["suburban_pop_percent"],
                 user_inputs["urban_pop_percent"],
             ),
         ],
@@ -1558,7 +1862,6 @@ def wrangle_data_for_stacked_chart(user_inputs):
                 user_inputs["grid_ng"],
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
-                user_inputs["ff_carbon_capture"],
                 user_inputs["ci_energy_change"],
             ),
         ],
@@ -1605,16 +1908,11 @@ def wrangle_data_for_stacked_chart(user_inputs):
         "Mobile-Other": [
             GHG_OTHER_MOBILE,
             calc_other_mobile_ghg(
-                user_inputs["f_energy_elec_motion"],
                 user_inputs["grid_coal"],
                 user_inputs["grid_ng"],
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
-                user_inputs["icr_energy_elec_motion"],
                 user_inputs["mp_energy_elec_motion"],
-                user_inputs["ff_carbon_capture"],
-                user_inputs["change_freight_rail"],
-                user_inputs["change_inter_city_rail"],
                 user_inputs["change_marine_port"],
                 user_inputs["change_off_road"],
                 user_inputs["or_energy_elec_motion"],
@@ -1640,6 +1938,8 @@ def wrangle_data_for_stacked_chart(user_inputs):
                 user_inputs["rur_energy_elec"],
                 user_inputs["sub_energy_elec"],
                 user_inputs["urb_energy_elec"],
+                user_inputs["rural_pop_percent"],
+                user_inputs["suburban_pop_percent"],
                 user_inputs["urban_pop_percent"],
             ),
         ],
