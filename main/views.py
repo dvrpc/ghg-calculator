@@ -38,9 +38,7 @@ from bokeh_apps.ghg_calc import (
     RUR_ENERGY_ELEC,
     CI_ENERGY_ELEC,
     REG_FLEET_MPG,
-    RT_ENERGY_ELEC_MOTION_URB,
-    RT_ENERGY_ELEC_MOTION_SUB,
-    RT_ENERGY_ELEC_MOTION_RUR,
+    RT_ENERGY_ELEC_MOTION,
     F_ENERGY_ELEC_MOTION,
     ICR_ENERGY_ELEC_MOTION,
     MP_ENERGY_ELEC_MOTION,
@@ -315,9 +313,7 @@ def mobile_highway(request: HttpRequest) -> HttpResponse:
 def mobile_transit_handler(doc: Document) -> None:
     def callback(attr, old, new):
         user_inputs["change_rail_transit"] = change_rail_transit_slider.value
-        user_inputs["rt_energy_elec_motion_urb"] = rt_energy_elec_motion_urb_slider.value
-        user_inputs["rt_energy_elec_motion_sub"] = rt_energy_elec_motion_sub_slider.value
-        user_inputs["rt_energy_elec_motion_rur"] = rt_energy_elec_motion_rur_slider.value
+        user_inputs["rt_energy_elec_motion"] = rt_energy_elec_motion_slider.value
         bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
         stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
 
@@ -326,32 +322,14 @@ def mobile_transit_handler(doc: Document) -> None:
     )
     change_rail_transit_slider.on_change("value", callback)
 
-    rt_energy_elec_motion_urb_slider = Slider(
+    rt_energy_elec_motion_slider = Slider(
         start=0,
         end=100,
-        value=RT_ENERGY_ELEC_MOTION_URB,
+        value=RT_ENERGY_ELEC_MOTION,
         step=1,
-        title="% Electrification of Rail Transit Urban Areas",
+        title="% Electrification of Rail Transit",
     )
-    rt_energy_elec_motion_urb_slider.on_change("value", callback)
-
-    rt_energy_elec_motion_sub_slider = Slider(
-        start=0,
-        end=100,
-        value=RT_ENERGY_ELEC_MOTION_SUB,
-        step=1,
-        title="% Electrification of Rail Transit in Suburban Areas",
-    )
-    rt_energy_elec_motion_sub_slider.on_change("value", callback)
-
-    rt_energy_elec_motion_rur_slider = Slider(
-        start=0,
-        end=100,
-        value=RT_ENERGY_ELEC_MOTION_RUR,
-        step=1,
-        title="% Electrification of Rail Transit in Rural Areas",
-    )
-    rt_energy_elec_motion_rur_slider.on_change("value", callback)
+    rt_energy_elec_motion_slider.on_change("value", callback)
 
     bar_chart_data = wrangle_data_for_bar_chart(user_inputs)
     bar_chart_source = ColumnDataSource(data=bar_chart_data)
@@ -363,9 +341,7 @@ def mobile_transit_handler(doc: Document) -> None:
 
     inputs = Column(
         change_rail_transit_slider,
-        rt_energy_elec_motion_urb_slider,
-        rt_energy_elec_motion_sub_slider,
-        rt_energy_elec_motion_rur_slider,
+        rt_energy_elec_motion_slider,
     )
     # @LAYOUT: changed to row. Look into grid and whatnot
     charts = row(bar_chart, inputs, stacked_chart, sizing_mode="stretch_both")

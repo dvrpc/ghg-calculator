@@ -448,9 +448,15 @@ RT_ENERGY_MOTION_URB = RT_ELEC_MOTION_URB + RT_D_MOTION_URB
 RT_ENERGY_MOTION_SUB = RT_ELEC_MOTION_SUB + RT_D_MOTION_SUB
 RT_ENERGY_MOTION_RUR = RT_ELEC_MOTION_RUR + RT_D_MOTION_RUR
 
-RT_ENERGY_ELEC_MOTION_URB = RT_ELEC_MOTION_URB / RT_ENERGY_MOTION_URB * 100
-RT_ENERGY_ELEC_MOTION_SUB = RT_ELEC_MOTION_SUB / RT_ENERGY_MOTION_SUB * 100
-RT_ENERGY_ELEC_MOTION_RUR = RT_ELEC_MOTION_RUR / RT_ENERGY_MOTION_RUR * 100
+RT_ENERGY_ELEC_MOTION = (
+    (RT_ELEC_MOTION_URB + RT_ELEC_MOTION_SUB + RT_ELEC_MOTION_RUR)
+    / (RT_ENERGY_MOTION_URB + RT_ENERGY_MOTION_SUB + RT_ENERGY_MOTION_RUR)
+) * 100
+
+# Averaged to allow for one electrification slider for transit rail
+# RT_ENERGY_ELEC_MOTION_URB = RT_ELEC_MOTION_URB / RT_ENERGY_MOTION_URB * 100
+# RT_ENERGY_ELEC_MOTION_SUB = RT_ELEC_MOTION_SUB / RT_ENERGY_MOTION_SUB * 100
+# RT_ENERGY_ELEC_MOTION_RUR = RT_ELEC_MOTION_RUR / RT_ENERGY_MOTION_RUR * 100
 
 
 ##########################
@@ -858,8 +864,9 @@ def calc_res_ghg(
     )
 
     # Calculate GHG emissions
+    res_elec_btu = urban_elec_btu + suburban_elec_btu + rural_elec_btu
     res_elec_ghg = (
-        (urban_elec_btu + suburban_elec_btu + rural_elec_btu)
+        res_elec_btu
         * (1 / BTU_MWH)
         / (1 - GRID_LOSS)
         * (
@@ -1093,41 +1100,41 @@ def calc_highway_ghg(
             + (grid_other_ff / 100 * CO2_LB_MWH_OTHER_FF)
         )
         * MMT_LB
-    ) * (
-        1 - ff_carbon_capture / 100
     )
 
-    return highway_ghg
+    return highway_ghg, highway_elec_btu
 
 
 def calc_aviation_ghg(change_pop, change_air_travel):
     return GHG_AVIATION * (1 + change_pop / 100) * (1 + change_air_travel / 100)
 
 
-def calc_transit_ghg(
+def calc_rail_ghg(
     grid_coal,
     grid_ng,
     grid_oil,
     grid_other_ff,
-    ff_carbon_capture,
     change_rail_transit,
     change_pop,
     rural_pop_percent,
     suburban_pop_percent,
-    rt_energy_elec_motion_urb,
-    rt_energy_elec_motion_sub,
-    rt_energy_elec_motion_rur,
     urban_pop_percent,
+    rt_energy_elec_motion,
+    f_energy_elec_motion,
+    icr_energy_elec_motion,
+    change_freight_rail,
+    change_inter_city_rail,
 ):
+
     transit_elec_ghg = (
         POP
         * (1 + change_pop / 100)
         * (1 / BTU_MWH)
         / (1 - GRID_LOSS)
         * (
-            (urban_pop_percent / 100 * RT_ENERGY_MOTION_URB * rt_energy_elec_motion_urb / 100)
-            + (suburban_pop_percent / 100 * RT_ENERGY_MOTION_SUB * rt_energy_elec_motion_sub / 100)
-            + (rural_pop_percent / 100 * RT_ENERGY_MOTION_RUR * rt_energy_elec_motion_rur / 100)
+            (urban_pop_percent / 100 * RT_ENERGY_MOTION_URB * rt_energy_elec_motion / 100)
+            + (suburban_pop_percent / 100 * RT_ENERGY_MOTION_SUB * rt_energy_elec_motion / 100)
+            + (rural_pop_percent / 100 * RT_ENERGY_MOTION_RUR * rt_energy_elec_motion / 100)
         )
         / (RT_ELEC_ENERGY_MOTION / 100)
         * (
@@ -1149,53 +1156,33 @@ def calc_transit_ghg(
         * (1 / 1000000000)
         * MT_TO_MMT
         * (
-            (
-                urban_pop_percent
-                / 100
-                * RT_ENERGY_MOTION_URB
-                * (100 - rt_energy_elec_motion_urb)
-                / 100
-            )
+            (urban_pop_percent / 100 * RT_ENERGY_MOTION_URB * (100 - rt_energy_elec_motion) / 100)
             + (
                 suburban_pop_percent
                 / 100
                 * RT_ENERGY_MOTION_SUB
-                * (100 - rt_energy_elec_motion_sub)
+                * (100 - rt_energy_elec_motion)
                 / 100
             )
-            + (
-                rural_pop_percent
-                / 100
-                * RT_ENERGY_MOTION_RUR
-                * (100 - rt_energy_elec_motion_rur)
-                / 100
-            )
+            + (rural_pop_percent / 100 * RT_ENERGY_MOTION_RUR * (100 - rt_energy_elec_motion) / 100)
         )
         / (RT_D_ENERGY_MOTION / 100)
     )
 
-    return (transit_elec_ghg + transit_d_ghg) * (1 + change_rail_transit / 100)
+    transit_ghg = (transit_elec_ghg + transit_d_ghg) * (1 + change_rail_transit / 100)
 
+    transit_elec_btu = (
+        POP
+        * (1 + change_pop / 100)
+        / (1 - GRID_LOSS)
+        * (
+            (urban_pop_percent / 100 * RT_ENERGY_MOTION_URB * rt_energy_elec_motion / 100)
+            + (suburban_pop_percent / 100 * RT_ENERGY_MOTION_SUB * rt_energy_elec_motion / 100)
+            + (rural_pop_percent / 100 * RT_ENERGY_MOTION_RUR * rt_energy_elec_motion / 100)
+        )
+        / (RT_ELEC_ENERGY_MOTION / 100)
+    ) * (1 + change_rail_transit / 100)
 
-def calc_other_mobile_ghg(
-    f_energy_elec_motion,
-    grid_coal,
-    grid_ng,
-    grid_oil,
-    grid_other_ff,
-    icr_energy_elec_motion,
-    mp_energy_elec_motion,
-    ff_carbon_capture,
-    change_freight_rail,
-    change_inter_city_rail,
-    change_marine_port,
-    change_off_road,
-    or_energy_elec_motion,
-):
-    """
-    Calculate GHG emissions for freight & intercity rail, marine & port-related, and off-road
-    vehicles and equipment.
-    """
     f_elec_ghg = (
         F_ENERGY_MOTION
         * (f_energy_elec_motion / 100)
@@ -1490,33 +1477,29 @@ def wrangle_data_for_bar_chart(user_inputs):
                 user_inputs["urban_pop_percent"],
                 user_inputs["change_veh_miles"],
             ),
-            calc_transit_ghg(
+            calc_rail_ghg(
                 user_inputs["grid_coal"],
                 user_inputs["grid_ng"],
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
-                user_inputs["ff_carbon_capture"],
                 user_inputs["change_rail_transit"],
                 user_inputs["change_pop"],
                 user_inputs["rural_pop_percent"],
                 user_inputs["suburban_pop_percent"],
-                user_inputs["rt_energy_elec_motion_urb"],
-                user_inputs["rt_energy_elec_motion_sub"],
-                user_inputs["rt_energy_elec_motion_rur"],
                 user_inputs["urban_pop_percent"],
+                user_inputs["rt_energy_elec_motion"],
+                user_inputs["f_energy_elec_motion"],
+                user_inputs["icr_energy_elec_motion"],
+                user_inputs["change_freight_rail"],
+                user_inputs["change_inter_city_rail"],
             ),
             calc_aviation_ghg(user_inputs["change_pop"], user_inputs["change_air_travel"]),
             calc_other_mobile_ghg(
-                user_inputs["f_energy_elec_motion"],
                 user_inputs["grid_coal"],
                 user_inputs["grid_ng"],
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
-                user_inputs["icr_energy_elec_motion"],
                 user_inputs["mp_energy_elec_motion"],
-                user_inputs["ff_carbon_capture"],
-                user_inputs["change_freight_rail"],
-                user_inputs["change_inter_city_rail"],
                 user_inputs["change_marine_port"],
                 user_inputs["change_off_road"],
                 user_inputs["or_energy_elec_motion"],
@@ -1598,20 +1581,21 @@ def wrangle_data_for_stacked_chart(user_inputs):
         ],
         "Mobile-Transit": [
             GHG_TRANSIT,
-            calc_transit_ghg(
+            calc_rail_ghg(
                 user_inputs["grid_coal"],
                 user_inputs["grid_ng"],
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
-                user_inputs["ff_carbon_capture"],
                 user_inputs["change_rail_transit"],
                 user_inputs["change_pop"],
                 user_inputs["rural_pop_percent"],
                 user_inputs["suburban_pop_percent"],
-                user_inputs["rt_energy_elec_motion_urb"],
-                user_inputs["rt_energy_elec_motion_sub"],
-                user_inputs["rt_energy_elec_motion_rur"],
                 user_inputs["urban_pop_percent"],
+                user_inputs["rt_energy_elec_motion"],
+                user_inputs["f_energy_elec_motion"],
+                user_inputs["icr_energy_elec_motion"],
+                user_inputs["change_freight_rail"],
+                user_inputs["change_inter_city_rail"],
             ),
         ],
         "Mobile-Aviation": [
