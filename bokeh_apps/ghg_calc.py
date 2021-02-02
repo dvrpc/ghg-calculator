@@ -1149,7 +1149,6 @@ def calc_rail_ghg(
     change_freight_rail,
     change_inter_city_rail,
 ):
-
     transit_elec_ghg = (
         POP
         * (1 + change_pop / 100)
@@ -1723,7 +1722,7 @@ SECTORS = [
     "Residential",
     "Commercial/Industrial",
     "Mobile-Highway",
-    "Mobile-Transit",
+    "Mobile-Rail",
     "Mobile-Aviation",
     "Mobile-Other",
     "Non-Energy",
@@ -1737,7 +1736,7 @@ def wrangle_data_for_bar_chart(user_inputs):
             GHG_RES,
             GHG_CI,
             GHG_HIGHWAY,
-            GHG_TRANSIT,
+            GHG_RAIL,
             GHG_AVIATION,
             GHG_OTHER_MOBILE,
             GHG_NON_ENERGY,
@@ -1764,7 +1763,7 @@ def wrangle_data_for_bar_chart(user_inputs):
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
                 user_inputs["ci_energy_change"],
-            ),
+            )[0],
             calc_highway_ghg(
                 user_inputs["grid_coal"],
                 user_inputs["grid_ng"],
@@ -1778,7 +1777,7 @@ def wrangle_data_for_bar_chart(user_inputs):
                 user_inputs["suburban_pop_percent"],
                 user_inputs["urban_pop_percent"],
                 user_inputs["change_veh_miles"],
-            ),
+            )[0],
             calc_rail_ghg(
                 user_inputs["grid_coal"],
                 user_inputs["grid_ng"],
@@ -1794,7 +1793,7 @@ def wrangle_data_for_bar_chart(user_inputs):
                 user_inputs["icr_energy_elec_motion"],
                 user_inputs["change_freight_rail"],
                 user_inputs["change_inter_city_rail"],
-            ),
+            )[0],
             calc_aviation_ghg(user_inputs["change_pop"], user_inputs["change_air_travel"]),
             calc_other_mobile_ghg(
                 user_inputs["grid_coal"],
@@ -1805,7 +1804,7 @@ def wrangle_data_for_bar_chart(user_inputs):
                 user_inputs["change_marine_port"],
                 user_inputs["change_off_road"],
                 user_inputs["or_energy_elec_motion"],
-            ),
+            )[0],
             calc_non_energy_ghg(
                 user_inputs["ci_energy_elec"],
                 user_inputs["grid_coal"],
@@ -1863,7 +1862,7 @@ def wrangle_data_for_stacked_chart(user_inputs):
                 user_inputs["grid_oil"],
                 user_inputs["grid_other_ff"],
                 user_inputs["ci_energy_change"],
-            ),
+            )[0],
         ],
         "Mobile-Highway": [
             GHG_HIGHWAY,
@@ -1880,10 +1879,10 @@ def wrangle_data_for_stacked_chart(user_inputs):
                 user_inputs["suburban_pop_percent"],
                 user_inputs["urban_pop_percent"],
                 user_inputs["change_veh_miles"],
-            ),
+            )[0],
         ],
-        "Mobile-Transit": [
-            GHG_TRANSIT,
+        "Mobile-Rail": [
+            GHG_RAIL,
             calc_rail_ghg(
                 user_inputs["grid_coal"],
                 user_inputs["grid_ng"],
@@ -1899,7 +1898,7 @@ def wrangle_data_for_stacked_chart(user_inputs):
                 user_inputs["icr_energy_elec_motion"],
                 user_inputs["change_freight_rail"],
                 user_inputs["change_inter_city_rail"],
-            ),
+            )[0],
         ],
         "Mobile-Aviation": [
             GHG_AVIATION,

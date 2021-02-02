@@ -310,13 +310,18 @@ def mobile_highway(request: HttpRequest) -> HttpResponse:
     return render(request, "main/base.html", dict(script=script))
 
 
-def mobile_transit_handler(doc: Document) -> None:
+def mobile_rail_handler(doc: Document) -> None:
     def callback(attr, old, new):
         user_inputs["change_rail_transit"] = change_rail_transit_slider.value
         user_inputs["rt_energy_elec_motion"] = rt_energy_elec_motion_slider.value
+        user_inputs["change_freight_rail"] = change_freight_rail_slider.value
+        user_inputs["f_energy_elec_motion"] = f_energy_elec_motion_slider.value
+        user_inputs["change_inter_city_rail"] = change_inter_city_rail_slider.value
+        user_inputs["icr_energy_elec_motion"] = icr_energy_elec_motion_slider.value
         bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
         stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
 
+    # transit rail
     change_rail_transit_slider = Slider(
         start=-100, end=100, value=0, step=1, title="% Change in Transit Ridership"
     )
@@ -331,6 +336,36 @@ def mobile_transit_handler(doc: Document) -> None:
     )
     rt_energy_elec_motion_slider.on_change("value", callback)
 
+    # freight rail
+    change_freight_rail_slider = Slider(
+        start=-100, end=100, value=0, step=1, title="% Change in Freight Rail"
+    )
+    change_freight_rail_slider.on_change("value", callback)
+
+    f_energy_elec_motion_slider = Slider(
+        start=0,
+        end=100,
+        value=F_ENERGY_ELEC_MOTION,
+        step=1,
+        title="% Electrification of Rail Freight",
+    )
+    f_energy_elec_motion_slider.on_change("value", callback)
+
+    # inter-city rail
+    change_inter_city_rail_slider = Slider(
+        start=-100, end=100, value=0, step=1, title="% Change in Inter-city Rail Travel"
+    )
+    change_inter_city_rail_slider.on_change("value", callback)
+
+    icr_energy_elec_motion_slider = Slider(
+        start=0,
+        end=100,
+        value=ICR_ENERGY_ELEC_MOTION,
+        step=1,
+        title="% Electrification of Inter-city Rail",
+    )
+    icr_energy_elec_motion_slider.on_change("value", callback)
+
     bar_chart_data = wrangle_data_for_bar_chart(user_inputs)
     bar_chart_source = ColumnDataSource(data=bar_chart_data)
     bar_chart = create_bar_chart(bar_chart_data, bar_chart_source)
@@ -342,13 +377,17 @@ def mobile_transit_handler(doc: Document) -> None:
     inputs = Column(
         change_rail_transit_slider,
         rt_energy_elec_motion_slider,
+        change_freight_rail_slider,
+        f_energy_elec_motion_slider,
+        change_inter_city_rail_slider,
+        icr_energy_elec_motion_slider,
     )
     # @LAYOUT: changed to row. Look into grid and whatnot
     charts = row(bar_chart, inputs, stacked_chart, sizing_mode="stretch_both")
     doc.add_root(layout([[charts]]))
 
 
-def mobile_transit(request: HttpRequest) -> HttpResponse:
+def mobile_rail(request: HttpRequest) -> HttpResponse:
     script = server_document(request.build_absolute_uri())
     return render(request, "main/base.html", dict(script=script))
 
@@ -387,46 +426,12 @@ def mobile_aviation(request: HttpRequest) -> HttpResponse:
 
 def mobile_other_handler(doc: Document) -> None:
     def callback(attr, old, new):
-        user_inputs["change_freight_rail"] = change_freight_rail_slider.value
-        user_inputs["f_energy_elec_motion"] = f_energy_elec_motion_slider.value
-        user_inputs["change_inter_city_rail"] = change_inter_city_rail_slider.value
-        user_inputs["icr_energy_elec_motion"] = icr_energy_motion_elec_slider.value
         user_inputs["change_marine_port"] = change_marine_port_slider.value
         user_inputs["mp_energy_elec_motion"] = mp_energy_elec_motion_slider.value
         user_inputs["change_off_road"] = change_off_road_slider.value
         user_inputs["or_energy_elec_motion"] = or_energy_elec_motion_slider.value
         bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
         stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
-
-    # freight rail
-    change_freight_rail_slider = Slider(
-        start=-100, end=100, value=0, step=1, title="% Change in Freight Rail"
-    )
-    change_freight_rail_slider.on_change("value", callback)
-
-    f_energy_elec_motion_slider = Slider(
-        start=0,
-        end=100,
-        value=F_ENERGY_ELEC_MOTION,
-        step=1,
-        title="% Electrification of Rail Freight",
-    )
-    f_energy_elec_motion_slider.on_change("value", callback)
-
-    # inter-city rail
-    change_inter_city_rail_slider = Slider(
-        start=-100, end=100, value=0, step=1, title="% Change in Inter-city Rail Travel"
-    )
-    change_inter_city_rail_slider.on_change("value", callback)
-
-    icr_energy_motion_elec_slider = Slider(
-        start=0,
-        end=100,
-        value=ICR_ENERGY_ELEC_MOTION,
-        step=1,
-        title="% Electrification of Inter-city Rail",
-    )
-    icr_energy_motion_elec_slider.on_change("value", callback)
 
     # marine and port
     change_marine_port_slider = Slider(
@@ -467,10 +472,6 @@ def mobile_other_handler(doc: Document) -> None:
     stacked_chart = create_stacked_chart(stacked_chart_data, stacked_chart_source)
 
     inputs = Column(
-        change_freight_rail_slider,
-        f_energy_elec_motion_slider,
-        change_inter_city_rail_slider,
-        icr_energy_motion_elec_slider,
         change_marine_port_slider,
         mp_energy_elec_motion_slider,
         change_off_road_slider,
