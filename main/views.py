@@ -80,7 +80,7 @@ def index(request):
     return render(request, "main/base.html")
 
 
-def population_handler(doc: Document) -> None:
+def pop_dev_patterns_handler(doc: Document) -> None:
     """Phase2 of proof of concept. This works.
     What makes the chart update is the bar_chart_source.data = wrangle... part
 
@@ -138,7 +138,7 @@ def population_handler(doc: Document) -> None:
     doc.add_root(layout([[charts]]))
 
 
-def population(request: HttpRequest) -> HttpResponse:
+def pop_dev_patterns(request: HttpRequest) -> HttpResponse:
     script = server_document(request.build_absolute_uri())
     return render(request, "main/base.html", dict(script=script))
 
@@ -212,7 +212,7 @@ def res_stationary(request: HttpRequest) -> HttpResponse:
     return render(request, "main/base.html", dict(script=script))
 
 
-def ci_stationary_handler(doc: Document) -> None:
+def non_res_stationary_handler(doc: Document) -> None:
     def callback(attr, old, new):
         user_inputs["ci_energy_change"] = ci_energy_change_slider.value
         user_inputs["ci_energy_elec"] = ci_energy_elec_slider.value
@@ -255,12 +255,12 @@ def ci_stationary_handler(doc: Document) -> None:
     doc.add_root(layout([[charts]]))
 
 
-def ci_stationary(request: HttpRequest) -> HttpResponse:
+def non_res_stationary(request: HttpRequest) -> HttpResponse:
     script = server_document(request.build_absolute_uri())
     return render(request, "main/base.html", dict(script=script))
 
 
-def mobile_highway_handler(doc: Document) -> None:
+def on_road_motor_veh_handler(doc: Document) -> None:
     def callback(attr, old, new):
         user_inputs["change_veh_miles"] = change_veh_miles_slider.value
         user_inputs["reg_fleet_mpg"] = reg_fleet_mpg_slider.value
@@ -305,12 +305,12 @@ def mobile_highway_handler(doc: Document) -> None:
     doc.add_root(layout([[charts]]))
 
 
-def mobile_highway(request: HttpRequest) -> HttpResponse:
+def on_road_motor_veh(request: HttpRequest) -> HttpResponse:
     script = server_document(request.build_absolute_uri())
     return render(request, "main/base.html", dict(script=script))
 
 
-def mobile_rail_handler(doc: Document) -> None:
+def rail_handler(doc: Document) -> None:
     def callback(attr, old, new):
         user_inputs["change_rail_transit"] = change_rail_transit_slider.value
         user_inputs["rt_energy_elec_motion"] = rt_energy_elec_motion_slider.value
@@ -387,12 +387,12 @@ def mobile_rail_handler(doc: Document) -> None:
     doc.add_root(layout([[charts]]))
 
 
-def mobile_rail(request: HttpRequest) -> HttpResponse:
+def rail(request: HttpRequest) -> HttpResponse:
     script = server_document(request.build_absolute_uri())
     return render(request, "main/base.html", dict(script=script))
 
 
-def mobile_aviation_handler(doc: Document) -> None:
+def aviation_handler(doc: Document) -> None:
     def callback(attr, old, new):
         user_inputs["change_air_travel"] = change_air_travel_slider.value
         bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
@@ -419,7 +419,7 @@ def mobile_aviation_handler(doc: Document) -> None:
     doc.add_root(layout([[charts]]))
 
 
-def mobile_aviation(request: HttpRequest) -> HttpResponse:
+def aviation(request: HttpRequest) -> HttpResponse:
     script = server_document(request.build_absolute_uri())
     return render(request, "main/base.html", dict(script=script))
 
@@ -558,26 +558,22 @@ def non_energy_handler(doc: Document) -> None:
     stacked_chart = create_stacked_chart(stacked_chart_data, stacked_chart_source)
 
     inputs = Column(
-        change_ag_slider,
-        change_solid_waste_slider,
-        change_wasterwater_slider,
-        change_industrial_processes_slider,
         change_urban_trees_slider,
         change_forest_slider,
         ff_carbon_capture_slider,
-        # air_capture_slider,
+        air_capture_slider,
     )
     # @LAYOUT: changed to row. Look into grid and whatnot
     charts = row(bar_chart, inputs, stacked_chart)
     doc.add_root(layout([[charts]]))
 
 
-def non_energy(request: HttpRequest) -> HttpResponse:
+def sequestration_storage(request: HttpRequest) -> HttpResponse:
     script = server_document(request.build_absolute_uri())
     return render(request, "main/base.html", dict(script=script))
 
 
-def grid_mix_handler(doc: Document) -> None:
+def electricity_grid_handler(doc: Document) -> None:
     def callback(attr, old, new):
         user_inputs["grid_coal"] = float(grid_coal_input.value)
         user_inputs["grid_oil"] = float(grid_oil_input.value)
@@ -726,6 +722,6 @@ def grid_mix_handler(doc: Document) -> None:
     doc.add_root(layout([[inputs, charts]]))
 
 
-def grid_mix(request: HttpRequest) -> HttpResponse:
+def electricity_grid(request: HttpRequest) -> HttpResponse:
     script = server_document(request.build_absolute_uri())
     return render(request, "main/base.html", dict(script=script))
