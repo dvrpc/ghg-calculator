@@ -23,29 +23,23 @@ GHG_F = 0.26  # freight rail
 GHG_ICR = 0.04  # inter-city rail
 GHG_RAIL = GHG_TRANSIT + GHG_F + GHG_ICR
 GHG_AVIATION = 3.90
-GHG_MP = 0.31
-GHG_OR = 0.52
-GHG_OTHER_MOBILE = (
-    GHG_MP + GHG_OR
-)  # includes marine & port-related, off-road vehicles and equipment
+GHG_MP = 0.31  # marine and port-related
+GHG_OR = 0.52  # off-road vehicles and equipment
+GHG_OTHER_MOBILE = GHG_MP + GHG_OR
 GHG_AG = 0.41  # agriculture
 GHG_SOLID_WASTE = 2.01  # landfills
 GHG_WASTEWATER = 0.49
 GHG_IP = 5.52  # industrial processes; includes Hydrogen production, iron & steel production, industrial wastewater treatment, ODS substitutes, and petroleum refining
 SEQ_URBAN_TREES = -1.025
 SEQ_FORESTS = -1.110  # corrected rounding
-GHG_FOREST_CHANGE = 0.380  # TODO: why is this not 0? #Answer - this is the number
-# for emissions from loss of forest for the year. so from beginning of 2015 to
-# end of 2015, forest loss caused emissions of 0.380 MMTCO2e
+GHG_FOREST_CHANGE = 0.380  # emissions from loss of forest for 2015 (MMTCO2e)
 FOREST_ACRE_2010 = 792534.1253
 FOREST_ACRE_2015 = 785312.64
 FOREST_CHANGE_ACRE_ANNUAL = (FOREST_ACRE_2015 - FOREST_ACRE_2010) / 5
 FOREST_SEQ_ACRE = -0.00000141308092029381  # MMTCO2 per acre
 FOREST_ACRE_2014 = FOREST_ACRE_2015 - FOREST_CHANGE_ACRE_ANNUAL
-PER_ANNUAL_FOREST_CHANGE = FOREST_CHANGE_ACRE_ANNUAL / FOREST_ACRE_2014
 FOREST_GHG_ACRELOSS = 0.00026284935386546
-URBAN_TREES_SEQ_ACRE = -0.00000143705967830054
-
+GHG_SEQ = SEQ_URBAN_TREES + SEQ_FORESTS
 RES_NG = 115884601.50 / 1000  # NG Consumpton 2015 (million CF)
 CI_NG = 139139475 / 1000  # NG Consumpton 2015 (million CF)
 GHG_NON_ENERGY = (
@@ -56,8 +50,6 @@ GHG_NON_ENERGY = (
     + GHG_FOREST_CHANGE
     + (RES_NG + CI_NG) * (NE_CO2_MMT_NG_METHANE + NE_CO2_MMT_NG_CO)
 )
-
-GHG_SEQ = SEQ_URBAN_TREES + SEQ_FORESTS
 
 # Demographics
 URBAN_POP = 1691830
@@ -75,10 +67,6 @@ CO2_LB_MWH_COAL = (2169.484351 + 2225.525) / 2
 CO2_LB_MWH_OIL = (1600.098812 + 1341.468) / 2
 CO2_LB_MWH_NG = (929.651872 + 897.037) / 2
 CO2_LB_MWH_OTHER_FF = (1488.036692 + 1334.201) / 2
-
-
-# Percent of carbon emissions from combustion of fossil fuels for electricity that are captured and stored
-ff_carbon_capture = 0
 
 # Electricity Mix from 2015 inventory
 GRID_COAL = 20.47
@@ -436,7 +424,9 @@ REG_FLEET_MPG = 19.744607425  # mpg imputed from 2015 inventory
 CO2_LB_GAL_GAS = 20.50758459351  # lbs co2e per gallon of gasoline (imputed from 2015 inventory)
 
 #################################
-# Mobile-Rail Transit GHG Factors
+# Mobile-Rail GHG Factors
+
+# rail transit
 
 RT_BBTU_KB_D = 5.768
 RT_CO2_MT_BBTU_D = 74.66024683
@@ -472,15 +462,6 @@ RT_ENERGY_ELEC_MOTION = (
     / (RT_ENERGY_MOTION_URB + RT_ENERGY_MOTION_SUB + RT_ENERGY_MOTION_RUR)
 ) * 100
 
-# Averaged to allow for one electrification slider for transit rail
-# RT_ENERGY_ELEC_MOTION_URB = RT_ELEC_MOTION_URB / RT_ENERGY_MOTION_URB * 100
-# RT_ENERGY_ELEC_MOTION_SUB = RT_ELEC_MOTION_SUB / RT_ENERGY_MOTION_SUB * 100
-# RT_ENERGY_ELEC_MOTION_RUR = RT_ELEC_MOTION_RUR / RT_ENERGY_MOTION_RUR * 100
-
-
-##########################
-# Mobile-Other GHG Factors
-
 # Freight Rail
 F_ELEC = 0
 F_D = 3525.18
@@ -498,6 +479,9 @@ ICR_D_MOTION = ICR_D * RT_D_ENERGY_MOTION / 100
 ICR_ENERGY_MOTION = ICR_ELEC_MOTION + ICR_D_MOTION
 ICR_ENERGY_ELEC_MOTION = ICR_ELEC_MOTION / ICR_ENERGY_MOTION * 100
 ICR_D_CO2_MT_BBTU = 73.978
+
+##########################
+# Mobile-Other GHG Factors
 
 # Marine and Port
 MP_ELEC_MOTION = 100
@@ -1709,9 +1693,7 @@ def calc_sequestration(  # May need all inputs for electricity calculations belo
     )
     seq_air_capture = -(gross_ghg + seq_source_capture + lulucf_seq) * air_capture
 
-    seq_total = seq_air_capture + seq_source_capture + lulucf_seq
-
-    return seq_total
+    return seq_air_capture + seq_source_capture + lulucf_seq
 
 
 ###########################
