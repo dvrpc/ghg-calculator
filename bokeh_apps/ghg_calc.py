@@ -1699,12 +1699,12 @@ def calc_sequestration(  # May need all inputs for electricity calculations belo
 ###########################
 
 SECTORS = [
-    "Residential",
-    "Commercial/Industrial",
-    "Mobile-Highway",
-    "Mobile-Rail",
-    "Mobile-Aviation",
-    "Mobile-Other",
+    "Residential Stationary Energy",
+    "Non-Residential Stationary Energy",
+    "On-Road Motor Vehicles",
+    "Rail",
+    "Aviation",
+    "Other Mobile Energy",
     "Non-Energy",
 ]
 
@@ -1815,7 +1815,7 @@ def wrangle_data_for_stacked_chart(user_inputs):
     # Transpose data
     data = {
         "Year": ["2015", "Scenario"],
-        "Residential": [
+        "Residential Stationary Energy": [
             GHG_RES,
             calc_res_ghg(
                 user_inputs["grid_coal"],
@@ -1832,7 +1832,7 @@ def wrangle_data_for_stacked_chart(user_inputs):
                 user_inputs["urban_pop_percent"],
             )[0],
         ],
-        "Commercial/Industrial": [
+        "Non-Residential Stationary Energy": [
             GHG_CI,
             calc_ci_ghg(
                 user_inputs["ci_energy_elec"],
@@ -1843,7 +1843,7 @@ def wrangle_data_for_stacked_chart(user_inputs):
                 user_inputs["ci_energy_change"],
             )[0],
         ],
-        "Mobile-Highway": [
+        "On-Road Motor Vehicles": [
             GHG_HIGHWAY,
             calc_highway_ghg(
                 user_inputs["grid_coal"],
@@ -1859,7 +1859,7 @@ def wrangle_data_for_stacked_chart(user_inputs):
                 user_inputs["change_veh_miles"],
             )[0],
         ],
-        "Mobile-Rail": [
+        "Rail": [
             GHG_RAIL,
             calc_rail_ghg(
                 user_inputs["grid_coal"],
@@ -1878,11 +1878,11 @@ def wrangle_data_for_stacked_chart(user_inputs):
                 user_inputs["change_inter_city_rail"],
             )[0],
         ],
-        "Mobile-Aviation": [
+        "Aviation": [
             GHG_AVIATION,
             calc_aviation_ghg(user_inputs["change_pop"], user_inputs["change_air_travel"]),
         ],
-        "Mobile-Other": [
+        "Other Mobile Energy": [
             GHG_OTHER_MOBILE,
             calc_other_mobile_ghg(
                 user_inputs["grid_coal"],
