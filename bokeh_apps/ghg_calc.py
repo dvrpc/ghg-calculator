@@ -2053,7 +2053,7 @@ def create_bar_chart(data, source):
     """
     bar_chart = figure(
         x_range=data["Category"],
-        y_range=(0, 50),
+        y_range=(-25, 50),
         plot_height=500,
         plot_width=450,
         y_axis_label="Million Metric Tons of CO2e",
@@ -2118,7 +2118,7 @@ def create_stacked_chart(data, source):
     """
     stacked_bar_chart = figure(
         x_range=data["Year"],
-        y_range=(0, 100),
+        y_range=(-50, 100),
         plot_height=500,
         plot_width=500,
         y_axis_label="Million Metric Tons of CO2e",
