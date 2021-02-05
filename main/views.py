@@ -493,10 +493,6 @@ def non_energy_handler(doc: Document) -> None:
         user_inputs["change_solid_waste"] = change_solid_waste_slider.value
         user_inputs["change_wastewater"] = change_wasterwater_slider.value
         user_inputs["change_industrial_processes"] = change_industrial_processes_slider.value
-        user_inputs["change_urban_trees"] = change_urban_trees_slider.value
-        user_inputs["change_forest"] = change_forest_slider.value
-        user_inputs["ff_carbon_capture"] = ff_carbon_capture_slider.value
-        # user_inputs["AirCapture"] = air_capture_slider.value  # TK, possibly
         bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
         stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
 
@@ -524,6 +520,40 @@ def non_energy_handler(doc: Document) -> None:
     )
     change_industrial_processes_slider.on_change("value", callback)
 
+    bar_chart_data = wrangle_data_for_bar_chart(user_inputs)
+    bar_chart_source = ColumnDataSource(data=bar_chart_data)
+    bar_chart = create_bar_chart(bar_chart_data, bar_chart_source)
+
+    stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
+    stacked_chart_source = ColumnDataSource(data=stacked_chart_data)
+    stacked_chart = create_stacked_chart(stacked_chart_data, stacked_chart_source)
+
+    inputs = Column(
+        change_ag_slider,
+        change_solid_waste_slider,
+        change_wasterwater_slider,
+        change_industrial_processes_slider,
+    )
+    # @LAYOUT: changed to row. Look into grid and whatnot
+    charts = row(bar_chart, inputs, stacked_chart)
+    doc.add_root(layout([[charts]]))
+
+
+def non_energy(request: HttpRequest) -> HttpResponse:
+    script = server_document(request.build_absolute_uri())
+    return render(request, "main/base.html", dict(script=script))
+
+
+def sequestration_storage_handler(doc: Document) -> None:
+    def callback(attr, old, new):
+        user_inputs["change_urban_trees"] = change_urban_trees_slider.value
+        user_inputs["change_forest"] = change_forest_slider.value
+        user_inputs["ff_carbon_capture"] = ff_carbon_capture_slider.value
+        user_inputs["AirCapture"] = air_capture_slider.value  # TODO: rename/check
+        bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
+        stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
+
+    # sequestration
     change_urban_trees_slider = Slider(
         start=-100, end=100, value=0, step=1, title="% Change in Urban Tree Coverage"
     )
@@ -544,10 +574,10 @@ def non_energy_handler(doc: Document) -> None:
     )
     ff_carbon_capture_slider.on_change("value", callback)
 
-    # air_capture_slider = Slider(
-    #     start=0, end=100, value=0, step=1, title="MMTCO2e Captured from the Air"
-    # )
-    # air_capture_slider.on_change("value", callback)
+    air_capture_slider = Slider(
+        start=0, end=100, value=0, step=1, title="MMTCO2e Captured from the Air"
+    )
+    air_capture_slider.on_change("value", callback)
 
     bar_chart_data = wrangle_data_for_bar_chart(user_inputs)
     bar_chart_source = ColumnDataSource(data=bar_chart_data)
