@@ -121,9 +121,9 @@ def test_calc_non_energy_ghg():
         g.RUR_ENERGY_ELEC * 100,
         g.SUB_ENERGY_ELEC * 100,
         g.URB_ENERGY_ELEC * 100,
-        g.URBAN_POP_PERCENT,
         g.RURAL_POP_PERCENT,
         g.SUBURBAN_POP_PERCENT,
+        g.URBAN_POP_PERCENT,
     )
     assert ghg == g.GHG_NON_ENERGY
 
