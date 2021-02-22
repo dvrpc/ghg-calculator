@@ -36,9 +36,9 @@ GHG_FOREST_CHANGE = 0.380  # emissions from loss of forest for 2015 (MMTCO2e)
 FOREST_ACRE_2010 = 792534.1253
 FOREST_ACRE_2015 = 785312.64
 FOREST_CHANGE_ACRE_ANNUAL = (FOREST_ACRE_2015 - FOREST_ACRE_2010) / 5
-FOREST_SEQ_ACRE = -0.00000141308092029381  # MMTCO2 per acre
+FOREST_SEQ_ACRE = -0.00000141308092029381  # weighted average MMTCO2 per acre sequestered per year.
 FOREST_ACRE_2014 = FOREST_ACRE_2015 - FOREST_CHANGE_ACRE_ANNUAL
-FOREST_GHG_ACRELOSS = 0.00026284935386546
+FOREST_GHG_ACRELOSS = 0.000260941776124502  # weighted average MMTCO2 released per acre lost
 GHG_SEQ = SEQ_URBAN_TREES + SEQ_FORESTS
 RES_NG = 115884601.50 / 1000  # NG Consumpton 2015 (million CF)
 CI_NG = 139139475 / 1000  # NG Consumpton 2015 (million CF)
@@ -1398,10 +1398,10 @@ def calc_lulucf(
     change_urban_trees,
 ):
 
-    seq_urban_trees = SEQ_URBAN_TREES * (1 + change_urban_trees)
-    seq_forest = FOREST_ACRE_2014 * (1 + change_forest) * FOREST_SEQ_ACRE
+    seq_urban_trees = SEQ_URBAN_TREES * (1 + change_urban_trees / 100)
+    seq_forest = FOREST_ACRE_2014 * (1 + change_forest / 100) * FOREST_SEQ_ACRE
     if change_forest < 0:
-        ghg_forest = FOREST_ACRE_2014 * (-change_forest) * FOREST_GHG_ACRELOSS
+        ghg_forest = FOREST_ACRE_2014 * -(change_forest / 100) * FOREST_GHG_ACRELOSS
     else:
         ghg_forest = 0
 
@@ -1602,6 +1602,7 @@ def calc_sequestration(  # May need all inputs for electricity calculations belo
         )
         * MMT_LB
         * ff_carbon_capture
+        / 100
     )
 
     gross_ghg = (
