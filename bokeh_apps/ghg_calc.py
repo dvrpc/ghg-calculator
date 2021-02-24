@@ -572,7 +572,7 @@ user_inputs = {
     "change_air_travel": 0,
     "ff_carbon_capture": 0,
     "air_capture": 0,
-    "change_forest": 0,
+    "change_forest": FOREST_CHANGE_ACRE_ANNUAL / (FOREST_ACRE_2014 * 100),
     "change_urban_trees": 0,
     "change_ag": 0,
     "change_solid_waste": 0,
