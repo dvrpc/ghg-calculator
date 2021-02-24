@@ -549,7 +549,7 @@ def sequestration_storage_handler(doc: Document) -> None:
         user_inputs["change_urban_trees"] = change_urban_trees_slider.value
         user_inputs["change_forest"] = change_forest_slider.value
         user_inputs["ff_carbon_capture"] = ff_carbon_capture_slider.value
-        user_inputs["AirCapture"] = air_capture_slider.value  # TODO: rename/check
+        user_inputs["air_capture"] = air_capture_slider.value
         bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
         stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
 
