@@ -625,100 +625,35 @@ def electricity_grid_handler(doc: Document) -> None:
     text, style = generate_text_and_style(user_inputs)
     grid_text = Paragraph(text=text, style=style)
 
-    # grid_oil_input = TextInput(value=str(round(GRID_OIL, 1)), title="% Oil in Grid Mix")
-    # grid_oil_input.on_change("value", callback)
-
-    # grid_ng_input = TextInput(value=str(round(GRID_NG, 1)), title="% Natural Gas in Grid Mix")
-    # grid_ng_input.on_change("value", callback)
-
-    # grid_nuclear_input = TextInput(value=str(round(GRID_NUCLEAR, 1)), title="% Nuclear in Grid Mix")
-    # grid_nuclear_input.on_change("value", callback)
-
-    # grid_solar_input = TextInput(value=str(round(GRID_SOLAR, 1)), title="% Solar in Grid Mix")
-    # grid_solar_input.on_change("value", callback)
-
-    # grid_wind_input = TextInput(value=str(round(GRID_WIND, 1)), title="% Wind in Grid Mix")
-    # grid_wind_input.on_change("value", callback)
-
-    # grid_bio_input = TextInput(value=str(round(GRID_BIO, 1)), title="% Biomass in Grid Mix")
-    # grid_bio_input.on_change("value", callback)
-
-    # grid_hydro_input = TextInput(value=str(round(GRID_HYDRO, 1)), title="% Hydropower in Grid Mix")
-    # grid_hydro_input.on_change("value", callback)
-
-    # grid_geo_input = TextInput(value=str(round(GRID_GEO, 1)), title="% Geothermal in Grid Mix")
-    # grid_geo_input.on_change("value", callback)
-
-    # grid_other_ff_input = TextInput(
-    #     value=str(round(GRID_OTHER_FF, 1)), title="% Other Fossil Fuel in Grid Mix"
-    # )
-    # grid_other_ff_input.on_change("value", callback)
-
-    # net_zero_carbon_input = TextInput(
-    #     value=str(round(GRID_NUCLEAR + GRID_SOLAR + GRID_WIND + GRID_BIO + GRID_HYDRO + GRID_GEO)),
-    #     title="% Net Zero Carbon Sources in Grid Mix",
-    # )
-    # net_zero_carbon_input.on_change("value", callback)
-
-    # ff_carbon_capture_slider = Slider(
-    #     start=0,
-    #     end=100,
-    #     value=0,
-    #     step=1,
-    #     title="% Carbon Captured at Combustion Site for Electricity Generation",
-    # )
-
-    grid_coal_input = Slider(
-        start=0, end=100, step=0.1, value=round(GRID_COAL, 1), title="% Coal in Grid Mix"
-    )
+    grid_coal_input = TextInput(value=str(round(GRID_COAL, 1)), title="% Coal in Grid Mix")
     grid_coal_input.on_change("value", callback)
 
-    grid_oil_input = Slider(
-        start=0, end=100, step=0.1, value=round(GRID_OIL, 1), title="% Oil in Grid Mix"
-    )
+    grid_oil_input = TextInput(value=str(round(GRID_OIL, 1)), title="% Oil in Grid Mix")
     grid_oil_input.on_change("value", callback)
 
-    grid_ng_input = Slider(
-        start=0, end=100, step=0.1, value=round(GRID_NG, 1), title="% Natural Gas in Grid Mix"
-    )
+    grid_ng_input = TextInput(value=str(round(GRID_NG, 1)), title="% Natural Gas in Grid Mix")
     grid_ng_input.on_change("value", callback)
 
-    grid_nuclear_input = Slider(
-        start=0, end=100, step=0.1, value=round(GRID_NUCLEAR, 1), title="% Nuclear in Grid Mix"
-    )
+    grid_nuclear_input = TextInput(value=str(round(GRID_NUCLEAR, 1)), title="% Nuclear in Grid Mix")
     grid_nuclear_input.on_change("value", callback)
 
-    grid_solar_input = Slider(
-        start=0, end=100, step=0.1, value=round(GRID_SOLAR, 1), title="% Solar in Grid Mix"
-    )
+    grid_solar_input = TextInput(value=str(round(GRID_SOLAR, 1)), title="% Solar in Grid Mix")
     grid_solar_input.on_change("value", callback)
 
-    grid_wind_input = Slider(
-        start=0, end=100, step=0.1, value=round(GRID_WIND, 1), title="% Wind in Grid Mix"
-    )
+    grid_wind_input = TextInput(value=str(round(GRID_WIND, 1)), title="% Wind in Grid Mix")
     grid_wind_input.on_change("value", callback)
 
-    grid_bio_input = Slider(
-        start=0, end=100, step=0.1, value=round(GRID_BIO, 1), title="% Biomass in Grid Mix"
-    )
+    grid_bio_input = TextInput(value=str(round(GRID_BIO, 1)), title="% Biomass in Grid Mix")
     grid_bio_input.on_change("value", callback)
 
-    grid_hydro_input = Slider(
-        start=0, end=100, step=0.1, value=round(GRID_HYDRO, 1), title="% Hydropower in Grid Mix"
-    )
+    grid_hydro_input = TextInput(value=str(round(GRID_HYDRO, 1)), title="% Hydropower in Grid Mix")
     grid_hydro_input.on_change("value", callback)
 
-    grid_geo_input = Slider(
-        start=0, end=100, step=0.1, value=round(GRID_GEO, 1), title="% Geothermal in Grid Mix"
-    )
+    grid_geo_input = TextInput(value=str(round(GRID_GEO, 1)), title="% Geothermal in Grid Mix")
     grid_geo_input.on_change("value", callback)
 
-    grid_other_ff_input = Slider(
-        start=0,
-        end=100,
-        step=0.1,
-        value=round(GRID_OTHER_FF, 1),
-        title="% Other Fossil Fuel in Grid Mix",
+    grid_other_ff_input = TextInput(
+        value=str(round(GRID_OTHER_FF, 1)), title="% Other Fossil Fuel in Grid Mix"
     )
     grid_other_ff_input.on_change("value", callback)
 
