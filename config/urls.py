@@ -28,16 +28,16 @@ bokeh_app_config = apps.get_app_config("bokeh.server.django")
 urlpatterns = [
     # path("admin", admin.site.urls),
     path("", views.index, name="index"),
-    path("population-and-development-patterns/", views.pop_dev_patterns),
-    path("residential-stationary-energy/", views.res_stationary),
-    path("non-residential-stationary-energy/", views.non_res_stationary),
-    path("on-road-motor-vehicles/", views.on_road_motor_veh),
-    path("rail/", views.rail),
-    path("aviation/", views.aviation),
-    path("other-mobile-energy/", views.mobile_other),
-    path("non-energy/", views.non_energy),
-    path("carbon-sequestration-and-storage/", views.sequestration_storage),
-    path("electricity-grid/", views.electricity_grid),
+    path("population-and-development-patterns/", views.pop_dev_patterns, name="pop"),
+    path("residential-stationary-energy/", views.res_stationary, name="res"),
+    path("non-residential-stationary-energy/", views.non_res_stationary, name="non_res"),
+    path("on-road-motor-vehicles/", views.on_road_motor_veh, name="on_road"),
+    path("rail/", views.rail, name="rail"),
+    path("aviation/", views.aviation, name="aviation"),
+    path("other-mobile-energy/", views.mobile_other, name="other"),
+    path("non-energy/", views.non_energy, name="non_energy"),
+    path("carbon-sequestration-and-storage/", views.sequestration_storage, name="seq"),
+    path("electricity-grid/", views.electricity_grid, name="grid"),
 ]
 
 bokeh_apps = [

@@ -16,10 +16,10 @@
 </head>
 <body>
     <nav>
-        <a href="http://127.0.0.1:8000/">
-          <img src="../static/img/logo-main.svg" alt="Project logo" id="project-logo-main" />
-        </a>
-        <!-- <img src="" alt="DVRPC logo" /> -->
+      <a href="{% url 'index' %}">
+        <img src="../static/img/logo-main.svg" alt="Project logo" id="project-logo-main" />
+      </a>
+      <!-- <img src="" alt="DVRPC logo" /> -->
     </nav>
 
     <header>
@@ -32,7 +32,7 @@
     <ul id="homepage-cat-list">
       <li>
         <figure>
-          <a href="http://127.0.0.1:8000/population-and-development-patterns/">
+          <a href="{% url 'pop' %}")>
             <figcaption class="homepage-cat-icon-caption">Population and Development Patterns</figcaption>
             <img src="../static/img/population.svg" alt="icon" class="homepage-cat-icon" />
           </a>
@@ -40,7 +40,7 @@
       </li>
       <li>
         <figure>
-          <a href="http://127.0.0.1:8000/electricity-grid/">
+          <a href="{% url 'grid' %}">
             <figcaption class="homepage-cat-icon-caption">Electricity Grid</figcaption>
             <img src="../static/img/grid-mix.svg" alt="icon" class="homepage-cat-icon" />
           </a>
@@ -48,7 +48,7 @@
       </li>
       <li>
         <figure>
-          <a href="http://127.0.0.1:8000/residential-stationary-energy/">
+          <a href="{% url 'res' %}">
             <figcaption class="homepage-cat-icon-caption">Residential Stationary Energy</figcaption>
             <img src="../static/img/res-stationary.svg" alt="icon" class="homepage-cat-icon" />
           </a>
@@ -56,7 +56,7 @@
       </li>
       <li>
         <figure>
-          <a href="http://127.0.0.1:8000/non-residential-stationary-energy/">
+          <a href="{% url 'non_res' %}">
             <figcaption class="homepage-cat-icon-caption">Non-Residential Stationary Energy</figcaption>
             <img src="../static/img/ci-stationary.svg" alt="icon" class="homepage-cat-icon" />
           </a>
@@ -64,7 +64,7 @@
       </li>
       <li>
         <figure>
-          <a href="http://127.0.0.1:8000/on-road-motor-vehicles/">
+          <a href="{% url 'on_road' %}">
             <figcaption class="homepage-cat-icon-caption">On-Road Motor Vehicles</figcaption>
             <img src="../static/img/mobile-highway.svg" alt="icon" class="homepage-cat-icon" />
           </a>
@@ -72,7 +72,7 @@
       </li>
       <li>
         <figure>
-          <a href="http://127.0.0.1:8000/aviation/">
+          <a href="{% url 'aviation' %}">
             <figcaption class="homepage-cat-icon-caption">Aviation</figcaption>
             <img src="../static/img/mobile-aviation.svg" alt="icon" class="homepage-cat-icon" />
           </a>
@@ -80,7 +80,7 @@
       </li>
       <li>
         <figure>
-          <a href="http://127.0.0.1:8000/rail/">
+          <a href="{% url 'rail' %}">
             <figcaption class="homepage-cat-icon-caption">Rail</figcaption>
             <img src="../static/img/mobile-transit.svg" alt="icon" class="homepage-cat-icon" />
           </a>
@@ -88,7 +88,7 @@
       </li>
       <li>
         <figure>
-          <a href="http://127.0.0.1:8000/other-mobile-energy/">
+          <a href="{% url 'other' %}">
             <figcaption class="homepage-cat-icon-caption">Other Mobile Energy</figcaption>
             <img src="../static/img/mobile-other.svg" alt="icon" class="homepage-cat-icon" />
           </a>
@@ -96,14 +96,14 @@
       </li>
       <li>
         <figure>
-          <a href="http://127.0.0.1:8000/non-energy/">
+          <a href="{% url 'non_energy' %}">
             <figcaption class="homepage-cat-icon-caption">Non-Energy</figcaption>
             <img src="../static/img/non-energy.svg" alt="icon" class="homepage-cat-icon" />
           </a>
         </figure>
       </li>
       <li>
-          <a href="http://127.0.0.1:8000/carbon-sequestration-and-storage/">Carbon Sequestration & Storage</a>
+          <a href="{% url 'seq' %}">Carbon Sequestration & Storage</a>
       </li>
     </ul>
   <main>
