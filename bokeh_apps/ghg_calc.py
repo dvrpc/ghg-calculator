@@ -1700,6 +1700,7 @@ def calc_sequestration(  # May need all inputs for electricity calculations belo
 ###########################
 
 SECTORS = [
+    "Carbon Sequestration & Storage",
     "Residential Stationary Energy",
     "Non-Residential Stationary Energy",
     "On-Road Motor Vehicles",
@@ -1707,7 +1708,6 @@ SECTORS = [
     "Aviation",
     "Other Mobile Energy",
     "Non-Energy",
-    "Carbon Sequestration & Storage",
 ]
 
 
@@ -1715,6 +1715,7 @@ def wrangle_data_for_bar_chart(user_inputs):
     data = {
         "Category": SECTORS,
         "2015": [
+            GHG_SEQ,
             GHG_RES,
             GHG_CI,
             GHG_HIGHWAY,
@@ -1722,9 +1723,45 @@ def wrangle_data_for_bar_chart(user_inputs):
             GHG_AVIATION,
             GHG_OTHER_MOBILE,
             GHG_NON_ENERGY,
-            GHG_SEQ,
         ],
         "Scenario": [
+            calc_sequestration(
+                user_inputs["grid_coal"],
+                user_inputs["grid_ng"],
+                user_inputs["grid_oil"],
+                user_inputs["grid_other_ff"],
+                user_inputs["res_energy_change"],
+                user_inputs["change_pop"],
+                user_inputs["rur_energy_elec"],
+                user_inputs["sub_energy_elec"],
+                user_inputs["urb_energy_elec"],
+                user_inputs["rural_pop_percent"],
+                user_inputs["suburban_pop_percent"],
+                user_inputs["urban_pop_percent"],
+                user_inputs["ci_energy_elec"],
+                user_inputs["ci_energy_change"],
+                user_inputs["veh_miles_elec"],
+                user_inputs["reg_fleet_mpg"],
+                user_inputs["change_veh_miles"],
+                user_inputs["change_rail_transit"],
+                user_inputs["rt_energy_elec_motion"],
+                user_inputs["f_energy_elec_motion"],
+                user_inputs["icr_energy_elec_motion"],
+                user_inputs["change_freight_rail"],
+                user_inputs["change_inter_city_rail"],
+                user_inputs["mp_energy_elec_motion"],
+                user_inputs["change_marine_port"],
+                user_inputs["change_off_road"],
+                user_inputs["or_energy_elec_motion"],
+                user_inputs["change_ag"],
+                user_inputs["change_industrial_processes"],
+                user_inputs["change_solid_waste"],
+                user_inputs["change_wastewater"],
+                user_inputs["change_forest"],
+                user_inputs["change_urban_trees"],
+                user_inputs["ff_carbon_capture"],
+                user_inputs["air_capture"],
+            ),
             calc_res_ghg(
                 user_inputs["grid_coal"],
                 user_inputs["grid_ng"],
@@ -1809,6 +1846,17 @@ def wrangle_data_for_bar_chart(user_inputs):
                 user_inputs["suburban_pop_percent"],
                 user_inputs["urban_pop_percent"],
             ),
+        ],
+    }
+    return data
+
+
+def wrangle_data_for_stacked_chart(user_inputs):
+    # Transpose data
+    data = {
+        "Year": ["2015", "Scenario"],
+        "Carbon Sequestration & Storage": [
+            GHG_SEQ,
             calc_sequestration(
                 user_inputs["grid_coal"],
                 user_inputs["grid_ng"],
@@ -1847,14 +1895,6 @@ def wrangle_data_for_bar_chart(user_inputs):
                 user_inputs["air_capture"],
             ),
         ],
-    }
-    return data
-
-
-def wrangle_data_for_stacked_chart(user_inputs):
-    # Transpose data
-    data = {
-        "Year": ["2015", "Scenario"],
         "Residential Stationary Energy": [
             GHG_RES,
             calc_res_ghg(
@@ -1958,46 +1998,6 @@ def wrangle_data_for_stacked_chart(user_inputs):
                 user_inputs["rural_pop_percent"],
                 user_inputs["suburban_pop_percent"],
                 user_inputs["urban_pop_percent"],
-            ),
-        ],
-        "Carbon Sequestration & Storage": [
-            GHG_SEQ,
-            calc_sequestration(
-                user_inputs["grid_coal"],
-                user_inputs["grid_ng"],
-                user_inputs["grid_oil"],
-                user_inputs["grid_other_ff"],
-                user_inputs["res_energy_change"],
-                user_inputs["change_pop"],
-                user_inputs["rur_energy_elec"],
-                user_inputs["sub_energy_elec"],
-                user_inputs["urb_energy_elec"],
-                user_inputs["rural_pop_percent"],
-                user_inputs["suburban_pop_percent"],
-                user_inputs["urban_pop_percent"],
-                user_inputs["ci_energy_elec"],
-                user_inputs["ci_energy_change"],
-                user_inputs["veh_miles_elec"],
-                user_inputs["reg_fleet_mpg"],
-                user_inputs["change_veh_miles"],
-                user_inputs["change_rail_transit"],
-                user_inputs["rt_energy_elec_motion"],
-                user_inputs["f_energy_elec_motion"],
-                user_inputs["icr_energy_elec_motion"],
-                user_inputs["change_freight_rail"],
-                user_inputs["change_inter_city_rail"],
-                user_inputs["mp_energy_elec_motion"],
-                user_inputs["change_marine_port"],
-                user_inputs["change_off_road"],
-                user_inputs["or_energy_elec_motion"],
-                user_inputs["change_ag"],
-                user_inputs["change_industrial_processes"],
-                user_inputs["change_solid_waste"],
-                user_inputs["change_wastewater"],
-                user_inputs["change_forest"],
-                user_inputs["change_urban_trees"],
-                user_inputs["ff_carbon_capture"],
-                user_inputs["air_capture"],
             ),
         ],
     }
