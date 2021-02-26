@@ -38,6 +38,7 @@ FOREST_ACRE_2015 = 785312.64
 FOREST_CHANGE_ACRE_ANNUAL = (FOREST_ACRE_2015 - FOREST_ACRE_2010) / 5
 FOREST_SEQ_ACRE = -0.00000141308092029381  # weighted average MMTCO2 per acre sequestered per year.
 FOREST_ACRE_2014 = FOREST_ACRE_2015 - FOREST_CHANGE_ACRE_ANNUAL
+PER_ANNUAL_FOREST_CHANGE_2015 = FOREST_CHANGE_ACRE_ANNUAL / FOREST_ACRE_2014 * 100
 FOREST_GHG_ACRELOSS = 0.000260941776124502  # weighted average MMTCO2 released per acre lost
 GHG_SEQ = SEQ_URBAN_TREES + SEQ_FORESTS
 RES_NG = 115884601.50 / 1000  # NG Consumpton 2015 (million CF)
@@ -572,7 +573,7 @@ user_inputs = {
     "change_air_travel": 0,
     "ff_carbon_capture": 0,
     "air_capture": 0,
-    "change_forest": FOREST_CHANGE_ACRE_ANNUAL / (FOREST_ACRE_2014 * 100),
+    "change_forest": PER_ANNUAL_FOREST_CHANGE_2015,
     "change_urban_trees": 0,
     "change_ag": 0,
     "change_solid_waste": 0,
@@ -1690,7 +1691,7 @@ def calc_sequestration(  # May need all inputs for electricity calculations belo
             urban_pop_percent,
         )
     )
-    seq_air_capture = -(gross_ghg + seq_source_capture + lulucf_seq) * air_capture
+    seq_air_capture = -(gross_ghg + seq_source_capture + lulucf_seq) * air_capture/100
 
     return seq_air_capture + seq_source_capture + lulucf_seq
 
