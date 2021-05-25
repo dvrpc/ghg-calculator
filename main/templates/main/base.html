@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>GHG Calculator</title>
+  <title>Decarbonizing the Delaware Valley</title>
   <meta name="viewport" content="width=device-width" />
   <meta name="description" content="">
   <link href="http://cdn.pydata.org/bokeh/release/bokeh-2.1.1.min.css" rel="stylesheet" type="text/css">
@@ -23,12 +23,19 @@
     </nav>
 
     <header>
-      <h1>DVRPC Greenhouse Gas Calculator</h1>
-    </header>
+      <h1><a href="{% url 'index' %}">Decarbonizing the Delaware Valley</a></h1>
+      <!-- <h1>Decarbonizing the Delaware Valley</h1> -->
+      <h2>Interactive Greenhouse Gas Reduction Pathways</h2>
 
-    <p class="header-paragraph">Geospatial inventory bicycle yes in my back yard public works department general plan Levittown industrial parklet transferable development right. School zone signage origination fee 8-80. Ordinance suburbanization traffic mixed use legal crosswalk road hierarchy parking meter ground floor retail medina industrialized city esplanade commercial. Affordable housing transit market analysis travel shed redevelopment agencies, rising property values ordinance external inventory overpass.</p>
+      {% block header_intro %}
+
+      {% endblock %}
+
+    </header>
+    </p>
+
     
-    <h2>click an icon to calculate emission scenarios from the following energy sources:</h2>
+    <h4>click an icon to calculate emission scenarios from the following energy sources:</h4>
     <ul id="homepage-cat-list">
       <li>
         <figure>
