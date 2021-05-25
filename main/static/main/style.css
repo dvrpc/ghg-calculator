@@ -45,6 +45,8 @@ a {
 a:hover {
   text-decoration: underline;
 }
+
+
 h1, h2, h3, h4 {
   font-family: 'Raleway', sans-serif;
   color: var(--header-text-color);
@@ -94,6 +96,10 @@ h1 {
   font-size: 3rem;
   /* @SHADOW old */
   /* filter: drop-shadow(var(--icon-shadow)); */
+}
+h1 a, h1 a:hover {
+  text-decoration: none;
+  color: var(--main-text-color);
 }
 .header-paragraph {
   font-size: var(--font-large);
