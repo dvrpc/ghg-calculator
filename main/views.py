@@ -560,7 +560,7 @@ def sequestration_storage_handler(doc: Document) -> None:
     change_urban_trees_slider.on_change("value", callback)
 
     change_forest_slider = Slider(
-        start=-100, end=100, value=0, step=1, title="% Change in Forest Coverage"
+        start=-20, end=20, value=0, step=1, title="% Change in Forest Coverage"
     )
     change_forest_slider.on_change("value", callback)
 
