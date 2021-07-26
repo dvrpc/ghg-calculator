@@ -1,0 +1,18 @@
+attrs:
+  Figure:
+    background_fill_color: '#eef6ef'
+    border_fill_color: '#eef6ef'
+  Title:
+    text_color: "black"
+  Legend:
+    background_fill_color: "#eef6ef"
+    border_line_alpha: 0
+    # spacing:
+    # glyph_width: 15
+    # label_standoff: 8
+    # label_text_color: "#E0E0E0"
+    # label_text_font: "Helvetica"
+    # label_text_font_size: "1.025em"
+    # border_line_alpha: 0
+    # background_fill_alpha: 0.25
+    # background_fill_color: "#2C001E"

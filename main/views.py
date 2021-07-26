@@ -4,7 +4,8 @@ from django.shortcuts import render
 from bokeh.models import Slider, Column, ColumnDataSource, TextInput, Paragraph
 from bokeh.document import Document
 from bokeh.embed import server_document
-from bokeh.layouts import row, layout
+from bokeh.layouts import row, layout, column
+from bokeh.themes import Theme
 
 from bokeh_apps.ghg_calc import (
     wrangle_data_for_bar_chart,
@@ -625,36 +626,34 @@ def electricity_grid_handler(doc: Document) -> None:
     text, style = generate_text_and_style(user_inputs)
     grid_text = Paragraph(text=text, style=style)
 
-    grid_coal_input = TextInput(value=str(round(GRID_COAL, 1)), title="% Coal in Grid Mix")
+    grid_coal_input = TextInput(value=str(round(GRID_COAL, 1)), title="% Coal")
     grid_coal_input.on_change("value", callback)
 
-    grid_oil_input = TextInput(value=str(round(GRID_OIL, 1)), title="% Oil in Grid Mix")
+    grid_oil_input = TextInput(value=str(round(GRID_OIL, 1)), title="% Oil")
     grid_oil_input.on_change("value", callback)
 
-    grid_ng_input = TextInput(value=str(round(GRID_NG, 1)), title="% Natural Gas in Grid Mix")
+    grid_ng_input = TextInput(value=str(round(GRID_NG, 1)), title="% Natural")
     grid_ng_input.on_change("value", callback)
 
-    grid_nuclear_input = TextInput(value=str(round(GRID_NUCLEAR, 1)), title="% Nuclear in Grid Mix")
+    grid_nuclear_input = TextInput(value=str(round(GRID_NUCLEAR, 1)), title="% Nuclear")
     grid_nuclear_input.on_change("value", callback)
 
-    grid_solar_input = TextInput(value=str(round(GRID_SOLAR, 1)), title="% Solar in Grid Mix")
+    grid_solar_input = TextInput(value=str(round(GRID_SOLAR, 1)), title="% Solar")
     grid_solar_input.on_change("value", callback)
 
-    grid_wind_input = TextInput(value=str(round(GRID_WIND, 1)), title="% Wind in Grid Mix")
+    grid_wind_input = TextInput(value=str(round(GRID_WIND, 1)), title="% Wind")
     grid_wind_input.on_change("value", callback)
 
-    grid_bio_input = TextInput(value=str(round(GRID_BIO, 1)), title="% Biomass in Grid Mix")
+    grid_bio_input = TextInput(value=str(round(GRID_BIO, 1)), title="% Biomass")
     grid_bio_input.on_change("value", callback)
 
-    grid_hydro_input = TextInput(value=str(round(GRID_HYDRO, 1)), title="% Hydropower in Grid Mix")
+    grid_hydro_input = TextInput(value=str(round(GRID_HYDRO, 1)), title="% Hydropower")
     grid_hydro_input.on_change("value", callback)
 
-    grid_geo_input = TextInput(value=str(round(GRID_GEO, 1)), title="% Geothermal in Grid Mix")
+    grid_geo_input = TextInput(value=str(round(GRID_GEO, 1)), title="% Geothermal")
     grid_geo_input.on_change("value", callback)
 
-    grid_other_ff_input = TextInput(
-        value=str(round(GRID_OTHER_FF, 1)), title="% Other Fossil Fuel in Grid Mix"
-    )
+    grid_other_ff_input = TextInput(value=str(round(GRID_OTHER_FF, 1)), title="% Other Fossil Fuel")
     grid_other_ff_input.on_change("value", callback)
 
     inputs = Column(
@@ -669,6 +668,7 @@ def electricity_grid_handler(doc: Document) -> None:
         grid_hydro_input,
         grid_geo_input,
         grid_other_ff_input,
+        width=200,
     )
     bar_chart_data = wrangle_data_for_bar_chart(user_inputs)
     bar_chart_source = ColumnDataSource(data=bar_chart_data)
@@ -683,7 +683,8 @@ def electricity_grid_handler(doc: Document) -> None:
     pie_chart = create_pie_chart(pie_chart_source)
 
     # @LAYOUT: changed to row. Look into grid and whatnot
-    charts = row(bar_chart, stacked_chart, pie_chart)
+    charts = column(bar_chart, stacked_chart, pie_chart, sizing_mode="scale_width")
+    doc.theme = Theme(filename="main/static/main/ghg_bokeh_theme.yaml")
     doc.add_root(layout([[inputs, charts]]))
 
 

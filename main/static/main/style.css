@@ -2,7 +2,6 @@
 /* General */
 :root {
   --off-white-soft: #f7f7f7;
-  --lightgray: hsl(0, 0, 30);
   --font-large: 1.3rem;
   --font-extra-large: 1.6rem;
   --font-color-gas: green;
@@ -18,13 +17,9 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Roboto', sans-serif;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  grid-template-areas: "header" "main" "footer";
   
   /* @GRADIENTS */
   /* background: linear-gradient(165deg, #477f3c 0%, #FDFCDC 50%); */
-
 
   /* background: #159957;
   background: -webkit-linear-gradient(to right, #159957, #155799);
@@ -34,11 +29,11 @@ body {
   background: -webkit-linear-gradient(165deg, #4ca2cd, #67B26F); 
   background: linear-gradient(165deg, #4ca2cd, #67B26F);
   
-
   /* END GRADIENTS */
 
   color: var(--main-text-color);
 }
+
 a {
   text-decoration: none;
 }
@@ -71,10 +66,15 @@ p {
 /********/
 /* Nav */
 nav {
-  display: flex;
-  justify-self: flex-end;
-  padding: 15px 30px;
-  color: var(--off-white-soft);
+  padding: 10px 0 0 0;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  background: #67B26F;
+  scrollbar-color: gray transparent;
+  border-right: 2px solid green;
 }
 #project-logo-main {
   filter: drop-shadow(var(--icon-shadow));
@@ -91,6 +91,12 @@ nav {
 
 /***********/
 /* Header */
+
+header {
+  margin-left: 400px;
+  padding: 0 10px 0 10px;
+}
+
 h1 {
   margin: 45px auto;
   font-size: 3rem;
@@ -104,6 +110,7 @@ h1 a, h1 a:hover {
 .header-paragraph {
   font-size: var(--font-large);
   margin: 0 auto 45px auto;
+  padding: 0 auto 45px auto;
   line-height: 1.7;
   align-self: flex-end;
 }
@@ -117,28 +124,28 @@ h1 a, h1 a:hover {
 #homepage-cat-list {
   list-style-type: none;
   padding-left: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 #homepage-cat-list a {
   color: var(--main-text-color);
-  font-weight: 700;
-  display: flex;
-  flex-direction: column-reverse;
+  font-weight: 500;
+  font-size: 14px;
 }
 .homepage-cat-icon {
-  display: block;
-  margin: 0 auto;
-  width: 75px;
-  height: 75px;
+  width: 40px;
+  height: 40px;
   filter: drop-shadow(var(--icon-shadow));
 }
 .homepage-cat-icon-caption:hover + .homepage-cat-icon , .homepage-cat-icon:hover {
   filter: drop-shadow(var(--icon-shadow-hover));
 }
 figcaption {
-  text-align: center;
+  white-space: nowrap;
+}
+
+figure a {
+  display: grid;
+  grid-template-columns: 20% 80%;
+  align-items: center;
 }
 /* END Homepage */
 /*************/
@@ -148,25 +155,12 @@ figcaption {
 /****************/
 /* Chart Pages */
 /* @TODO get back into this */
-/* main {
+main {
   background-color: transparent;
-  display: grid;
-  grid-area: main;
-  gap: 20px;
-  grid-template-columns: 2fr 1fr;
-  grid-template-areas: "left right";
-  padding-bottom: 20px;
+  margin-left: 400px;
+  padding: 20px;
+  padding: 0 auto;
 }
-main .left {
-  grid-area: left;
-  background-color: white;
-  padding: 10px;
-}
-main .right {
-  grid-area: right;
-  background-color: var(--light-gray);
-  padding: 10px;
-} */
 /* END Chart Pages */
 /****************/
 
@@ -175,10 +169,10 @@ main .right {
 /**********/
 /* Footer */
 footer {
-  background: rgba(0,0,0,0.1);
+  /* background: rgba(0,0,0,0.1); */
   margin-top: 3%;
-  width: 100%;
-  padding: 5% 0;
+  margin-left: 400px;
+  padding: 20px;
 }
 /**********/
 /* END Footer */
@@ -192,23 +186,5 @@ footer {
   body {
     padding: 0px;
     margin: 0px;
-    grid-template-columns: auto auto;
-    grid-template-areas: "header header" "main main" "footer footer";
-  }
-  header {
-    margin-left: 20px;
-    margin-right: 20px;
-    grid-area: header;
-    display: grid;
-    grid-gap: 5px;
-    grid-template-columns: auto auto;
-    grid-template-areas: "search nav" "logo logo";
-  }
-  main  {
-    grid-template-columns: 1fr;
-    grid-template-areas: "left" "right";
-  }
-  footer img {
-    width: 125px;
   }
 }

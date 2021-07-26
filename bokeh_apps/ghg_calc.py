@@ -1691,7 +1691,7 @@ def calc_sequestration(  # May need all inputs for electricity calculations belo
             urban_pop_percent,
         )
     )
-    seq_air_capture = -(gross_ghg + seq_source_capture + lulucf_seq) * air_capture/100
+    seq_air_capture = -(gross_ghg + seq_source_capture + lulucf_seq) * air_capture / 100
 
     return seq_air_capture + seq_source_capture + lulucf_seq
 
@@ -2106,6 +2106,8 @@ def create_bar_chart(data, source):
     )
     bar_chart.add_layout(labels_scenario)
     bar_chart.add_layout(labels_2015)
+    bar_chart_legend = bar_chart.legend[0]
+    bar_chart.add_layout(bar_chart_legend, "left")
 
     return bar_chart
 
@@ -2136,7 +2138,7 @@ def create_stacked_chart(data, source):
     )
     stacked_bar_chart.legend[0].items.reverse()  # Reverse legend items to match order in stack
     stacked_bar_chart_legend = stacked_bar_chart.legend[0]
-    stacked_bar_chart.add_layout(stacked_bar_chart_legend, "right")
+    stacked_bar_chart.add_layout(stacked_bar_chart_legend, "left")
 
     return stacked_bar_chart
 
