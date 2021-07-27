@@ -1,11 +1,13 @@
 attrs:
   Figure:
-    background_fill_color: '#eef6ef'
-    border_fill_color: '#eef6ef'
+    # background_fill_color: '#eef6ef'
+    # border_fill_color: '#eef6ef'
+    background_fill_color: '#e4f1e5'
+    border_fill_color: '#e4f1e5'
   Title:
     text_color: "black"
   Legend:
-    background_fill_color: "#eef6ef"
+    background_fill_color: "#e4f1e5"
     border_line_alpha: 0
     # spacing:
     # glyph_width: 15

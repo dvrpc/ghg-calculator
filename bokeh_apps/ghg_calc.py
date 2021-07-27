@@ -1701,7 +1701,7 @@ def calc_sequestration(  # May need all inputs for electricity calculations belo
 ###########################
 
 SECTORS = [
-    "Carbon Sequestration & Storage",
+    "Carbon Seq. & Storage",
     "Residential Stationary Energy",
     "Non-Residential Stationary Energy",
     "On-Road Motor Vehicles",
@@ -1716,136 +1716,159 @@ def wrangle_data_for_bar_chart(user_inputs):
     data = {
         "Category": SECTORS,
         "2015": [
-            GHG_SEQ,
-            GHG_RES,
-            GHG_CI,
-            GHG_HIGHWAY,
-            GHG_RAIL,
-            GHG_AVIATION,
-            GHG_OTHER_MOBILE,
-            GHG_NON_ENERGY,
+            round(GHG_SEQ, 1),
+            round(GHG_RES, 1),
+            round(GHG_CI, 1),
+            round(GHG_HIGHWAY, 1),
+            round(GHG_RAIL, 1),
+            round(GHG_AVIATION, 1),
+            round(GHG_OTHER_MOBILE, 1),
+            round(GHG_NON_ENERGY, 1),
         ],
         "Scenario": [
-            calc_sequestration(
-                user_inputs["grid_coal"],
-                user_inputs["grid_ng"],
-                user_inputs["grid_oil"],
-                user_inputs["grid_other_ff"],
-                user_inputs["res_energy_change"],
-                user_inputs["change_pop"],
-                user_inputs["rur_energy_elec"],
-                user_inputs["sub_energy_elec"],
-                user_inputs["urb_energy_elec"],
-                user_inputs["rural_pop_percent"],
-                user_inputs["suburban_pop_percent"],
-                user_inputs["urban_pop_percent"],
-                user_inputs["ci_energy_elec"],
-                user_inputs["ci_energy_change"],
-                user_inputs["veh_miles_elec"],
-                user_inputs["reg_fleet_mpg"],
-                user_inputs["change_veh_miles"],
-                user_inputs["change_rail_transit"],
-                user_inputs["rt_energy_elec_motion"],
-                user_inputs["f_energy_elec_motion"],
-                user_inputs["icr_energy_elec_motion"],
-                user_inputs["change_freight_rail"],
-                user_inputs["change_inter_city_rail"],
-                user_inputs["mp_energy_elec_motion"],
-                user_inputs["change_marine_port"],
-                user_inputs["change_off_road"],
-                user_inputs["or_energy_elec_motion"],
-                user_inputs["change_ag"],
-                user_inputs["change_industrial_processes"],
-                user_inputs["change_solid_waste"],
-                user_inputs["change_wastewater"],
-                user_inputs["change_forest"],
-                user_inputs["change_urban_trees"],
-                user_inputs["ff_carbon_capture"],
-                user_inputs["air_capture"],
+            round(
+                calc_sequestration(
+                    user_inputs["grid_coal"],
+                    user_inputs["grid_ng"],
+                    user_inputs["grid_oil"],
+                    user_inputs["grid_other_ff"],
+                    user_inputs["res_energy_change"],
+                    user_inputs["change_pop"],
+                    user_inputs["rur_energy_elec"],
+                    user_inputs["sub_energy_elec"],
+                    user_inputs["urb_energy_elec"],
+                    user_inputs["rural_pop_percent"],
+                    user_inputs["suburban_pop_percent"],
+                    user_inputs["urban_pop_percent"],
+                    user_inputs["ci_energy_elec"],
+                    user_inputs["ci_energy_change"],
+                    user_inputs["veh_miles_elec"],
+                    user_inputs["reg_fleet_mpg"],
+                    user_inputs["change_veh_miles"],
+                    user_inputs["change_rail_transit"],
+                    user_inputs["rt_energy_elec_motion"],
+                    user_inputs["f_energy_elec_motion"],
+                    user_inputs["icr_energy_elec_motion"],
+                    user_inputs["change_freight_rail"],
+                    user_inputs["change_inter_city_rail"],
+                    user_inputs["mp_energy_elec_motion"],
+                    user_inputs["change_marine_port"],
+                    user_inputs["change_off_road"],
+                    user_inputs["or_energy_elec_motion"],
+                    user_inputs["change_ag"],
+                    user_inputs["change_industrial_processes"],
+                    user_inputs["change_solid_waste"],
+                    user_inputs["change_wastewater"],
+                    user_inputs["change_forest"],
+                    user_inputs["change_urban_trees"],
+                    user_inputs["ff_carbon_capture"],
+                    user_inputs["air_capture"],
+                ),
+                1,
             ),
-            calc_res_ghg(
-                user_inputs["grid_coal"],
-                user_inputs["grid_ng"],
-                user_inputs["grid_oil"],
-                user_inputs["grid_other_ff"],
-                user_inputs["res_energy_change"],
-                user_inputs["change_pop"],
-                user_inputs["rur_energy_elec"],
-                user_inputs["sub_energy_elec"],
-                user_inputs["urb_energy_elec"],
-                user_inputs["rural_pop_percent"],
-                user_inputs["suburban_pop_percent"],
-                user_inputs["urban_pop_percent"],
-            )[0],
-            calc_ci_ghg(
-                user_inputs["ci_energy_elec"],
-                user_inputs["grid_coal"],
-                user_inputs["grid_ng"],
-                user_inputs["grid_oil"],
-                user_inputs["grid_other_ff"],
-                user_inputs["ci_energy_change"],
-            )[0],
-            calc_highway_ghg(
-                user_inputs["grid_coal"],
-                user_inputs["grid_ng"],
-                user_inputs["grid_oil"],
-                user_inputs["grid_other_ff"],
-                user_inputs["veh_miles_elec"],
-                user_inputs["change_pop"],
-                user_inputs["reg_fleet_mpg"],
-                user_inputs["rural_pop_percent"],
-                user_inputs["suburban_pop_percent"],
-                user_inputs["urban_pop_percent"],
-                user_inputs["change_veh_miles"],
-            )[0],
-            calc_rail_ghg(
-                user_inputs["grid_coal"],
-                user_inputs["grid_ng"],
-                user_inputs["grid_oil"],
-                user_inputs["grid_other_ff"],
-                user_inputs["change_rail_transit"],
-                user_inputs["change_pop"],
-                user_inputs["rural_pop_percent"],
-                user_inputs["suburban_pop_percent"],
-                user_inputs["urban_pop_percent"],
-                user_inputs["rt_energy_elec_motion"],
-                user_inputs["f_energy_elec_motion"],
-                user_inputs["icr_energy_elec_motion"],
-                user_inputs["change_freight_rail"],
-                user_inputs["change_inter_city_rail"],
-            )[0],
-            calc_aviation_ghg(user_inputs["change_pop"], user_inputs["change_air_travel"]),
-            calc_other_mobile_ghg(
-                user_inputs["grid_coal"],
-                user_inputs["grid_ng"],
-                user_inputs["grid_oil"],
-                user_inputs["grid_other_ff"],
-                user_inputs["mp_energy_elec_motion"],
-                user_inputs["change_marine_port"],
-                user_inputs["change_off_road"],
-                user_inputs["or_energy_elec_motion"],
-            )[0],
-            calc_non_energy_ghg(
-                user_inputs["ci_energy_elec"],
-                user_inputs["grid_coal"],
-                user_inputs["grid_ng"],
-                user_inputs["grid_oil"],
-                user_inputs["grid_other_ff"],
-                user_inputs["change_ag"],
-                user_inputs["res_energy_change"],
-                user_inputs["ci_energy_change"],
-                user_inputs["change_forest"],
-                user_inputs["change_industrial_processes"],
-                user_inputs["change_urban_trees"],
-                user_inputs["change_solid_waste"],
-                user_inputs["change_wastewater"],
-                user_inputs["change_pop"],
-                user_inputs["rur_energy_elec"],
-                user_inputs["sub_energy_elec"],
-                user_inputs["urb_energy_elec"],
-                user_inputs["rural_pop_percent"],
-                user_inputs["suburban_pop_percent"],
-                user_inputs["urban_pop_percent"],
+            round(
+                calc_res_ghg(
+                    user_inputs["grid_coal"],
+                    user_inputs["grid_ng"],
+                    user_inputs["grid_oil"],
+                    user_inputs["grid_other_ff"],
+                    user_inputs["res_energy_change"],
+                    user_inputs["change_pop"],
+                    user_inputs["rur_energy_elec"],
+                    user_inputs["sub_energy_elec"],
+                    user_inputs["urb_energy_elec"],
+                    user_inputs["rural_pop_percent"],
+                    user_inputs["suburban_pop_percent"],
+                    user_inputs["urban_pop_percent"],
+                )[0],
+                1,
+            ),
+            round(
+                calc_ci_ghg(
+                    user_inputs["ci_energy_elec"],
+                    user_inputs["grid_coal"],
+                    user_inputs["grid_ng"],
+                    user_inputs["grid_oil"],
+                    user_inputs["grid_other_ff"],
+                    user_inputs["ci_energy_change"],
+                )[0],
+                1,
+            ),
+            round(
+                calc_highway_ghg(
+                    user_inputs["grid_coal"],
+                    user_inputs["grid_ng"],
+                    user_inputs["grid_oil"],
+                    user_inputs["grid_other_ff"],
+                    user_inputs["veh_miles_elec"],
+                    user_inputs["change_pop"],
+                    user_inputs["reg_fleet_mpg"],
+                    user_inputs["rural_pop_percent"],
+                    user_inputs["suburban_pop_percent"],
+                    user_inputs["urban_pop_percent"],
+                    user_inputs["change_veh_miles"],
+                )[0],
+                1,
+            ),
+            round(
+                calc_rail_ghg(
+                    user_inputs["grid_coal"],
+                    user_inputs["grid_ng"],
+                    user_inputs["grid_oil"],
+                    user_inputs["grid_other_ff"],
+                    user_inputs["change_rail_transit"],
+                    user_inputs["change_pop"],
+                    user_inputs["rural_pop_percent"],
+                    user_inputs["suburban_pop_percent"],
+                    user_inputs["urban_pop_percent"],
+                    user_inputs["rt_energy_elec_motion"],
+                    user_inputs["f_energy_elec_motion"],
+                    user_inputs["icr_energy_elec_motion"],
+                    user_inputs["change_freight_rail"],
+                    user_inputs["change_inter_city_rail"],
+                )[0],
+                1,
+            ),
+            round(
+                calc_aviation_ghg(user_inputs["change_pop"], user_inputs["change_air_travel"]), 1
+            ),
+            round(
+                calc_other_mobile_ghg(
+                    user_inputs["grid_coal"],
+                    user_inputs["grid_ng"],
+                    user_inputs["grid_oil"],
+                    user_inputs["grid_other_ff"],
+                    user_inputs["mp_energy_elec_motion"],
+                    user_inputs["change_marine_port"],
+                    user_inputs["change_off_road"],
+                    user_inputs["or_energy_elec_motion"],
+                )[0],
+                1,
+            ),
+            round(
+                calc_non_energy_ghg(
+                    user_inputs["ci_energy_elec"],
+                    user_inputs["grid_coal"],
+                    user_inputs["grid_ng"],
+                    user_inputs["grid_oil"],
+                    user_inputs["grid_other_ff"],
+                    user_inputs["change_ag"],
+                    user_inputs["res_energy_change"],
+                    user_inputs["ci_energy_change"],
+                    user_inputs["change_forest"],
+                    user_inputs["change_industrial_processes"],
+                    user_inputs["change_urban_trees"],
+                    user_inputs["change_solid_waste"],
+                    user_inputs["change_wastewater"],
+                    user_inputs["change_pop"],
+                    user_inputs["rur_energy_elec"],
+                    user_inputs["sub_energy_elec"],
+                    user_inputs["urb_energy_elec"],
+                    user_inputs["rural_pop_percent"],
+                    user_inputs["suburban_pop_percent"],
+                    user_inputs["urban_pop_percent"],
+                ),
+                1,
             ),
         ],
     }
@@ -2020,8 +2043,8 @@ def wrangle_data_for_pie_chart(user_inputs):
         "Other Fossil Fuel": user_inputs["grid_other_ff"],
     }
 
-    data = pd.Series(x).reset_index(name="Percentage").rename(columns={"index": "FuelType"})
-    data["angle"] = data["Percentage"] / data["Percentage"].sum() * 2 * pi
+    data = pd.Series(x).reset_index(name="percentage").rename(columns={"index": "fuel_type"})
+    data["angle"] = data["percentage"] / data["percentage"].sum() * 2 * pi
     data["color"] = Spectral10
 
     return data
@@ -2057,10 +2080,11 @@ def create_bar_chart(data, source):
         x_range=data["Category"],
         y_range=(-25, 50),
         plot_height=500,
-        plot_width=450,
+        plot_width=750,
         y_axis_label="Million Metric Tons of CO2e",
         title="Greenhouse Gas Emissions in Greater Philadelphia",
         name="barchart",
+        toolbar_location="below",
     )
     bar_chart.vbar(
         x=dodge("Category", -0.15, range=bar_chart.x_range),
@@ -2088,7 +2112,7 @@ def create_bar_chart(data, source):
         x_offset=4,
         y_offset=5,
         text="Scenario",
-        text_font_size="9px",
+        text_font_size="10px",
         angle=1.57,
         level="glyph",
         source=source,
@@ -2099,15 +2123,14 @@ def create_bar_chart(data, source):
         x_offset=-10,
         y_offset=5,
         text="2015",
-        text_font_size="9px",
+        text_font_size="10px",
         angle=1.57,
         level="glyph",
         source=source,
     )
     bar_chart.add_layout(labels_scenario)
     bar_chart.add_layout(labels_2015)
-    bar_chart_legend = bar_chart.legend[0]
-    bar_chart.add_layout(bar_chart_legend, "left")
+    bar_chart.add_layout(bar_chart.legend[0], "right")
 
     return bar_chart
 
@@ -2123,10 +2146,11 @@ def create_stacked_chart(data, source):
     stacked_bar_chart = figure(
         x_range=data["Year"],
         y_range=(-50, 100),
-        plot_height=500,
-        plot_width=500,
+        plot_height=400,
+        plot_width=750,
         y_axis_label="Million Metric Tons of CO2e",
         title="Greenhouse Gas Emissions in Greater Philadelphia",
+        toolbar_location="below",
     )
     stacked_bar_chart.vbar_stack(
         SECTORS,
@@ -2137,8 +2161,7 @@ def create_stacked_chart(data, source):
         legend_label=SECTORS,
     )
     stacked_bar_chart.legend[0].items.reverse()  # Reverse legend items to match order in stack
-    stacked_bar_chart_legend = stacked_bar_chart.legend[0]
-    stacked_bar_chart.add_layout(stacked_bar_chart_legend, "left")
+    stacked_bar_chart.add_layout(stacked_bar_chart.legend[0], "right")
 
     return stacked_bar_chart
 
@@ -2152,11 +2175,10 @@ def create_pie_chart(source):
     """
     pie_chart = figure(
         title="Electricity Grid Resource Mix",
-        toolbar_location=None,
+        toolbar_location="below",
         plot_height=400,
         plot_width=750,
-        tools="hover",
-        tooltips="@FuelType: @Percentage",
+        tooltips="@fuel_type: @percentage",
         x_range=(-0.5, 1.0),
     )
     pie_chart.wedge(
@@ -2167,11 +2189,12 @@ def create_pie_chart(source):
         end_angle=cumsum("angle"),
         line_color="white",
         fill_color="color",
-        legend_field="FuelType",
+        legend_field="fuel_type",
         source=source,
     )
     pie_chart.axis.axis_label = None
     pie_chart.axis.visible = False
     pie_chart.grid.grid_line_color = None
+    pie_chart.add_layout(pie_chart.legend[0], "right")
 
     return pie_chart

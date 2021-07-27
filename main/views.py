@@ -682,10 +682,19 @@ def electricity_grid_handler(doc: Document) -> None:
     pie_chart_source = ColumnDataSource(data=pie_chart_data)
     pie_chart = create_pie_chart(pie_chart_source)
 
+    bar_chart.margin = (0, 0, 15, 0)
+    stacked_chart.margin = (0, 0, 15, 0)
+
     # @LAYOUT: changed to row. Look into grid and whatnot
-    charts = column(bar_chart, stacked_chart, pie_chart, sizing_mode="scale_width")
+    charts = column(
+        bar_chart,
+        stacked_chart,
+        pie_chart,
+        sizing_mode="stretch_width",
+        margin=(0, 15, 0, 15),
+    )
     doc.theme = Theme(filename="main/static/main/ghg_bokeh_theme.yaml")
-    doc.add_root(layout([[inputs, charts]]))
+    doc.add_root(layout([[inputs, charts]], css_classes=["center"]))
 
 
 def electricity_grid(request: HttpRequest) -> HttpResponse:

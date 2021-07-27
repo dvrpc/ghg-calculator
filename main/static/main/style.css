@@ -12,10 +12,16 @@
   --header-text-color: #312509;
 }
 body {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto;
+  grid-template-areas:
+    "nav header"
+    "nav main"
+    "nav footer";
   line-height: 1.2;
   font-size: 16px;
   margin: 0;
-  padding: 0;
   font-family: 'Roboto', sans-serif;
   
   /* @GRADIENTS */
@@ -66,16 +72,18 @@ p {
 /********/
 /* Nav */
 nav {
-  padding: 10px 0 0 0;
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  overflow-y: scroll;
-  overflow-x: hidden;
+  overflow-y: auto;
   background: #67B26F;
   scrollbar-color: gray transparent;
   border-right: 2px solid green;
+  grid-area: nav;
+  min-width: 400px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  bottom: 0;
 }
+
 #project-logo-main {
   filter: drop-shadow(var(--icon-shadow));
   width: 60px;
@@ -93,8 +101,7 @@ nav {
 /* Header */
 
 header {
-  margin-left: 400px;
-  padding: 0 10px 0 10px;
+  grid-area: header;
 }
 
 h1 {
@@ -110,9 +117,7 @@ h1 a, h1 a:hover {
 .header-paragraph {
   font-size: var(--font-large);
   margin: 0 auto 45px auto;
-  padding: 0 auto 45px auto;
   line-height: 1.7;
-  align-self: flex-end;
 }
 /* END Header */
 /***********/
@@ -124,6 +129,7 @@ h1 a, h1 a:hover {
 #homepage-cat-list {
   list-style-type: none;
   padding-left: 0;
+  padding-top: 15px;
 }
 #homepage-cat-list a {
   color: var(--main-text-color);
@@ -157,9 +163,8 @@ figure a {
 /* @TODO get back into this */
 main {
   background-color: transparent;
-  margin-left: 400px;
   padding: 20px;
-  padding: 0 auto;
+  grid-area: main;
 }
 /* END Chart Pages */
 /****************/
@@ -171,12 +176,20 @@ main {
 footer {
   /* background: rgba(0,0,0,0.1); */
   margin-top: 3%;
-  margin-left: 400px;
   padding: 20px;
+  grid-area: footer;
 }
 /**********/
 /* END Footer */
 
+.chart {
+  margin: 15px;
+  padding: 15px;
+}
+
+.center {
+  margin: 0 auto;
+}
 
 
 /**********************/
