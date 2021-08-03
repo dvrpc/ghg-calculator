@@ -10,9 +10,12 @@ from bokeh.themes import Theme
 from bokeh_apps.ghg_calc import (
     wrangle_data_for_bar_chart,
     wrangle_data_for_stacked_chart,
+    wrangle_data_for_stacked_chart2,
+    wrangle_data_for_stacked_chart3,
     wrangle_data_for_pie_chart,
     create_bar_chart,
     create_stacked_chart,
+    create_stacked_chart2,
     create_pie_chart,
     user_inputs,
     URBAN_POP_PERCENT,
@@ -553,6 +556,8 @@ def sequestration_storage_handler(doc: Document) -> None:
         user_inputs["air_capture"] = air_capture_slider.value
         bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
         stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
+        stacked_chart_positive_source.data = wrangle_data_for_stacked_chart2(user_inputs)
+        stacked_chart_negative_source.data = wrangle_data_for_stacked_chart3(user_inputs)
 
     # sequestration
     change_urban_trees_slider = Slider(
@@ -585,8 +590,17 @@ def sequestration_storage_handler(doc: Document) -> None:
     bar_chart = create_bar_chart(bar_chart_data, bar_chart_source)
 
     stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
+    stacked_chart_positive_data = wrangle_data_for_stacked_chart2(user_inputs)
+    stacked_chart_negative_data = wrangle_data_for_stacked_chart3(user_inputs)
     stacked_chart_source = ColumnDataSource(data=stacked_chart_data)
-    stacked_chart = create_stacked_chart(stacked_chart_data, stacked_chart_source)
+    stacked_chart_positive_source = ColumnDataSource(data=stacked_chart_positive_data)
+    stacked_chart_negative_source = ColumnDataSource(data=stacked_chart_negative_data)
+    stacked_chart = create_stacked_chart2(
+        stacked_chart_positive_data,
+        stacked_chart_negative_data,
+        stacked_chart_positive_source,
+        stacked_chart_negative_source,
+    )
 
     inputs = Column(
         change_urban_trees_slider,

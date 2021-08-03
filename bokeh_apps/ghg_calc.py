@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 from bokeh.models import LabelSet
-from bokeh.palettes import Viridis8, Spectral10
+from bokeh.palettes import Viridis7, Viridis8, Spectral10
 from bokeh.plotting import figure
 from bokeh.transform import dodge, cumsum
 
@@ -2028,6 +2028,167 @@ def wrangle_data_for_stacked_chart(user_inputs):
     return data
 
 
+def wrangle_data_for_stacked_chart2(user_inputs):
+    # Transpose data
+    data = {
+        "Year": ["2015", "Scenario"],
+        "Residential Stationary Energy": [
+            GHG_RES,
+            calc_res_ghg(
+                user_inputs["grid_coal"],
+                user_inputs["grid_ng"],
+                user_inputs["grid_oil"],
+                user_inputs["grid_other_ff"],
+                user_inputs["res_energy_change"],
+                user_inputs["change_pop"],
+                user_inputs["rur_energy_elec"],
+                user_inputs["sub_energy_elec"],
+                user_inputs["urb_energy_elec"],
+                user_inputs["rural_pop_percent"],
+                user_inputs["suburban_pop_percent"],
+                user_inputs["urban_pop_percent"],
+            )[0],
+        ],
+        "Non-Residential Stationary Energy": [
+            GHG_CI,
+            calc_ci_ghg(
+                user_inputs["ci_energy_elec"],
+                user_inputs["grid_coal"],
+                user_inputs["grid_ng"],
+                user_inputs["grid_oil"],
+                user_inputs["grid_other_ff"],
+                user_inputs["ci_energy_change"],
+            )[0],
+        ],
+        "On-Road Motor Vehicles": [
+            GHG_HIGHWAY,
+            calc_highway_ghg(
+                user_inputs["grid_coal"],
+                user_inputs["grid_ng"],
+                user_inputs["grid_oil"],
+                user_inputs["grid_other_ff"],
+                user_inputs["veh_miles_elec"],
+                user_inputs["change_pop"],
+                user_inputs["reg_fleet_mpg"],
+                user_inputs["rural_pop_percent"],
+                user_inputs["suburban_pop_percent"],
+                user_inputs["urban_pop_percent"],
+                user_inputs["change_veh_miles"],
+            )[0],
+        ],
+        "Rail": [
+            GHG_RAIL,
+            calc_rail_ghg(
+                user_inputs["grid_coal"],
+                user_inputs["grid_ng"],
+                user_inputs["grid_oil"],
+                user_inputs["grid_other_ff"],
+                user_inputs["change_rail_transit"],
+                user_inputs["change_pop"],
+                user_inputs["rural_pop_percent"],
+                user_inputs["suburban_pop_percent"],
+                user_inputs["urban_pop_percent"],
+                user_inputs["rt_energy_elec_motion"],
+                user_inputs["f_energy_elec_motion"],
+                user_inputs["icr_energy_elec_motion"],
+                user_inputs["change_freight_rail"],
+                user_inputs["change_inter_city_rail"],
+            )[0],
+        ],
+        "Aviation": [
+            GHG_AVIATION,
+            calc_aviation_ghg(user_inputs["change_pop"], user_inputs["change_air_travel"]),
+        ],
+        "Other Mobile Energy": [
+            GHG_OTHER_MOBILE,
+            calc_other_mobile_ghg(
+                user_inputs["grid_coal"],
+                user_inputs["grid_ng"],
+                user_inputs["grid_oil"],
+                user_inputs["grid_other_ff"],
+                user_inputs["mp_energy_elec_motion"],
+                user_inputs["change_marine_port"],
+                user_inputs["change_off_road"],
+                user_inputs["or_energy_elec_motion"],
+            )[0],
+        ],
+        "Non-Energy": [
+            GHG_NON_ENERGY,
+            calc_non_energy_ghg(
+                user_inputs["ci_energy_elec"],
+                user_inputs["grid_coal"],
+                user_inputs["grid_ng"],
+                user_inputs["grid_oil"],
+                user_inputs["grid_other_ff"],
+                user_inputs["change_ag"],
+                user_inputs["res_energy_change"],
+                user_inputs["ci_energy_change"],
+                user_inputs["change_forest"],
+                user_inputs["change_industrial_processes"],
+                user_inputs["change_urban_trees"],
+                user_inputs["change_solid_waste"],
+                user_inputs["change_wastewater"],
+                user_inputs["change_pop"],
+                user_inputs["rur_energy_elec"],
+                user_inputs["sub_energy_elec"],
+                user_inputs["urb_energy_elec"],
+                user_inputs["rural_pop_percent"],
+                user_inputs["suburban_pop_percent"],
+                user_inputs["urban_pop_percent"],
+            ),
+        ],
+    }
+    return data
+
+
+def wrangle_data_for_stacked_chart3(user_inputs):
+    # Transpose data
+    data = {
+        "Year": ["2015", "Scenario"],
+        "Carbon Sequestration & Storage": [
+            GHG_SEQ,
+            calc_sequestration(
+                user_inputs["grid_coal"],
+                user_inputs["grid_ng"],
+                user_inputs["grid_oil"],
+                user_inputs["grid_other_ff"],
+                user_inputs["res_energy_change"],
+                user_inputs["change_pop"],
+                user_inputs["rur_energy_elec"],
+                user_inputs["sub_energy_elec"],
+                user_inputs["urb_energy_elec"],
+                user_inputs["rural_pop_percent"],
+                user_inputs["suburban_pop_percent"],
+                user_inputs["urban_pop_percent"],
+                user_inputs["ci_energy_elec"],
+                user_inputs["ci_energy_change"],
+                user_inputs["veh_miles_elec"],
+                user_inputs["reg_fleet_mpg"],
+                user_inputs["change_veh_miles"],
+                user_inputs["change_rail_transit"],
+                user_inputs["rt_energy_elec_motion"],
+                user_inputs["f_energy_elec_motion"],
+                user_inputs["icr_energy_elec_motion"],
+                user_inputs["change_freight_rail"],
+                user_inputs["change_inter_city_rail"],
+                user_inputs["mp_energy_elec_motion"],
+                user_inputs["change_marine_port"],
+                user_inputs["change_off_road"],
+                user_inputs["or_energy_elec_motion"],
+                user_inputs["change_ag"],
+                user_inputs["change_industrial_processes"],
+                user_inputs["change_solid_waste"],
+                user_inputs["change_wastewater"],
+                user_inputs["change_forest"],
+                user_inputs["change_urban_trees"],
+                user_inputs["ff_carbon_capture"],
+                user_inputs["air_capture"],
+            ),
+        ],
+    }
+    return data
+
+
 def wrangle_data_for_pie_chart(user_inputs):
     """Configure data and plot for pie chart."""
     x = {
@@ -2162,6 +2323,56 @@ def create_stacked_chart(data, source):
     )
     stacked_bar_chart.legend[0].items.reverse()  # Reverse legend items to match order in stack
     stacked_bar_chart.add_layout(stacked_bar_chart.legend[0], "right")
+
+    return stacked_bar_chart
+
+
+SECTORS1 = [
+    "Residential Stationary Energy",
+    "Non-Residential Stationary Energy",
+    "On-Road Motor Vehicles",
+    "Rail",
+    "Aviation",
+    "Other Mobile Energy",
+    "Non-Energy",
+]
+
+
+def create_stacked_chart2(positive_data, negative_data, positive_source, negative_source):
+    """
+    Return a figure object.
+
+    *data* is output of wrangle_data_for_stacked_chart().
+
+    *source* is the result of feeding *data* into bokeh's ColumnDataSource().
+    """
+    stacked_bar_chart = figure(
+        x_range=positive_data["Year"],
+        y_range=(-50, 100),
+        plot_height=500,
+        plot_width=500,
+        y_axis_label="Million Metric Tons of CO2e",
+        title="Greenhouse Gas Emissions in Greater Philadelphia",
+    )
+    stacked_bar_chart.vbar_stack(
+        ["Carbon Sequestration & Storage"],
+        x="Year",
+        width=0.4,
+        color=Viridis8[:1],
+        source=negative_source,
+        legend_label=["Carbon Sequestration & Storage"],
+    )
+    stacked_bar_chart.vbar_stack(
+        SECTORS1,
+        x="Year",
+        width=0.4,
+        color=Viridis8[1:],
+        source=positive_source,
+        legend_label=SECTORS1,
+    )
+    stacked_bar_chart.legend[0].items.reverse()  # Reverse legend items to match order in stack
+    stacked_bar_chart_legend = stacked_bar_chart.legend[0]
+    stacked_bar_chart.add_layout(stacked_bar_chart_legend, "right")
 
     return stacked_bar_chart
 
