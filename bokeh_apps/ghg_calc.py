@@ -2028,7 +2028,7 @@ def wrangle_data_for_stacked_chart(user_inputs):
     return data
 
 
-def wrangle_data_for_stacked_chart2(user_inputs):
+def wrangle_pos_data_for_stacked_chart(user_inputs):
     # Transpose data
     data = {
         "Year": ["2015", "Scenario"],
@@ -2141,7 +2141,7 @@ def wrangle_data_for_stacked_chart2(user_inputs):
     return data
 
 
-def wrangle_data_for_stacked_chart3(user_inputs):
+def wrangle_neg_data_for_stacked_chart(user_inputs):
     # Transpose data
     data = {
         "Year": ["2015", "Scenario"],
@@ -2266,7 +2266,6 @@ def create_bar_chart(data, source):
     bar_chart.xaxis.major_label_orientation = np.pi / 4
     bar_chart.x_range.range_padding = 0.1
 
-    # temporary data labels
     labels_scenario = LabelSet(
         x=dodge("Category", 0.15, range=bar_chart.x_range),
         y="Scenario",
@@ -2296,38 +2295,7 @@ def create_bar_chart(data, source):
     return bar_chart
 
 
-def create_stacked_chart(data, source):
-    """
-    Return a figure object.
-
-    *data* is output of wrangle_data_for_stacked_chart().
-
-    *source* is the result of feeding *data* into bokeh's ColumnDataSource().
-    """
-    stacked_bar_chart = figure(
-        x_range=data["Year"],
-        y_range=(-50, 100),
-        plot_height=400,
-        plot_width=750,
-        y_axis_label="Million Metric Tons of CO2e",
-        title="Greenhouse Gas Emissions in Greater Philadelphia",
-        toolbar_location="below",
-    )
-    stacked_bar_chart.vbar_stack(
-        SECTORS,
-        x="Year",
-        width=0.4,
-        color=Viridis8,
-        source=source,
-        legend_label=SECTORS,
-    )
-    stacked_bar_chart.legend[0].items.reverse()  # Reverse legend items to match order in stack
-    stacked_bar_chart.add_layout(stacked_bar_chart.legend[0], "right")
-
-    return stacked_bar_chart
-
-
-SECTORS1 = [
+POS_SECTORS = [
     "Residential Stationary Energy",
     "Non-Residential Stationary Energy",
     "On-Road Motor Vehicles",
@@ -2338,11 +2306,11 @@ SECTORS1 = [
 ]
 
 
-def create_stacked_chart2(positive_data, negative_data, positive_source, negative_source):
+def create_stacked_chart(positive_data, negative_data, positive_source, negative_source):
     """
     Return a figure object.
 
-    *data* is output of wrangle_data_for_stacked_chart().
+    *positive_data* is output of wrangle_data_for_stacked_chart().
 
     *source* is the result of feeding *data* into bokeh's ColumnDataSource().
     """
@@ -2353,6 +2321,7 @@ def create_stacked_chart2(positive_data, negative_data, positive_source, negativ
         plot_width=500,
         y_axis_label="Million Metric Tons of CO2e",
         title="Greenhouse Gas Emissions in Greater Philadelphia",
+        toolbar_location="below",
     )
     stacked_bar_chart.vbar_stack(
         ["Carbon Sequestration & Storage"],
@@ -2363,12 +2332,12 @@ def create_stacked_chart2(positive_data, negative_data, positive_source, negativ
         legend_label=["Carbon Sequestration & Storage"],
     )
     stacked_bar_chart.vbar_stack(
-        SECTORS1,
+        POS_SECTORS,
         x="Year",
         width=0.4,
         color=Viridis8[1:],
         source=positive_source,
-        legend_label=SECTORS1,
+        legend_label=POS_SECTORS,
     )
     stacked_bar_chart.legend[0].items.reverse()  # Reverse legend items to match order in stack
     stacked_bar_chart_legend = stacked_bar_chart.legend[0]

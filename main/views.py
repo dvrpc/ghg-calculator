@@ -10,12 +10,12 @@ from bokeh.themes import Theme
 from bokeh_apps.ghg_calc import (
     wrangle_data_for_bar_chart,
     wrangle_data_for_stacked_chart,
-    wrangle_data_for_stacked_chart2,
-    wrangle_data_for_stacked_chart3,
+    wrangle_pos_data_for_stacked_chart,
+    wrangle_neg_data_for_stacked_chart,
     wrangle_data_for_pie_chart,
     create_bar_chart,
     create_stacked_chart,
-    create_stacked_chart2,
+    # create_stacked_chart2,
     create_pie_chart,
     user_inputs,
     URBAN_POP_PERCENT,
@@ -99,7 +99,9 @@ def pop_dev_patterns_handler(doc: Document) -> None:
         user_inputs["suburban_pop_percent"] = float(suburban_pop_percent_text_input.value)
         user_inputs["rural_pop_percent"] = float(rural_pop_percent_text_input.value)
         bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
-        stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
+        # stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
+        stacked_chart_positive_source.data = wrangle_pos_data_for_stacked_chart(user_inputs)
+        stacked_chart_negative_source.data = wrangle_neg_data_for_stacked_chart(user_inputs)
 
     pop_slider = Slider(start=-100, end=100, value=0, step=10, title="% Change in Population")
     pop_slider.on_change("value", callback)
@@ -126,9 +128,20 @@ def pop_dev_patterns_handler(doc: Document) -> None:
     bar_chart_source = ColumnDataSource(data=bar_chart_data)
     bar_chart = create_bar_chart(bar_chart_data, bar_chart_source)
 
-    stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
-    stacked_chart_source = ColumnDataSource(data=stacked_chart_data)
-    stacked_chart = create_stacked_chart(stacked_chart_data, stacked_chart_source)
+    # stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
+    # stacked_chart_source = ColumnDataSource(data=stacked_chart_data)
+    # stacked_chart = create_stacked_chart(stacked_chart_data, stacked_chart_source)
+
+    stacked_chart_positive_data = wrangle_pos_data_for_stacked_chart(user_inputs)
+    stacked_chart_negative_data = wrangle_neg_data_for_stacked_chart(user_inputs)
+    stacked_chart_positive_source = ColumnDataSource(data=stacked_chart_positive_data)
+    stacked_chart_negative_source = ColumnDataSource(data=stacked_chart_negative_data)
+    stacked_chart = create_stacked_chart(
+        stacked_chart_positive_data,
+        stacked_chart_negative_data,
+        stacked_chart_positive_source,
+        stacked_chart_negative_source,
+    )
 
     inputs = Column(
         pop_slider,
@@ -138,8 +151,21 @@ def pop_dev_patterns_handler(doc: Document) -> None:
         sizing_mode="fixed",
         width=150,
     )
-    charts = row(bar_chart, inputs, stacked_chart, sizing_mode="stretch_both")
-    doc.add_root(layout([[charts]]))
+    # charts = row(bar_chart, inputs, stacked_chart, sizing_mode="stretch_both")
+    # doc.add_root(layout([[charts]]))
+
+    # layout of charts
+    bar_chart.margin = (0, 0, 15, 0)
+    stacked_chart.margin = (0, 0, 15, 0)
+
+    charts = column(
+        bar_chart,
+        stacked_chart,
+        sizing_mode="stretch_width",
+        margin=(0, 15, 0, 15),
+    )
+    doc.theme = Theme(filename="main/static/main/ghg_bokeh_theme.yaml")
+    doc.add_root(layout([[inputs, charts]], css_classes=["center"]))
 
 
 def pop_dev_patterns(request: HttpRequest) -> HttpResponse:
@@ -154,7 +180,9 @@ def res_stationary_handler(doc: Document) -> None:
         user_inputs["sub_energy_elec"] = sub_energy_elec_slider.value
         user_inputs["rur_energy_elec"] = rur_energy_elec_slider.value
         bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
-        stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
+        # stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
+        stacked_chart_positive_source.data = wrangle_pos_data_for_stacked_chart(user_inputs)
+        stacked_chart_negative_source.data = wrangle_neg_data_for_stacked_chart(user_inputs)
 
     # residential
     res_energy_change_slider = Slider(
@@ -196,9 +224,20 @@ def res_stationary_handler(doc: Document) -> None:
     bar_chart_source = ColumnDataSource(data=bar_chart_data)
     bar_chart = create_bar_chart(bar_chart_data, bar_chart_source)
 
-    stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
-    stacked_chart_source = ColumnDataSource(data=stacked_chart_data)
-    stacked_chart = create_stacked_chart(stacked_chart_data, stacked_chart_source)
+    # stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
+    # stacked_chart_source = ColumnDataSource(data=stacked_chart_data)
+    # stacked_chart = create_stacked_chart(stacked_chart_data, stacked_chart_source)
+
+    stacked_chart_positive_data = wrangle_pos_data_for_stacked_chart(user_inputs)
+    stacked_chart_negative_data = wrangle_neg_data_for_stacked_chart(user_inputs)
+    stacked_chart_positive_source = ColumnDataSource(data=stacked_chart_positive_data)
+    stacked_chart_negative_source = ColumnDataSource(data=stacked_chart_negative_data)
+    stacked_chart = create_stacked_chart(
+        stacked_chart_positive_data,
+        stacked_chart_negative_data,
+        stacked_chart_positive_source,
+        stacked_chart_negative_source,
+    )
 
     inputs = Column(
         res_energy_change_slider,
@@ -207,8 +246,21 @@ def res_stationary_handler(doc: Document) -> None:
         rur_energy_elec_slider,
     )
     # @HERE
-    charts = row(bar_chart, inputs, stacked_chart, sizing_mode="stretch_both")
-    doc.add_root(layout([[charts]]))
+    # charts = row(bar_chart, inputs, stacked_chart, sizing_mode="stretch_both")
+    # doc.add_root(layout([[charts]]))
+
+    # layout of charts
+    bar_chart.margin = (0, 0, 15, 0)
+    stacked_chart.margin = (0, 0, 15, 0)
+
+    charts = column(
+        bar_chart,
+        stacked_chart,
+        sizing_mode="stretch_width",
+        margin=(0, 15, 0, 15),
+    )
+    doc.theme = Theme(filename="main/static/main/ghg_bokeh_theme.yaml")
+    doc.add_root(layout([[inputs, charts]], css_classes=["center"]))
 
 
 def res_stationary(request: HttpRequest) -> HttpResponse:
@@ -221,7 +273,9 @@ def non_res_stationary_handler(doc: Document) -> None:
         user_inputs["ci_energy_change"] = ci_energy_change_slider.value
         user_inputs["ci_energy_elec"] = ci_energy_elec_slider.value
         bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
-        stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
+        # stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
+        stacked_chart_positive_source.data = wrangle_pos_data_for_stacked_chart(user_inputs)
+        stacked_chart_negative_source.data = wrangle_neg_data_for_stacked_chart(user_inputs)
 
     # commercial and industrial
     ci_energy_change_slider = Slider(
@@ -246,17 +300,41 @@ def non_res_stationary_handler(doc: Document) -> None:
     bar_chart_source = ColumnDataSource(data=bar_chart_data)
     bar_chart = create_bar_chart(bar_chart_data, bar_chart_source)
 
-    stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
-    stacked_chart_source = ColumnDataSource(data=stacked_chart_data)
-    stacked_chart = create_stacked_chart(stacked_chart_data, stacked_chart_source)
+    # stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
+    # stacked_chart_source = ColumnDataSource(data=stacked_chart_data)
+    # stacked_chart = create_stacked_chart(stacked_chart_data, stacked_chart_source)
+
+    stacked_chart_positive_data = wrangle_pos_data_for_stacked_chart(user_inputs)
+    stacked_chart_negative_data = wrangle_neg_data_for_stacked_chart(user_inputs)
+    stacked_chart_positive_source = ColumnDataSource(data=stacked_chart_positive_data)
+    stacked_chart_negative_source = ColumnDataSource(data=stacked_chart_negative_data)
+    stacked_chart = create_stacked_chart(
+        stacked_chart_positive_data,
+        stacked_chart_negative_data,
+        stacked_chart_positive_source,
+        stacked_chart_negative_source,
+    )
 
     inputs = Column(
         ci_energy_change_slider,
         ci_energy_elec_slider,
     )
     # @LAYOUT: changed to row. Look into grid and whatnot
-    charts = row(bar_chart, inputs, stacked_chart, sizing_mode="stretch_both")
-    doc.add_root(layout([[charts]]))
+    # charts = row(bar_chart, inputs, stacked_chart, sizing_mode="stretch_both")
+    # doc.add_root(layout([[charts]]))
+
+    # layout of charts
+    bar_chart.margin = (0, 0, 15, 0)
+    stacked_chart.margin = (0, 0, 15, 0)
+
+    charts = column(
+        bar_chart,
+        stacked_chart,
+        sizing_mode="stretch_width",
+        margin=(0, 15, 0, 15),
+    )
+    doc.theme = Theme(filename="main/static/main/ghg_bokeh_theme.yaml")
+    doc.add_root(layout([[inputs, charts]], css_classes=["center"]))
 
 
 def non_res_stationary(request: HttpRequest) -> HttpResponse:
@@ -270,7 +348,9 @@ def on_road_motor_veh_handler(doc: Document) -> None:
         user_inputs["reg_fleet_mpg"] = reg_fleet_mpg_slider.value
         user_inputs["veh_miles_elec"] = veh_miles_elec_slider.value
         bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
-        stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
+        # stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
+        stacked_chart_positive_source.data = wrangle_pos_data_for_stacked_chart(user_inputs)
+        stacked_chart_negative_source.data = wrangle_neg_data_for_stacked_chart(user_inputs)
 
     change_veh_miles_slider = Slider(
         start=-100, end=100, value=0, step=1, title="% Change in Vehicle Miles Traveled per Person"
@@ -295,18 +375,39 @@ def on_road_motor_veh_handler(doc: Document) -> None:
     bar_chart_source = ColumnDataSource(data=bar_chart_data)
     bar_chart = create_bar_chart(bar_chart_data, bar_chart_source)
 
-    stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
-    stacked_chart_source = ColumnDataSource(data=stacked_chart_data)
-    stacked_chart = create_stacked_chart(stacked_chart_data, stacked_chart_source)
+    # stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
+    # stacked_chart_source = ColumnDataSource(data=stacked_chart_data)
+    # stacked_chart = create_stacked_chart(stacked_chart_data, stacked_chart_source)
+
+    stacked_chart_positive_data = wrangle_pos_data_for_stacked_chart(user_inputs)
+    stacked_chart_negative_data = wrangle_neg_data_for_stacked_chart(user_inputs)
+    stacked_chart_positive_source = ColumnDataSource(data=stacked_chart_positive_data)
+    stacked_chart_negative_source = ColumnDataSource(data=stacked_chart_negative_data)
+    stacked_chart = create_stacked_chart(
+        stacked_chart_positive_data,
+        stacked_chart_negative_data,
+        stacked_chart_positive_source,
+        stacked_chart_negative_source,
+    )
 
     inputs = Column(
         change_veh_miles_slider,
         veh_miles_elec_slider,
         reg_fleet_mpg_slider,
     )
-    # @LAYOUT: changed to row. Look into grid and whatnot
-    charts = row(bar_chart, inputs, stacked_chart, sizing_mode="stretch_both")
-    doc.add_root(layout([[charts]]))
+
+    # layout of charts
+    bar_chart.margin = (0, 0, 15, 0)
+    stacked_chart.margin = (0, 0, 15, 0)
+
+    charts = column(
+        bar_chart,
+        stacked_chart,
+        sizing_mode="stretch_width",
+        margin=(0, 15, 0, 15),
+    )
+    doc.theme = Theme(filename="main/static/main/ghg_bokeh_theme.yaml")
+    doc.add_root(layout([[inputs, charts]], css_classes=["center"]))
 
 
 def on_road_motor_veh(request: HttpRequest) -> HttpResponse:
@@ -323,7 +424,8 @@ def rail_handler(doc: Document) -> None:
         user_inputs["change_inter_city_rail"] = change_inter_city_rail_slider.value
         user_inputs["icr_energy_elec_motion"] = icr_energy_elec_motion_slider.value
         bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
-        stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
+        stacked_chart_positive_source.data = wrangle_pos_data_for_stacked_chart(user_inputs)
+        stacked_chart_negative_source.data = wrangle_neg_data_for_stacked_chart(user_inputs)
 
     # transit rail
     change_rail_transit_slider = Slider(
@@ -374,9 +476,16 @@ def rail_handler(doc: Document) -> None:
     bar_chart_source = ColumnDataSource(data=bar_chart_data)
     bar_chart = create_bar_chart(bar_chart_data, bar_chart_source)
 
-    stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
-    stacked_chart_source = ColumnDataSource(data=stacked_chart_data)
-    stacked_chart = create_stacked_chart(stacked_chart_data, stacked_chart_source)
+    stacked_chart_positive_data = wrangle_pos_data_for_stacked_chart(user_inputs)
+    stacked_chart_negative_data = wrangle_neg_data_for_stacked_chart(user_inputs)
+    stacked_chart_positive_source = ColumnDataSource(data=stacked_chart_positive_data)
+    stacked_chart_negative_source = ColumnDataSource(data=stacked_chart_negative_data)
+    stacked_chart = create_stacked_chart(
+        stacked_chart_positive_data,
+        stacked_chart_negative_data,
+        stacked_chart_positive_source,
+        stacked_chart_negative_source,
+    )
 
     inputs = Column(
         change_rail_transit_slider,
@@ -386,9 +495,19 @@ def rail_handler(doc: Document) -> None:
         change_inter_city_rail_slider,
         icr_energy_elec_motion_slider,
     )
-    # @LAYOUT: changed to row. Look into grid and whatnot
-    charts = row(bar_chart, inputs, stacked_chart, sizing_mode="stretch_both")
-    doc.add_root(layout([[charts]]))
+
+    # layout of charts
+    bar_chart.margin = (0, 0, 15, 0)
+    stacked_chart.margin = (0, 0, 15, 0)
+
+    charts = column(
+        bar_chart,
+        stacked_chart,
+        sizing_mode="stretch_width",
+        margin=(0, 15, 0, 15),
+    )
+    doc.theme = Theme(filename="main/static/main/ghg_bokeh_theme.yaml")
+    doc.add_root(layout([[inputs, charts]], css_classes=["center"]))
 
 
 def rail(request: HttpRequest) -> HttpResponse:
@@ -400,7 +519,8 @@ def aviation_handler(doc: Document) -> None:
     def callback(attr, old, new):
         user_inputs["change_air_travel"] = change_air_travel_slider.value
         bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
-        stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
+        stacked_chart_positive_source.data = wrangle_pos_data_for_stacked_chart(user_inputs)
+        stacked_chart_negative_source.data = wrangle_neg_data_for_stacked_chart(user_inputs)
 
     change_air_travel_slider = Slider(
         start=-100, end=100, value=0, step=1, title="% Change in Air Travel"
@@ -411,16 +531,33 @@ def aviation_handler(doc: Document) -> None:
     bar_chart_source = ColumnDataSource(data=bar_chart_data)
     bar_chart = create_bar_chart(bar_chart_data, bar_chart_source)
 
-    stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
-    stacked_chart_source = ColumnDataSource(data=stacked_chart_data)
-    stacked_chart = create_stacked_chart(stacked_chart_data, stacked_chart_source)
+    stacked_chart_positive_data = wrangle_pos_data_for_stacked_chart(user_inputs)
+    stacked_chart_negative_data = wrangle_neg_data_for_stacked_chart(user_inputs)
+    stacked_chart_positive_source = ColumnDataSource(data=stacked_chart_positive_data)
+    stacked_chart_negative_source = ColumnDataSource(data=stacked_chart_negative_data)
+    stacked_chart = create_stacked_chart(
+        stacked_chart_positive_data,
+        stacked_chart_negative_data,
+        stacked_chart_positive_source,
+        stacked_chart_negative_source,
+    )
 
     inputs = Column(
         change_air_travel_slider,
     )
-    # @LAYOUT: changed to row. Look into grid and whatnot
-    charts = row(bar_chart, inputs, stacked_chart, sizing_mode="stretch_both")
-    doc.add_root(layout([[charts]]))
+
+    # layout of charts
+    bar_chart.margin = (0, 0, 15, 0)
+    stacked_chart.margin = (0, 0, 15, 0)
+
+    charts = column(
+        bar_chart,
+        stacked_chart,
+        sizing_mode="stretch_width",
+        margin=(0, 15, 0, 15),
+    )
+    doc.theme = Theme(filename="main/static/main/ghg_bokeh_theme.yaml")
+    doc.add_root(layout([[inputs, charts]], css_classes=["center"]))
 
 
 def aviation(request: HttpRequest) -> HttpResponse:
@@ -435,7 +572,8 @@ def mobile_other_handler(doc: Document) -> None:
         user_inputs["change_off_road"] = change_off_road_slider.value
         user_inputs["or_energy_elec_motion"] = or_energy_elec_motion_slider.value
         bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
-        stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
+        stacked_chart_positive_source.data = wrangle_pos_data_for_stacked_chart(user_inputs)
+        stacked_chart_negative_source.data = wrangle_neg_data_for_stacked_chart(user_inputs)
 
     # marine and port
     change_marine_port_slider = Slider(
@@ -471,9 +609,16 @@ def mobile_other_handler(doc: Document) -> None:
     bar_chart_source = ColumnDataSource(data=bar_chart_data)
     bar_chart = create_bar_chart(bar_chart_data, bar_chart_source)
 
-    stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
-    stacked_chart_source = ColumnDataSource(data=stacked_chart_data)
-    stacked_chart = create_stacked_chart(stacked_chart_data, stacked_chart_source)
+    stacked_chart_positive_data = wrangle_pos_data_for_stacked_chart(user_inputs)
+    stacked_chart_negative_data = wrangle_neg_data_for_stacked_chart(user_inputs)
+    stacked_chart_positive_source = ColumnDataSource(data=stacked_chart_positive_data)
+    stacked_chart_negative_source = ColumnDataSource(data=stacked_chart_negative_data)
+    stacked_chart = create_stacked_chart(
+        stacked_chart_positive_data,
+        stacked_chart_negative_data,
+        stacked_chart_positive_source,
+        stacked_chart_negative_source,
+    )
 
     inputs = Column(
         change_marine_port_slider,
@@ -481,9 +626,19 @@ def mobile_other_handler(doc: Document) -> None:
         change_off_road_slider,
         or_energy_elec_motion_slider,
     )
-    # @LAYOUT: changed to row. Look into grid and whatnot
-    charts = row(bar_chart, inputs, stacked_chart, sizing_mode="stretch_both")
-    doc.add_root(layout([[charts]]))
+
+    # layout of charts
+    bar_chart.margin = (0, 0, 15, 0)
+    stacked_chart.margin = (0, 0, 15, 0)
+
+    charts = column(
+        bar_chart,
+        stacked_chart,
+        sizing_mode="stretch_width",
+        margin=(0, 15, 0, 15),
+    )
+    doc.theme = Theme(filename="main/static/main/ghg_bokeh_theme.yaml")
+    doc.add_root(layout([[inputs, charts]], css_classes=["center"]))
 
 
 def mobile_other(request: HttpRequest) -> HttpResponse:
@@ -498,7 +653,8 @@ def non_energy_handler(doc: Document) -> None:
         user_inputs["change_wastewater"] = change_wasterwater_slider.value
         user_inputs["change_industrial_processes"] = change_industrial_processes_slider.value
         bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
-        stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
+        stacked_chart_positive_source.data = wrangle_pos_data_for_stacked_chart(user_inputs)
+        stacked_chart_negative_source.data = wrangle_neg_data_for_stacked_chart(user_inputs)
 
     change_ag_slider = Slider(
         start=-100, end=100, value=0, step=1, title="% Change in Emissions from Agriculture"
@@ -528,9 +684,16 @@ def non_energy_handler(doc: Document) -> None:
     bar_chart_source = ColumnDataSource(data=bar_chart_data)
     bar_chart = create_bar_chart(bar_chart_data, bar_chart_source)
 
-    stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
-    stacked_chart_source = ColumnDataSource(data=stacked_chart_data)
-    stacked_chart = create_stacked_chart(stacked_chart_data, stacked_chart_source)
+    stacked_chart_positive_data = wrangle_pos_data_for_stacked_chart(user_inputs)
+    stacked_chart_negative_data = wrangle_neg_data_for_stacked_chart(user_inputs)
+    stacked_chart_positive_source = ColumnDataSource(data=stacked_chart_positive_data)
+    stacked_chart_negative_source = ColumnDataSource(data=stacked_chart_negative_data)
+    stacked_chart = create_stacked_chart(
+        stacked_chart_positive_data,
+        stacked_chart_negative_data,
+        stacked_chart_positive_source,
+        stacked_chart_negative_source,
+    )
 
     inputs = Column(
         change_ag_slider,
@@ -538,9 +701,19 @@ def non_energy_handler(doc: Document) -> None:
         change_wasterwater_slider,
         change_industrial_processes_slider,
     )
-    # @LAYOUT: changed to row. Look into grid and whatnot
-    charts = row(bar_chart, inputs, stacked_chart)
-    doc.add_root(layout([[charts]]))
+
+    # layout of charts
+    bar_chart.margin = (0, 0, 15, 0)
+    stacked_chart.margin = (0, 0, 15, 0)
+
+    charts = column(
+        bar_chart,
+        stacked_chart,
+        sizing_mode="stretch_width",
+        margin=(0, 15, 0, 15),
+    )
+    doc.theme = Theme(filename="main/static/main/ghg_bokeh_theme.yaml")
+    doc.add_root(layout([[inputs, charts]], css_classes=["center"]))
 
 
 def non_energy(request: HttpRequest) -> HttpResponse:
@@ -555,9 +728,8 @@ def sequestration_storage_handler(doc: Document) -> None:
         user_inputs["ff_carbon_capture"] = ff_carbon_capture_slider.value
         user_inputs["air_capture"] = air_capture_slider.value
         bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
-        stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
-        stacked_chart_positive_source.data = wrangle_data_for_stacked_chart2(user_inputs)
-        stacked_chart_negative_source.data = wrangle_data_for_stacked_chart3(user_inputs)
+        stacked_chart_positive_source.data = wrangle_pos_data_for_stacked_chart(user_inputs)
+        stacked_chart_negative_source.data = wrangle_neg_data_for_stacked_chart(user_inputs)
 
     # sequestration
     change_urban_trees_slider = Slider(
@@ -589,13 +761,11 @@ def sequestration_storage_handler(doc: Document) -> None:
     bar_chart_source = ColumnDataSource(data=bar_chart_data)
     bar_chart = create_bar_chart(bar_chart_data, bar_chart_source)
 
-    stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
-    stacked_chart_positive_data = wrangle_data_for_stacked_chart2(user_inputs)
-    stacked_chart_negative_data = wrangle_data_for_stacked_chart3(user_inputs)
-    stacked_chart_source = ColumnDataSource(data=stacked_chart_data)
+    stacked_chart_positive_data = wrangle_pos_data_for_stacked_chart(user_inputs)
+    stacked_chart_negative_data = wrangle_neg_data_for_stacked_chart(user_inputs)
     stacked_chart_positive_source = ColumnDataSource(data=stacked_chart_positive_data)
     stacked_chart_negative_source = ColumnDataSource(data=stacked_chart_negative_data)
-    stacked_chart = create_stacked_chart2(
+    stacked_chart = create_stacked_chart(
         stacked_chart_positive_data,
         stacked_chart_negative_data,
         stacked_chart_positive_source,
@@ -608,9 +778,19 @@ def sequestration_storage_handler(doc: Document) -> None:
         ff_carbon_capture_slider,
         air_capture_slider,
     )
-    # @LAYOUT: changed to row. Look into grid and whatnot
-    charts = row(bar_chart, inputs, stacked_chart)
-    doc.add_root(layout([[charts]]))
+
+    # layout of charts
+    bar_chart.margin = (0, 0, 15, 0)
+    stacked_chart.margin = (0, 0, 15, 0)
+
+    charts = column(
+        bar_chart,
+        stacked_chart,
+        sizing_mode="stretch_width",
+        margin=(0, 15, 0, 15),
+    )
+    doc.theme = Theme(filename="main/static/main/ghg_bokeh_theme.yaml")
+    doc.add_root(layout([[inputs, charts]], css_classes=["center"]))
 
 
 def sequestration_storage(request: HttpRequest) -> HttpResponse:
@@ -630,9 +810,9 @@ def electricity_grid_handler(doc: Document) -> None:
         user_inputs["grid_hydro"] = float(grid_hydro_input.value)
         user_inputs["grid_geo"] = float(grid_geo_input.value)
         user_inputs["grid_other_ff"] = float(grid_other_ff_input.value)
-        # user_inputs["net_zero_carbon_input"] = (float(net_zero_carbon_input.value_input),)  # TK, possibly
         bar_chart_source.data = wrangle_data_for_bar_chart(user_inputs)
-        stacked_chart_source.data = wrangle_data_for_stacked_chart(user_inputs)
+        stacked_chart_positive_source.data = wrangle_pos_data_for_stacked_chart(user_inputs)
+        stacked_chart_negative_source.data = wrangle_neg_data_for_stacked_chart(user_inputs)
         pie_chart_source.data = wrangle_data_for_pie_chart(user_inputs)
         grid_text.text, grid_text.style = generate_text_and_style(user_inputs)
 
@@ -688,18 +868,25 @@ def electricity_grid_handler(doc: Document) -> None:
     bar_chart_source = ColumnDataSource(data=bar_chart_data)
     bar_chart = create_bar_chart(bar_chart_data, bar_chart_source)
 
-    stacked_chart_data = wrangle_data_for_stacked_chart(user_inputs)
-    stacked_chart_source = ColumnDataSource(data=stacked_chart_data)
-    stacked_chart = create_stacked_chart(stacked_chart_data, stacked_chart_source)
+    stacked_chart_positive_data = wrangle_pos_data_for_stacked_chart(user_inputs)
+    stacked_chart_negative_data = wrangle_neg_data_for_stacked_chart(user_inputs)
+    stacked_chart_positive_source = ColumnDataSource(data=stacked_chart_positive_data)
+    stacked_chart_negative_source = ColumnDataSource(data=stacked_chart_negative_data)
+    stacked_chart = create_stacked_chart(
+        stacked_chart_positive_data,
+        stacked_chart_negative_data,
+        stacked_chart_positive_source,
+        stacked_chart_negative_source,
+    )
 
     pie_chart_data = wrangle_data_for_pie_chart(user_inputs)
     pie_chart_source = ColumnDataSource(data=pie_chart_data)
     pie_chart = create_pie_chart(pie_chart_source)
 
+    # layout of charts
     bar_chart.margin = (0, 0, 15, 0)
     stacked_chart.margin = (0, 0, 15, 0)
 
-    # @LAYOUT: changed to row. Look into grid and whatnot
     charts = column(
         bar_chart,
         stacked_chart,
