@@ -17,92 +17,92 @@
 <body>
   <nav>
     <!-- <img src="" alt="DVRPC logo" /> -->
-    <ul id="homepage-cat-list">
+    <ul id="nav-cat-list">
       <li>
         <figure>
         <a href="{% url 'index' %}">
-          <img src="../static/img/logo-main.svg" alt="Project logo" class="homepage-cat-icon" />
-          <figcaption class="homepage-cat-icon-caption">Home</figcaption>
+          <img src="../static/img/logo-main.svg" alt="Project logo" class="nav-cat-icon" />
+          <figcaption class="nav-cat-icon-caption">Home</figcaption>
         </a>
         </figure>
       </li>
       <li>
         <figure>
           <a href="{% url 'pop' %}">
-            <img src="../static/img/population.svg" alt="icon" class="homepage-cat-icon" />
-            <figcaption class="homepage-cat-icon-caption">Population and Development Patterns</figcaption>
+            <img src="../static/img/population.svg" alt="icon" class="nav-cat-icon" />
+            <figcaption class="nav-cat-icon-caption">Population and Development Patterns</figcaption>
           </a>
         </figure>
       </li>
       <li>
         <figure>
           <a href="{% url 'grid' %}">
-            <img src="../static/img/grid-mix.svg" alt="icon" class="homepage-cat-icon" />
-            <figcaption class="homepage-cat-icon-caption">Electricity Grid</figcaption>
+            <img src="../static/img/grid-mix.svg" alt="icon" class="nav-cat-icon" />
+            <figcaption class="nav-cat-icon-caption">Electricity Grid</figcaption>
           </a>
         </figure>
       </li>
       <li>
         <figure>
           <a href="{% url 'res' %}">
-            <img src="../static/img/res-stationary.svg" alt="icon" class="homepage-cat-icon" />
-            <figcaption class="homepage-cat-icon-caption">Residential Stationary Energy</figcaption>
+            <img src="../static/img/res-stationary.svg" alt="icon" class="nav-cat-icon" />
+            <figcaption class="nav-cat-icon-caption">Residential Stationary Energy</figcaption>
           </a>
         </figure>
       </li>
       <li>
         <figure>
           <a href="{% url 'non_res' %}">
-            <img src="../static/img/ci-stationary.svg" alt="icon" class="homepage-cat-icon" />
-            <figcaption class="homepage-cat-icon-caption">Non-Residential Stationary Energy</figcaption>
+            <img src="../static/img/ci-stationary.svg" alt="icon" class="nav-cat-icon" />
+            <figcaption class="nav-cat-icon-caption">Non-Residential Stationary Energy</figcaption>
           </a>
         </figure>
       </li>
       <li>
         <figure>
           <a href="{% url 'on_road' %}">
-            <img src="../static/img/mobile-highway.svg" alt="icon" class="homepage-cat-icon" />
-            <figcaption class="homepage-cat-icon-caption">On-Road Motor Vehicles</figcaption>
+            <img src="../static/img/mobile-highway.svg" alt="icon" class="nav-cat-icon" />
+            <figcaption class="nav-cat-icon-caption">On-Road Motor Vehicles</figcaption>
           </a>
         </figure>
       </li>
       <li>
         <figure>
           <a href="{% url 'aviation' %}">
-            <img src="../static/img/mobile-aviation.svg" alt="icon" class="homepage-cat-icon" />
-            <figcaption class="homepage-cat-icon-caption">Aviation</figcaption>
+            <img src="../static/img/mobile-aviation.svg" alt="icon" class="nav-cat-icon" />
+            <figcaption class="nav-cat-icon-caption">Aviation</figcaption>
           </a>
         </figure>
       </li>
       <li>
         <figure>
           <a href="{% url 'rail' %}">
-            <img src="../static/img/mobile-transit.svg" alt="icon" class="homepage-cat-icon" />
-            <figcaption class="homepage-cat-icon-caption">Rail</figcaption>
+            <img src="../static/img/mobile-transit.svg" alt="icon" class="nav-cat-icon" />
+            <figcaption class="nav-cat-icon-caption">Rail</figcaption>
           </a>
         </figure>
       </li>
       <li>
         <figure>
           <a href="{% url 'other' %}">
-            <img src="../static/img/mobile-other.svg" alt="icon" class="homepage-cat-icon" />
-            <figcaption class="homepage-cat-icon-caption">Other Mobile Energy</figcaption>
+            <img src="../static/img/mobile-other.svg" alt="icon" class="nav-cat-icon" />
+            <figcaption class="nav-cat-icon-caption">Other Mobile Energy</figcaption>
           </a>
         </figure>
       </li>
       <li>
         <figure>
           <a href="{% url 'non_energy' %}">
-            <img src="../static/img/non-energy.svg" alt="icon" class="homepage-cat-icon" />
-            <figcaption class="homepage-cat-icon-caption">Non-Energy</figcaption>
+            <img src="../static/img/non-energy.svg" alt="icon" class="nav-cat-icon" />
+            <figcaption class="nav-cat-icon-caption">Non-Energy</figcaption>
           </a>
         </figure>
       </li>
       <li>
         <figure>
           <a href="{% url 'seq' %}">
-            <img src="../static/img/non-energy.svg" alt="icon" class="homepage-cat-icon" />
-            <figcaption class="homepage-cat-icon-caption">Carbon Sequestration & Storage</figcaption>
+            <img src="../static/img/non-energy.svg" alt="icon" class="nav-cat-icon" />
+            <figcaption class="nav-cat-icon-caption">Carbon Sequestration & Storage</figcaption>
           </a>
         </figure>
       </li>
@@ -111,21 +111,22 @@
 
   <header>
     <h1><a href="{% url 'index' %}">Decarbonizing the Delaware Valley</a></h1>
-    <!-- <h1>Decarbonizing the Delaware Valley</h1> -->
     <h2>Interactive Greenhouse Gas Reduction Pathways</h2>
+    <div class="text">
+      {% block header_intro %}
 
-    {% block header_intro %}
+      {% endblock %}
+    </div>
+    <div class="endnotes">
+      {% block endnotes %}
 
-    {% endblock %}
-
-
+      {% endblock %}
+    </div>
   </header>
     
-  {% block main %}
-    <div style="margin: 0 auto; width:inherit">
-      {{ script|safe }}
-    </div>
-  {% endblock %}
+  <main style="margin: 0 auto; width:inherit">
+    {{ script|safe }}
+  </main>
 
   <footer>
     Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
