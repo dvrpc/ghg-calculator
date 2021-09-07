@@ -169,7 +169,7 @@ def pop_dev_patterns_handler(doc: Document) -> None:
 
 
 def pop_dev_patterns(request: HttpRequest) -> HttpResponse:
-    script = server_document(request.build_absolute_uri())
+    script = server_document(request.path)
     return render(request, "main/pop.html", dict(script=script))
 
 
@@ -264,7 +264,7 @@ def res_stationary_handler(doc: Document) -> None:
 
 
 def res_stationary(request: HttpRequest) -> HttpResponse:
-    script = server_document(request.build_absolute_uri())
+    script = server_document(request.path)
     return render(request, "main/res.html", dict(script=script))
 
 
@@ -338,7 +338,7 @@ def non_res_stationary_handler(doc: Document) -> None:
 
 
 def non_res_stationary(request: HttpRequest) -> HttpResponse:
-    script = server_document(request.build_absolute_uri())
+    script = server_document(request.path)
     return render(request, "main/non_res.html", dict(script=script))
 
 
@@ -411,7 +411,7 @@ def on_road_motor_veh_handler(doc: Document) -> None:
 
 
 def on_road_motor_veh(request: HttpRequest) -> HttpResponse:
-    script = server_document(request.build_absolute_uri())
+    script = server_document(request.path)
     return render(request, "main/on_road.html", dict(script=script))
 
 
@@ -511,7 +511,7 @@ def rail_handler(doc: Document) -> None:
 
 
 def rail(request: HttpRequest) -> HttpResponse:
-    script = server_document(request.build_absolute_uri())
+    script = server_document(request.path)
     return render(request, "main/rail.html", dict(script=script))
 
 
@@ -561,7 +561,7 @@ def aviation_handler(doc: Document) -> None:
 
 
 def aviation(request: HttpRequest) -> HttpResponse:
-    script = server_document(request.build_absolute_uri())
+    script = server_document(request.path)
     return render(request, "main/aviation.html", dict(script=script))
 
 
@@ -642,7 +642,7 @@ def mobile_other_handler(doc: Document) -> None:
 
 
 def mobile_other(request: HttpRequest) -> HttpResponse:
-    script = server_document(request.build_absolute_uri())
+    script = server_document(request.path)
     return render(request, "main/other.html", dict(script=script))
 
 
@@ -717,7 +717,7 @@ def non_energy_handler(doc: Document) -> None:
 
 
 def non_energy(request: HttpRequest) -> HttpResponse:
-    script = server_document(request.build_absolute_uri())
+    script = server_document(request.path)
     return render(request, "main/non_energy.html", dict(script=script))
 
 
@@ -794,7 +794,7 @@ def sequestration_storage_handler(doc: Document) -> None:
 
 
 def sequestration_storage(request: HttpRequest) -> HttpResponse:
-    script = server_document(request.build_absolute_uri())
+    script = server_document(request.path)
     return render(request, "main/seq.html", dict(script=script))
 
 
@@ -899,5 +899,5 @@ def electricity_grid_handler(doc: Document) -> None:
 
 
 def electricity_grid(request: HttpRequest) -> HttpResponse:
-    script = server_document(request.build_absolute_uri())
+    script = server_document(request.path)
     return render(request, "main/grid.html", dict(script=script))

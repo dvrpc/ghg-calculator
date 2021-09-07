@@ -16,7 +16,6 @@ Including another URLconf
 from django.apps import apps
 from django.conf import settings
 from django.conf.urls.static import static
-from django.contrib import admin
 from django.urls import path
 
 from bokeh.server.django import autoload
@@ -26,7 +25,6 @@ from main import views
 bokeh_app_config = apps.get_app_config("bokeh.server.django")
 
 urlpatterns = [
-    # path("admin", admin.site.urls),
     path("", views.index, name="index"),
     path("population-and-development-patterns/", views.pop_dev_patterns, name="pop"),
     path("residential-stationary-energy/", views.res_stationary, name="res"),
