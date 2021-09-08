@@ -13,20 +13,13 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.apps import apps
-from django.conf import settings
-from django.conf.urls.static import static
 from django.urls import path
-
-from bokeh.server.django import autoload
 
 from main import views
 
-bokeh_app_config = apps.get_app_config("bokeh.server.django")
-
 urlpatterns = [
     path("", views.index, name="index"),
-    path("population-and-development-patterns/", views.pop_dev_patterns, name="pop"),
+    path("population-and-development-patterns/", views.pop, name="pop"),
     path("residential-stationary-energy/", views.res_stationary, name="res"),
     path("non-residential-stationary-energy/", views.non_res_stationary, name="non_res"),
     path("on-road-motor-vehicles/", views.on_road_motor_veh, name="on_road"),
@@ -37,19 +30,3 @@ urlpatterns = [
     path("carbon-sequestration-and-storage/", views.sequestration_storage, name="seq"),
     path("electricity-grid/", views.electricity_grid, name="grid"),
 ]
-
-bokeh_apps = [
-    autoload("population-and-development-patterns", views.pop_dev_patterns_handler),
-    autoload("residential-stationary-energy", views.res_stationary_handler),
-    autoload("non-residential-stationary-energy", views.non_res_stationary_handler),
-    autoload("on-road-motor-vehicles", views.on_road_motor_veh_handler),
-    autoload("rail", views.rail_handler),
-    autoload("aviation", views.aviation_handler),
-    autoload("other-mobile-energy", views.mobile_other_handler),
-    autoload("non-energy", views.non_energy_handler),
-    autoload("carbon-sequestration-and-storage", views.sequestration_storage_handler),
-    autoload("electricity-grid", views.electricity_grid_handler),
-]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
