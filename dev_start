@@ -1,0 +1,25 @@
+#!/bin/bash
+
+url_prefix="/app/ghg"
+source ve/bin/activate
+
+bokeh serve \
+  bokeh_apps/bokeh_aviation.py \
+  bokeh_apps/bokeh_grid.py \
+  bokeh_apps/bokeh_non_energy.py \
+  bokeh_apps/bokeh_non_res.py \
+  bokeh_apps/bokeh_on_road.py \
+  bokeh_apps/bokeh_other.py \
+  bokeh_apps/bokeh_pop.py \
+  bokeh_apps/bokeh_rail.py \
+  bokeh_apps/bokeh_res.py \
+  bokeh_apps/bokeh_seq.py \
+  --prefix "$url_prefix" --allow-websocket-origin '*' &
+  bokeh_server_pid=$!
+
+trap onexit INT
+function onexit() {
+  kill -9 $bokeh_server_pid
+}
+
+python manage.py runserver localhost:8000

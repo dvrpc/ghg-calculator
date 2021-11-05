@@ -1,0 +1,9 @@
+# example values for vars that should be in environment.py
+
+# production
+# bokeh_base_url = ""  
+# relative_urls = True
+
+# development
+# bokeh_base_url = "http://localhost:5006"
+# relative_urls = False

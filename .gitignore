@@ -5,3 +5,4 @@ __pycache__
 config/settings.py
 notes.md
 current_files.txt
+environment.py
