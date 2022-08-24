@@ -129,22 +129,21 @@ figure a {
 header {
   grid-area: header;
   margin: 0 auto;
-  max-width: 650px;
+  padding: 0 25px 0 25px;
 }
 
 h1 {
   margin: 45px auto;
   font-size: 3rem;
-  /* @SHADOW old */
-  /* filter: drop-shadow(var(--icon-shadow)); */
 }
+
 h1 a, h1 a:hover {
   text-decoration: none;
   color: var(--main-text-color);
 }
 
 header .text {
-  max-width: 65ch;
+  max-width: 50ch;
   margin: 0 auto;
   font-size: var(--font-large);
   line-height: 1.7;
