@@ -7,5 +7,5 @@ twisted[tls,http2]
 
 # neither of these are direct dependencies, but without specifying them, the app breaks
 # it seems that jinja2 (required by django) did not pin its markupsafe dependency
-jinja2==2.11.2
+jinja2==3.1.3
 markupsafe==1.1.1
